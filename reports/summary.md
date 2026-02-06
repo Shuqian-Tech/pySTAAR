@@ -49,6 +49,7 @@ Status as of 2026-02-06:
 Open compliance notes:
 
 - Related GLMM/conditional/individual-score/AI/binary-SPA workflows default to fully computed Python paths; parity scenarios opt in to baseline artifacts via `use_precomputed_artifacts: true`.
+- AI-STAAR related parity paths no longer depend on baseline `nullmodel_theta` sentinels; remaining AI parity artifacts are covariance-based.
 - Related binary SPA pure-path deltas against baseline sentinels are now small (roughly `1e-6` to `1e-5` on `example`) but still exceed current strict parity tolerances in some mapped sentinels.
 - `SPA_p_filter=TRUE` workflows currently consume precomputed R-derived covariance artifacts for baseline parity scenarios.
 - This behavior is recorded as `DEV-001` in `reports/deviations.md`.

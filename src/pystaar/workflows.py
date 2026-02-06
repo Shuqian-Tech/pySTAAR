@@ -5,8 +5,6 @@ matching the scenario specs under `specs/`.
 """
 
 from __future__ import annotations
-
-import json
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -31,7 +29,6 @@ from .staar_core import (
 )
 
 DATA_DIR = Path(__file__).resolve().parents[2] / "data"
-BASELINES_DIR = Path(__file__).resolve().parents[2] / "baselines"
 BASELINE_PRECOMPUTED_RARE_MAF_CUTOFF = 0.05
 BASELINE_COND_METHOD = "optimal"
 BASELINE_COND_ADJ_VARIANT_INDICES = (0, 3)
@@ -41,8 +38,6 @@ AI_POP_GROUPS_FILE = "example_ai_pop_groups.csv"
 AI_POP_WEIGHTS_1_1_FILE = "example_ai_pop_weights_1_1.csv"
 AI_POP_WEIGHTS_1_25_FILE = "example_ai_pop_weights_1_25.csv"
 AI_COV_FILE_TEMPLATE = "example_ai_cov_{suffix}_s{scenario}_b{base}.csv"
-R_THETA_SPARSE_SENTINEL = "related_sparse_glmmkin_sentinels.json"
-R_THETA_DENSE_SENTINEL = "related_dense_glmmkin_sentinels.json"
 
 
 
@@ -131,24 +126,6 @@ def _load_ai_metadata(num_samples: int):
     pop_weights_1_1 = w11_df.loc[pop_levels, weight_cols_11].to_numpy(dtype=float)
     pop_weights_1_25 = w125_df.loc[pop_levels, weight_cols_125].to_numpy(dtype=float)
     return pop_groups, pop_levels, pop_weights_1_1, pop_weights_1_25
-
-
-def _load_precomputed_theta(sparse: bool):
-    sentinel_name = R_THETA_SPARSE_SENTINEL if sparse else R_THETA_DENSE_SENTINEL
-    sentinel_path = BASELINES_DIR / sentinel_name
-    if not sentinel_path.exists():
-        return None
-
-    payload = json.loads(sentinel_path.read_text())
-    theta_payload = payload.get("nullmodel_theta")
-    if not isinstance(theta_payload, dict):
-        return None
-
-    dispersion = theta_payload.get("dispersion")
-    kins1 = theta_payload.get("kins1")
-    if dispersion is None or kins1 is None:
-        return None
-    return np.array([float(dispersion), float(kins1)], dtype=float)
 
 
 def _load_ai_precomputed_covariances(
@@ -762,17 +739,12 @@ def _related_ai_common(
             expected_num_variants=expected_num_variants,
         )
 
-    precomputed_theta = (
-        _load_precomputed_theta(sparse=sparse) if use_precomputed_artifacts else None
-    )
-
     obj_nullmodel = fit_null_glmmkin(
         data.pheno_related,
         kins=kins,
         sparse_kins=sparse,
         precomputed_cov=precomputed_cov,
         precomputed_scaled_residuals=precomputed_scaled,
-        precomputed_theta=precomputed_theta,
     )
 
     obj_nullmodel.pop_groups = pop_groups

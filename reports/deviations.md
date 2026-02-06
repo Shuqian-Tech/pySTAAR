@@ -51,8 +51,6 @@ The following precomputed artifacts are still used for baseline parity when `use
 - `data/example_glm_binary_spa_cov_filter.csv`
 - `data/example_glmmkin_binary_spa_sparse_cov_filter.csv`
 - `data/example_glmmkin_binary_spa_dense_cov_filter.csv`
-- `baselines/related_sparse_glmmkin_sentinels.json` (`nullmodel_theta`)
-- `baselines/related_dense_glmmkin_sentinels.json` (`nullmodel_theta`)
 - `data/example_ai_cov_sparse_s1_b1.csv`
 - `data/example_ai_cov_sparse_s1_b2.csv`
 - `data/example_ai_cov_sparse_s2_b1.csv`
@@ -91,7 +89,7 @@ Observed on 2026-02-06 (reference backend):
   - Dense filter `results_STAAR_B`: `0.577180478848294` vs baseline `0.5771888444992558` (delta `-8.36565096178465e-06`)
   - Largest observed related-binary mapped sentinel delta:
     - `results_STAAR_B_1_25["STAAR-B(1,25)"]`: `~9.984e-06` in filter scenarios.
-- Related AI-STAAR pure-Python path showed mapped sentinel drift above baseline tolerance before using precomputed AI covariance/theta artifacts.
+- Related AI-STAAR pure-Python path showed mapped sentinel drift above baseline tolerance before using precomputed AI covariance artifacts.
 
 Parity test status with current hybrid path:
 

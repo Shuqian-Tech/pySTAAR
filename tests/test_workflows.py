@@ -99,6 +99,26 @@ def test_related_workflow_defaults_to_pure_path_for_baseline_cutoff(monkeypatch)
     assert captured["precomputed_scaled_residuals"] is None
 
 
+def test_related_ai_workflow_does_not_pass_precomputed_theta(monkeypatch):
+    original_fit_null_glmmkin = workflows.fit_null_glmmkin
+    captured = {}
+
+    def _track_precomputed_inputs(*args, **kwargs):
+        captured["precomputed_theta"] = kwargs.get("precomputed_theta", "__missing__")
+        return original_fit_null_glmmkin(*args, **kwargs)
+
+    monkeypatch.setattr(workflows, "fit_null_glmmkin", _track_precomputed_inputs)
+
+    workflows.ai_staar_related_sparse_glmmkin(
+        dataset="example",
+        seed=600,
+        rare_maf_cutoff=0.05,
+        use_precomputed_artifacts=True,
+    )
+
+    assert captured["precomputed_theta"] == "__missing__"
+
+
 def test_unrelated_binary_spa_filter_cutoff_one_matches_full_spa():
     full_spa = workflows.staar_unrelated_binary_spa(
         dataset="example",

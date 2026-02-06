@@ -711,19 +711,16 @@ def _related_binary_spa_common(
 ):
     np.random.seed(seed)
 
-    if not np.isclose(case_quantile, BASELINE_BINARY_SPA_CASE_QUANTILE):
-        raise NotImplementedError(
-            "Related binary SPA currently supports only the baseline case_quantile=0.95."
-        )
-
     data = load_dataset(dataset)
     pheno = data.pheno_related.copy()
     threshold = float(np.quantile(pheno["Y"].to_numpy(dtype=float), case_quantile))
     pheno["Y"] = (pheno["Y"].to_numpy(dtype=float) > threshold).astype(float)
     case_count = float(np.sum(pheno["Y"].to_numpy(dtype=float)))
     kins = data.kins_sparse if sparse else data.kins_dense
-    use_precomputed = use_precomputed_artifacts and np.isclose(
-        rare_maf_cutoff, BASELINE_PRECOMPUTED_RARE_MAF_CUTOFF
+    use_precomputed = (
+        use_precomputed_artifacts
+        and np.isclose(rare_maf_cutoff, BASELINE_PRECOMPUTED_RARE_MAF_CUTOFF)
+        and np.isclose(case_quantile, BASELINE_BINARY_SPA_CASE_QUANTILE)
     )
 
     suffix = "sparse" if sparse else "dense"

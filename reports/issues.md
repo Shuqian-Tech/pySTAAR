@@ -31,7 +31,7 @@
 - STAAR-29: Add strict parity scenario for `staar_related_dense_glmmkin` with `rare_maf_cutoff=0.01`. (Resolved)
 - STAAR-30: Generalize workflow dataset resolution beyond `dataset="example"` in `workflows.py`/`data.py`. (Resolved)
 - STAAR-31: Generalize null-model API beyond fixed `Y/X1/X2` design assumptions while preserving backward compatibility. (Resolved)
-- STAAR-32: Remove related binary SPA workflow restriction to `case_quantile=0.95`. (Open)
+- STAAR-32: Remove related binary SPA workflow restriction to `case_quantile=0.95`. (Resolved)
 - STAAR-33: Make AI metadata inputs runtime-configurable (population labels/weights) with `example` file fallback only. (Open)
 - STAAR-34: Add non-`example` functionality tests for generalized workflow and null-model interfaces. (Open)
 - STAAR-35: Add related-workflow pure-path parity shadow scenarios (`use_precomputed_artifacts: false`) with explicit blocker tracking where needed. (Open)

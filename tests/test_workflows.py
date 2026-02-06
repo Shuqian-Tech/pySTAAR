@@ -201,6 +201,61 @@ def test_related_binary_spa_filter_cutoff_one_matches_full_spa():
         assert math.isclose(filtered["results_STAAR_B_1_1"][key], expected, rel_tol=1e-10, abs_tol=1e-12)
 
 
+@pytest.mark.parametrize(
+    "workflow",
+    [
+        workflows.staar_related_sparse_binary_spa,
+        workflows.staar_related_dense_binary_spa,
+    ],
+)
+def test_related_binary_spa_supports_nonbaseline_case_quantile(workflow):
+    results = workflow(
+        dataset="example",
+        seed=600,
+        rare_maf_cutoff=0.05,
+        case_quantile=0.90,
+        use_precomputed_artifacts=False,
+    )
+
+    assert results["case_count"] > 0.0
+    assert 0.0 < results["results_STAAR_B"] <= 1.0
+
+
+@pytest.mark.parametrize(
+    "workflow",
+    [
+        workflows.staar_related_sparse_binary_spa,
+        workflows.staar_related_dense_binary_spa,
+    ],
+)
+def test_related_binary_spa_nonbaseline_case_quantile_skips_precomputed_fitted(
+    monkeypatch,
+    workflow,
+):
+    original_read_csv = workflows.pd.read_csv
+
+    def _guard_fitted_reads(*args, **kwargs):
+        path = str(args[0]) if args else ""
+        if path.endswith("example_glmmkin_binary_spa_sparse_fitted.csv"):
+            raise AssertionError(
+                "nonbaseline case_quantile should not use precomputed fitted artifact"
+            )
+        return original_read_csv(*args, **kwargs)
+
+    monkeypatch.setattr(workflows.pd, "read_csv", _guard_fitted_reads)
+
+    results = workflow(
+        dataset="example",
+        seed=600,
+        rare_maf_cutoff=0.05,
+        case_quantile=0.90,
+        use_precomputed_artifacts=True,
+    )
+
+    assert results["case_count"] > 0.0
+    assert 0.0 < results["results_STAAR_B"] <= 1.0
+
+
 def test_related_binary_spa_prefilter_loads_precomputed_cov(monkeypatch):
     original_staar_binary_spa = workflows.staar_binary_spa
     captured = {}

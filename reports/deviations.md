@@ -37,7 +37,7 @@ The following precomputed artifacts are still used for baseline parity when `use
 - `data/example_glmmkin_cov.csv`
 - `data/example_glmmkin_scaled_residuals.csv`
 - `data/example_glmmkin_cov_cond_sparse.csv`
-- `data/example_glmmkin_binary_spa_sparse_fitted.csv`
+- `data/example_glmmkin_binary_spa_sparse_scaled_residuals.csv`
 - `data/example_ai_cov_sparse_s1_b1.csv`
 - `data/example_ai_cov_sparse_s1_b2.csv`
 - `data/example_ai_cov_sparse_s2_b1.csv`
@@ -46,7 +46,7 @@ The following precomputed artifacts are still used for baseline parity when `use
 These are passed into the Python null-model/STAAR pipeline to reduce backend-specific numeric drift and match baseline sentinels for the `example` scenario.
 Related precomputed parity paths also anchor GLMM null-model `theta` to baseline constants (sparse/dense) to reduce residual backend optimization drift.
 
-For related binary-SPA parity paths, Python now reconstructs `scaled_residuals`, `XW`, and `XXWX_inv` from precomputed fitted values and computes `SPA_p_filter` covariance from fitted values + kinship; precomputed `*_cov_filter.csv`, `*_scaled_residuals.csv`, `*_XW.csv`, and `*_XXWX_inv.csv` artifacts are no longer loaded. Dense and sparse related-binary parity now share a single fitted artifact (`example_glmmkin_binary_spa_sparse_fitted.csv`).
+For related binary-SPA parity paths, Python now reconstructs fitted values (`fitted = Y - scaled_residuals`) from a shared precomputed scaled-residual artifact and computes `XW`, `XXWX_inv`, and `SPA_p_filter` covariance in Python; precomputed `*_cov_filter.csv`, `*_fitted.csv`, `*_XW.csv`, and `*_XXWX_inv.csv` artifacts are no longer loaded. Dense and sparse related-binary parity now share a single scaled-residual artifact (`example_glmmkin_binary_spa_sparse_scaled_residuals.csv`).
 For related GLMM parity paths with `rare_maf_cutoff` below the baseline (`0.05`), Python now derives the covariance submatrix directly from `example_glmmkin_cov.csv`; cutoff-specific covariance artifacts are no longer loaded.
 Related conditional sparse/dense parity now share a single conditional covariance artifact (`example_glmmkin_cov_cond_sparse.csv`).
 Related AI sparse/dense parity now share a single set of AI covariance artifacts (`example_ai_cov_sparse_*`).
@@ -70,8 +70,8 @@ Observed on 2026-02-06 (reference backend):
   - `results_STAAR_S_1_25_cond["SKAT(1,25)-Z2"]`: `-2.6103357830986607e-05`
 - Related binary SPA now has a fully computed Python PQL-style fallback path and uses that path by default.
 - Unrelated binary SPA prefilter now computes covariance directly from the Python null model (no precomputed covariance artifact needed) while preserving strict parity.
-- Related binary SPA prefilter now computes covariance in Python from precomputed fitted values + kinship (no precomputed covariance artifact needed) while preserving strict parity.
-- Related binary SPA precomputed parity path now reconstructs `scaled_residuals`, `XW`, and `XXWX_inv` from fitted values (no precomputed component artifacts needed) while preserving strict parity.
+- Related binary SPA prefilter now computes covariance in Python from reconstructed fitted values + kinship (no precomputed covariance artifact needed) while preserving strict parity.
+- Related binary SPA precomputed parity path now reconstructs fitted values from shared precomputed scaled residuals and derives `XW`/`XXWX_inv` in Python (no precomputed fitted/XW/XXWX_inv artifacts needed) while preserving strict parity.
 - Related GLMM parity at `rare_maf_cutoff=0.01` now derives covariance from baseline `example_glmmkin_cov.csv` (no precomputed `example_glmmkin_cov_rare_maf_0_01.csv` dependency) while preserving strict parity.
 - Related GLMM/AI/individual-score precomputed parity paths now use baseline `theta` constants (sparse/dense) to reduce null-model fit drift while preserving strict parity.
 - Current related binary pure-path deltas against baseline sentinels (`example`):
@@ -96,7 +96,7 @@ Parity test status with current hybrid path:
 ### Acceptability Criteria
 
 - Temporary acceptance only for Phase 2 parity closure on the `example` scenarios.
-- Related binary SPA default path is already fully computed in Python; remaining work is to reduce/remove remaining parity-only precomputed artifact usage (notably related binary fitted-value artifacts and related GLMM/conditional/AI covariance artifacts), or explicitly re-baseline/approve.
+- Related binary SPA default path is already fully computed in Python; remaining work is to reduce/remove remaining parity-only precomputed artifact usage (notably related binary scaled-residual artifacts and related GLMM/conditional/AI covariance artifacts), or explicitly re-baseline/approve.
 
 ### Approval Record
 

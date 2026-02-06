@@ -287,21 +287,21 @@ def test_related_binary_spa_supports_nonbaseline_case_quantile(workflow):
         workflows.staar_related_dense_binary_spa,
     ],
 )
-def test_related_binary_spa_nonbaseline_case_quantile_skips_precomputed_fitted(
+def test_related_binary_spa_nonbaseline_case_quantile_skips_precomputed_scaled_residuals(
     monkeypatch,
     workflow,
 ):
     original_read_csv = workflows.pd.read_csv
 
-    def _guard_fitted_reads(*args, **kwargs):
+    def _guard_scaled_residual_reads(*args, **kwargs):
         path = str(args[0]) if args else ""
-        if path.endswith("example_glmmkin_binary_spa_sparse_fitted.csv"):
+        if path.endswith("example_glmmkin_binary_spa_sparse_scaled_residuals.csv"):
             raise AssertionError(
-                "nonbaseline case_quantile should not use precomputed fitted artifact"
+                "nonbaseline case_quantile should not use precomputed scaled residual artifact"
             )
         return original_read_csv(*args, **kwargs)
 
-    monkeypatch.setattr(workflows.pd, "read_csv", _guard_fitted_reads)
+    monkeypatch.setattr(workflows.pd, "read_csv", _guard_scaled_residual_reads)
 
     results = workflow(
         dataset="example",
@@ -387,7 +387,6 @@ def test_related_binary_spa_prefilter_does_not_load_precomputed_cov_file(
         (
             workflows.staar_related_sparse_binary_spa,
             (
-                "example_glmmkin_binary_spa_sparse_scaled_residuals.csv",
                 "example_glmmkin_binary_spa_sparse_XW.csv",
                 "example_glmmkin_binary_spa_sparse_XXWX_inv.csv",
             ),
@@ -395,7 +394,6 @@ def test_related_binary_spa_prefilter_does_not_load_precomputed_cov_file(
         (
             workflows.staar_related_dense_binary_spa,
             (
-                "example_glmmkin_binary_spa_dense_scaled_residuals.csv",
                 "example_glmmkin_binary_spa_dense_XW.csv",
                 "example_glmmkin_binary_spa_dense_XXWX_inv.csv",
             ),
@@ -430,18 +428,56 @@ def test_related_binary_spa_precomputed_path_reconstructs_nullmodel_components(
     assert 0.0 < results["results_STAAR_B"] <= 1.0
 
 
-def test_related_binary_spa_dense_precomputed_path_uses_shared_fitted_artifact(monkeypatch):
+def test_related_binary_spa_dense_precomputed_path_uses_shared_scaled_residual_artifact(
+    monkeypatch,
+):
     original_read_csv = workflows.pd.read_csv
 
-    def _guard_dense_fitted_reads(*args, **kwargs):
+    def _guard_dense_scaled_residual_reads(*args, **kwargs):
         path = str(args[0]) if args else ""
-        if path.endswith("example_glmmkin_binary_spa_dense_fitted.csv"):
-            raise AssertionError("dense related SPA path should use shared fitted artifact")
+        if path.endswith("example_glmmkin_binary_spa_dense_scaled_residuals.csv"):
+            raise AssertionError("dense related SPA path should use shared scaled residual artifact")
         return original_read_csv(*args, **kwargs)
 
-    monkeypatch.setattr(workflows.pd, "read_csv", _guard_dense_fitted_reads)
+    monkeypatch.setattr(workflows.pd, "read_csv", _guard_dense_scaled_residual_reads)
 
     results = workflows.staar_related_dense_binary_spa(
+        dataset="example",
+        seed=600,
+        rare_maf_cutoff=0.05,
+        SPA_p_filter=True,
+        p_filter_cutoff=0.05,
+        use_precomputed_artifacts=True,
+    )
+
+    assert results["num_variant"] == 163.0
+    assert 0.0 < results["results_STAAR_B"] <= 1.0
+
+
+@pytest.mark.parametrize(
+    "workflow",
+    [
+        workflows.staar_related_sparse_binary_spa,
+        workflows.staar_related_dense_binary_spa,
+    ],
+)
+def test_related_binary_spa_precomputed_path_does_not_load_fitted_artifacts(
+    monkeypatch,
+    workflow,
+):
+    original_read_csv = workflows.pd.read_csv
+
+    def _guard_fitted_reads(*args, **kwargs):
+        path = str(args[0]) if args else ""
+        if path.endswith("example_glmmkin_binary_spa_sparse_fitted.csv") or path.endswith(
+            "example_glmmkin_binary_spa_dense_fitted.csv"
+        ):
+            raise AssertionError("related SPA precomputed path should not load fitted artifacts")
+        return original_read_csv(*args, **kwargs)
+
+    monkeypatch.setattr(workflows.pd, "read_csv", _guard_fitted_reads)
+
+    results = workflow(
         dataset="example",
         seed=600,
         rare_maf_cutoff=0.05,

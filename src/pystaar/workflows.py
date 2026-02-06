@@ -437,15 +437,22 @@ def _compute_related_binary_precomputed_components(
     return scaled_residuals, XW, XXWX_inv, precomputed_cov_filter
 
 
-def _load_related_binary_precomputed_fitted(suffix: str) -> np.ndarray | None:
-    # Sparse and dense parity baselines share numerically equivalent fitted values.
-    shared_path = DATA_DIR / "example_glmmkin_binary_spa_sparse_fitted.csv"
+def _load_related_binary_precomputed_scaled_residuals(
+    suffix: str,
+    expected_num_samples: int,
+) -> np.ndarray | None:
+    # Sparse and dense parity baselines share numerically equivalent scaled residuals.
+    shared_path = DATA_DIR / "example_glmmkin_binary_spa_sparse_scaled_residuals.csv"
     if shared_path.exists():
-        return pd.read_csv(shared_path).to_numpy().reshape(-1)
+        candidate = pd.read_csv(shared_path).to_numpy().reshape(-1)
+        if candidate.size == expected_num_samples:
+            return candidate
 
-    suffix_path = DATA_DIR / f"example_glmmkin_binary_spa_{suffix}_fitted.csv"
+    suffix_path = DATA_DIR / f"example_glmmkin_binary_spa_{suffix}_scaled_residuals.csv"
     if suffix_path.exists():
-        return pd.read_csv(suffix_path).to_numpy().reshape(-1)
+        candidate = pd.read_csv(suffix_path).to_numpy().reshape(-1)
+        if candidate.size == expected_num_samples:
+            return candidate
 
     return None
 
@@ -803,10 +810,14 @@ def _related_binary_spa_common(
     suffix = "sparse" if sparse else "dense"
     obj_nullmodel = None
     if use_precomputed:
-        fitted = _load_related_binary_precomputed_fitted(suffix=suffix)
+        scaled_residuals_precomputed = _load_related_binary_precomputed_scaled_residuals(
+            suffix=suffix,
+            expected_num_samples=pheno.shape[0],
+        )
     else:
-        fitted = None
-    if use_precomputed and fitted is not None:
+        scaled_residuals_precomputed = None
+    if use_precomputed and scaled_residuals_precomputed is not None:
+        fitted = pheno["Y"].to_numpy(dtype=float) - scaled_residuals_precomputed
         scaled_residuals, XW, XXWX_inv, precomputed_cov_filter = (
             _compute_related_binary_precomputed_components(
                 genotype=data.geno,

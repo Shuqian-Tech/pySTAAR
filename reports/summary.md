@@ -52,9 +52,9 @@ Open compliance notes:
 - Related GLMM/conditional/individual-score/AI parity paths anchor null-model `theta` to baseline constants in precomputed parity mode, reducing optimization drift while preserving strict parity.
 - Related binary SPA pure-path deltas against baseline sentinels are now small (roughly `1e-7` to `1e-6` on `example`) but still exceed current strict parity tolerances in some mapped sentinels.
 - Unrelated `SPA_p_filter=TRUE` now runs parity on a fully computed Python covariance path (no precomputed covariance artifact).
-- Related `SPA_p_filter=TRUE` now computes covariance in Python from precomputed fitted values + kinship (no precomputed `*_cov_filter.csv` artifacts).
-- Related binary precomputed parity path now reconstructs `scaled_residuals`, `XW`, and `XXWX_inv` from fitted values (no precomputed component artifacts).
-- Related binary dense/sparse parity paths now share one fitted artifact (`example_glmmkin_binary_spa_sparse_fitted.csv`), dropping dependency on a separate dense fitted artifact.
+- Related `SPA_p_filter=TRUE` now computes covariance in Python from reconstructed fitted values + kinship (no precomputed `*_cov_filter.csv` artifacts).
+- Related binary precomputed parity path now reconstructs fitted values from shared precomputed scaled residuals and computes `XW`/`XXWX_inv` in Python (no precomputed `*_fitted.csv`, `*_XW.csv`, or `*_XXWX_inv.csv` artifacts).
+- Related binary dense/sparse parity paths now share one scaled-residual artifact (`example_glmmkin_binary_spa_sparse_scaled_residuals.csv`), dropping dependency on separate dense/sparse fitted artifacts.
 - Related conditional dense/sparse parity paths now share one conditional covariance artifact (`example_glmmkin_cov_cond_sparse.csv`), dropping dependency on a separate dense conditional covariance artifact.
 - Related AI dense/sparse parity paths now share one AI covariance artifact set (`example_ai_cov_sparse_*`), dropping dependency on separate dense AI covariance artifacts.
 - Related GLMM parity for lower rare-MAF cutoffs now derives covariance submatrices from baseline `example_glmmkin_cov.csv` (no precomputed `example_glmmkin_cov_rare_maf_0_01.csv` artifact dependency).

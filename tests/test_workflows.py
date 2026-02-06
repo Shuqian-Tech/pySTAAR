@@ -411,7 +411,14 @@ def test_related_binary_spa_pure_path_tracks_precomputed(workflow, spa_filter):
         **kwargs,
     )
 
-    assert abs(pure["results_STAAR_B"] - precomputed["results_STAAR_B"]) < 1e-3
+    assert abs(pure["results_STAAR_B"] - precomputed["results_STAAR_B"]) < 2.5e-6
+    assert (
+        abs(
+            pure["results_STAAR_B_1_25"]["STAAR-B(1,25)"]
+            - precomputed["results_STAAR_B_1_25"]["STAAR-B(1,25)"]
+        )
+        < 2.5e-6
+    )
 
 
 def test_unrelated_binary_spa_prefilter_does_not_load_precomputed_cov(monkeypatch):

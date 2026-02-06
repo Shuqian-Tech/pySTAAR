@@ -339,8 +339,8 @@ def fit_null_glmmkin_binary_spa(
     df: pd.DataFrame,
     kins: sp.csc_matrix,
     sparse_kins: bool,
-    max_iter: int = 20,
-    tol: float = 1e-5,
+    max_iter: int = 80,
+    tol: float = 1e-8,
 ) -> NullModelGLMMKinBinarySPA:
     X, y = _design_matrix(df)
     y = y.astype(float)
@@ -348,7 +348,14 @@ def fit_null_glmmkin_binary_spa(
         raise ValueError("Binary SPA null model requires Y coded as 0/1.")
 
     eps = 1e-9
-    beta, _, _ = _fit_binomial_irls(X=X, y=y, max_iter=max_iter, tol=tol)
+    # R-style binomial initialization matches the null-model start used by STAAR's
+    # binary workflows more closely than the plain IRLS start.
+    beta, _, _ = _fit_binomial_glm_rstyle(
+        X=X,
+        y=y,
+        max_iter=100,
+        tol=1e-8,
+    )
     eta = X @ beta
     tau = 1.0
 
@@ -364,7 +371,7 @@ def fit_null_glmmkin_binary_spa(
                 bounds=(-10.0, 5.0),
                 method="bounded",
                 args=(X, z, d_inv, kins),
-                options={"xatol": 1e-3, "maxiter": 80},
+                options={"xatol": 1e-6, "maxiter": 200},
             )
             if opt.success:
                 tau_new = float(np.exp(opt.x))

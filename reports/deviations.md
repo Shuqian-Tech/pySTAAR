@@ -75,12 +75,12 @@ Observed on 2026-02-06 (reference backend):
 - Related GLMM parity at `rare_maf_cutoff=0.01` now derives covariance from baseline `example_glmmkin_cov.csv` (no precomputed `example_glmmkin_cov_rare_maf_0_01.csv` dependency) while preserving strict parity.
 - Related GLMM/AI/individual-score precomputed parity paths now use baseline `theta` constants (sparse/dense) to reduce null-model fit drift while preserving strict parity.
 - Current related binary pure-path deltas against baseline sentinels (`example`):
-  - Sparse `results_STAAR_B`: `0.23360206101344283` vs baseline `0.2336049736705653` (delta `-2.92187712246116e-06`)
-  - Dense `results_STAAR_B`: `0.2336021825223668` vs baseline `0.233605092772099` (delta `-2.9102497322207713e-06`)
-  - Sparse filter `results_STAAR_B`: `0.5771799157416181` vs baseline `0.5771882813570353` (delta `-8.365615417165462e-06`)
-  - Dense filter `results_STAAR_B`: `0.577180478848294` vs baseline `0.5771888444992558` (delta `-8.36565096178465e-06`)
-  - Largest observed related-binary mapped sentinel delta:
-    - `results_STAAR_B_1_25["STAAR-B(1,25)"]`: `~9.984e-06` in filter scenarios.
+  - Sparse `results_STAAR_B`: `0.23360463525923016` vs baseline `0.2336049736705653` (delta `-3.3861133513779507e-07`)
+  - Dense `results_STAAR_B`: `0.23360475727667856` vs baseline `0.233605092772099` (delta `-3.354954204448646e-07`)
+  - Sparse filter `results_STAAR_B`: `0.5771872755012124` vs baseline `0.5771882813570353` (delta `-1.0058558228553949e-06`)
+  - Dense filter `results_STAAR_B`: `0.5771878385971415` vs baseline `0.5771888444992558` (delta `-1.0059021143815627e-06`)
+- Largest observed related-binary mapped sentinel delta:
+    - `results_STAAR_B_1_25["STAAR-B(1,25)"]`: `~1.199e-06` in filter scenarios.
 - Related AI-STAAR pure-Python path showed mapped sentinel drift above baseline tolerance before using precomputed AI covariance artifacts.
 
 Parity test status with current hybrid path:

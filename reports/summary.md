@@ -50,7 +50,7 @@ Open compliance notes:
 
 - Related GLMM/conditional/individual-score/AI/binary-SPA workflows default to fully computed Python paths; parity scenarios opt in to baseline artifacts via `use_precomputed_artifacts: true`.
 - Related GLMM/conditional/individual-score/AI parity paths anchor null-model `theta` to baseline constants in precomputed parity mode, reducing optimization drift while preserving strict parity.
-- Related binary SPA pure-path deltas against baseline sentinels are now small (roughly `1e-6` to `1e-5` on `example`) but still exceed current strict parity tolerances in some mapped sentinels.
+- Related binary SPA pure-path deltas against baseline sentinels are now small (roughly `1e-7` to `1e-6` on `example`) but still exceed current strict parity tolerances in some mapped sentinels.
 - Unrelated `SPA_p_filter=TRUE` now runs parity on a fully computed Python covariance path (no precomputed covariance artifact).
 - Related `SPA_p_filter=TRUE` now computes covariance in Python from precomputed fitted values + kinship (no precomputed `*_cov_filter.csv` artifacts).
 - Related binary precomputed parity path now reconstructs `scaled_residuals`, `XW`, and `XXWX_inv` from fitted values (no precomputed component artifacts).

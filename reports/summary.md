@@ -2,7 +2,7 @@
 
 Status as of 2026-02-06:
 
-- Phase: 2 (Executable parity; implementation complete, open deviation pending approval)
+- Phase: 3 (Performance and backends; baseline benchmark collection started)
 - Parity status: `pytest tests/parity -q` passes (`24 passed`) on the documented reference backend.
 - Full test status: `pytest -q` passes (`47 passed`).
 - Scenarios implemented:
@@ -36,6 +36,10 @@ Status as of 2026-02-06:
   - Reference backend: `reports/reference_backend.md`
   - Python environment capture: `reports/python_environment.md`
   - Data source/fingerprints/checksums: `data/DATA_SOURCE.md`
+  - Phase 3 performance report: `reports/performance.md` (Python vs R baseline)
+  - Phase 3 Python benchmark logs: `benchmarks/phase3_baseline_raw.csv`, `benchmarks/phase3_baseline_summary.csv`, `benchmarks/phase3_baseline_meta.json`
+  - Phase 3 R benchmark logs: `benchmarks/phase3_baseline_r_raw.csv`, `benchmarks/phase3_baseline_r_summary.csv`, `benchmarks/phase3_baseline_r_meta.json`
+  - Phase 3 cross-language comparison: `benchmarks/phase3_cross_language_comparison.csv`
 
 Open compliance notes:
 
@@ -43,19 +47,20 @@ Open compliance notes:
 - Related binary SPA pure-path deltas against baseline sentinels are now small (roughly `1e-6` to `1e-5` on `example`) but still exceed current strict parity tolerances in some mapped sentinels.
 - `SPA_p_filter=TRUE` workflows currently consume precomputed R-derived covariance artifacts for baseline parity scenarios.
 - This behavior is recorded as `DEV-001` in `reports/deviations.md`.
-- Scientific owner approval for `DEV-001` is pending and must be recorded before treating the deviation as approved.
+- Scientific owner approval for `DEV-001` is recorded on 2026-02-06 (`xiaozhouwang`); deviation remains temporary and tracked.
+- Cross-language baseline benchmark is complete on the reference backend; geometric-mean Python speedup vs R across measured scenarios is approximately `1.64x` (see `reports/performance.md`).
 
 Phase 2 handoff status:
 
 - Planned migration scope in `reports/issues.md` is complete (`STAAR-1` through `STAAR-25` resolved).
-- Current state is suitable for a Phase 2 handoff PR as "implementation complete with open deviation".
-- Release-style sign-off remains gated by scientific owner approval for `DEV-001`.
+- Current state has completed Phase 2 implementation and moved into Phase 3 baseline measurement.
+- Release-style sign-off should continue to call out approved temporary `DEV-001` until retired/narrowed.
 
 PR-ready notes (copy into PR description):
 
 - Parity on reference backend: `pytest tests/parity -q` -> `24 passed`.
 - Full test suite: `pytest -q` -> `47 passed`.
-- Deviations: `DEV-001` (open, approval pending) in `reports/deviations.md`.
+- Deviations: `DEV-001` (approved temporary) in `reports/deviations.md`.
 - Required named roles per policy:
   - Migration owner: `<fill>`
   - Human sponsor: `<fill>`
@@ -64,5 +69,7 @@ PR-ready notes (copy into PR description):
 
 Next steps:
 
-- Retire or narrow `DEV-001` by validating parity thresholds/specs against fully computed Python paths and removing remaining parity-only precomputed covariance usage where feasible.
-- Expand parity/perf coverage beyond `example` with additional representative scenarios.
+- Add optimized variants for selected workflows and measure speedups against `benchmarks/phase3_baseline_summary.csv` and `benchmarks/phase3_cross_language_comparison.csv`.
+- Prioritize scenarios where Python is currently slower than R (notably `staar_unrelated_binary_spa`, `ai_staar_unrelated_glm`).
+- Re-run parity after each optimization change and retain `DEV-001` tracking until retired/narrowed.
+- Expand performance and parity coverage beyond `example` with additional representative scenarios.

@@ -2,7 +2,7 @@
 
 ## DEV-001: Parity Uses Precomputed R-Derived Intermediates
 
-- Status: Open (temporary)
+- Status: Approved (temporary)
 - Date recorded: 2026-02-06
 - Affected scenarios:
   - `staar_unrelated_binary_spa_filter`
@@ -107,18 +107,17 @@ Parity test status with current hybrid path:
 
 ### Approval Record
 
-- Scientific owner approval: **Pending** (not yet recorded in this repository).
-- Merge/release gating note: this deviation should not be treated as approved until an explicit approval reference is added.
+- Scientific owner approval: **Approved**.
+- Scientific owner: `xiaozhouwang`.
+- Approval reference: migration planning/approval thread on 2026-02-06 (instruction to record DEV-001 approval and proceed to Phase 3).
+- Approval date: 2026-02-06.
+- Approved scope: Phase 2 parity acceptance for current `example` scenarios using parity-spec opt-in precomputed artifacts; continue Phase 3 with explicit tracking and follow-up to retire/narrow the deviation.
+- Merge/release gating note: approved as a temporary deviation; keep explicit mention in release notes until retired or narrowed.
 
 ### PR Handoff Checklist
 
-- PR status label for this deviation: `Open deviation (temporary)` until approval is recorded.
-- Required approval record to close `DEV-001`:
-  - Scientific owner: `<fill>`
-  - Approval reference (PR comment/link): `<fill>`
-  - Decision date: `<fill>`
-  - Approved scope (scenarios/thresholds): `<fill>`
-- If merged before approval, PR description should explicitly state:
-  - `DEV-001` remains open.
+- PR status label for this deviation: `Approved temporary deviation`.
+- PR description should explicitly state:
+  - `DEV-001` is approved as temporary and remains tracked.
   - Parity pass status is based on parity specs that opt in to precomputed artifacts.
-  - Follow-up issue/plan exists to retire or narrow `DEV-001`.
+  - Follow-up work remains planned to retire or narrow `DEV-001`.

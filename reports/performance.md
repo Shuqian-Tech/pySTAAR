@@ -1,0 +1,36 @@
+# Phase 3 Performance (Python vs R)
+
+- Generated: 2026-02-06T07:46:16Z
+- Dataset fingerprint: `baselines/example_fingerprint.json`
+- Warm-up policy: 1 warm-up run(s) discarded
+- Measured runs: 5 per scenario
+- Reported statistic: median seconds
+- Reference backend details: `reports/reference_backend.md`
+- Python benchmark logs: `benchmarks/phase3_baseline_raw.csv`, `benchmarks/phase3_baseline_summary.csv`, `benchmarks/phase3_baseline_meta.json`
+- R benchmark logs: `benchmarks/phase3_baseline_r_raw.csv`, `benchmarks/phase3_baseline_r_summary.csv`, `benchmarks/phase3_baseline_r_meta.json`
+- Cross-language comparison: `benchmarks/phase3_cross_language_comparison.csv`
+
+## Environment
+
+- Python version: `3.13.5`
+- R version: `4.5.0`
+- STAAR package version: `0.9.8`
+
+## Cross-Language Results
+
+| Scenario | Python median (s) | R median (s) | Python vs R speedup |
+|---|---:|---:|---:|
+| staar_unrelated_glm | 0.235836 | 0.437000 | 1.85x |
+| staar_related_sparse_glmmkin_pure | 1.004456 | 1.625000 | 1.62x |
+| staar_unrelated_binary_spa | 0.288611 | 0.085000 | 0.29x |
+| staar_related_sparse_binary_spa_pure | 0.715168 | 4.725000 | 6.61x |
+| staar_unrelated_glm_cond | 0.302497 | 2.136000 | 7.06x |
+| indiv_score_unrelated_glm | 0.120387 | 0.382000 | 3.17x |
+| ai_staar_unrelated_glm | 0.928488 | 0.384000 | 0.41x |
+| ai_staar_related_sparse_glmmkin_find_weight_pure | 1.664256 | 1.624000 | 0.98x |
+
+## Summary
+
+- Geometric mean Python speedup vs R across scenarios: `1.64x`.
+- Speedup is computed as `R median / Python median` (values > 1 mean Python is faster).
+- This report is the Phase 3 baseline before Python optimizations.

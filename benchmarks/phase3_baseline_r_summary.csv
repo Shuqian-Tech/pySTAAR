@@ -1,0 +1,9 @@
+"scenario_id","warmup_runs","measured_runs","median_seconds","mean_seconds","min_seconds","max_seconds","std_seconds","relative_speedup_vs_baseline"
+"staar_unrelated_glm",1,5,0.436999999999999,0.4392,0.435,0.447,0.00521536192416221,1
+"staar_related_sparse_glmmkin_pure",1,5,1.625,1.6478,1.613,1.75,0.0574691221439828,1
+"staar_unrelated_binary_spa",1,5,0.0849999999999973,0.0833999999999996,0.0760000000000005,0.0899999999999999,0.00577061521850085,1
+"staar_related_sparse_binary_spa_pure",1,5,4.725,4.8234,4.663,5.269,0.251996626961554,1
+"staar_unrelated_glm_cond",1,5,2.136,2.2628,2.089,2.831,0.31852111389985,1
+"indiv_score_unrelated_glm",1,5,0.382000000000005,0.383000000000001,0.381999999999998,0.384999999999998,0.00141421356237106,1
+"ai_staar_unrelated_glm",1,5,0.384,0.384,0.366,0.405000000000001,0.0168374582404834,1
+"ai_staar_related_sparse_glmmkin_find_weight_pure",1,5,1.624,1.631,1.581,1.693,0.0488006147502238,1

@@ -143,6 +143,44 @@ def _load_related_precomputed_cov_scaled(
     return candidate_cov, candidate_scaled
 
 
+def _load_related_cond_precomputed_cov(
+    genotype: np.ndarray,
+    sparse: bool,
+    rare_maf_cutoff: float,
+    method_cond: str,
+    adj_variant_indices: tuple[int, ...],
+    use_precomputed_artifacts: bool,
+) -> np.ndarray | None:
+    if not (
+        use_precomputed_artifacts
+        and np.isclose(rare_maf_cutoff, BASELINE_PRECOMPUTED_RARE_MAF_CUTOFF)
+        and method_cond == BASELINE_COND_METHOD
+        and adj_variant_indices == BASELINE_COND_ADJ_VARIANT_INDICES
+    ):
+        return None
+
+    expected_num_variants = _num_rare_variants(genotype, rare_maf_cutoff)
+    expected_shape = (expected_num_variants, expected_num_variants)
+
+    shared_path = DATA_DIR / "example_glmmkin_cov_cond_sparse.csv"
+    if shared_path.exists():
+        candidate_shared = pd.read_csv(shared_path).to_numpy()
+        if candidate_shared.shape == expected_shape:
+            return candidate_shared
+
+    suffix_path = (
+        DATA_DIR / "example_glmmkin_cov_cond_sparse.csv"
+        if sparse
+        else DATA_DIR / "example_glmmkin_cov_cond_dense.csv"
+    )
+    if suffix_path.exists():
+        candidate_suffix = pd.read_csv(suffix_path).to_numpy()
+        if candidate_suffix.shape == expected_shape:
+            return candidate_suffix
+
+    return None
+
+
 def _load_ai_metadata(num_samples: int):
     groups_path = DATA_DIR / AI_POP_GROUPS_FILE
     w11_path = DATA_DIR / AI_POP_WEIGHTS_1_1_FILE
@@ -1021,14 +1059,6 @@ def _related_common_cond(
         rare_maf_cutoff=rare_maf_cutoff,
         use_precomputed_artifacts=use_precomputed_artifacts,
     )
-    precomputed_cov_cond = None
-
-    cond_cov_path = (
-        DATA_DIR / "example_glmmkin_cov_cond_sparse.csv"
-        if sparse
-        else DATA_DIR / "example_glmmkin_cov_cond_dense.csv"
-    )
-
     obj_nullmodel = fit_null_glmmkin(
         data.pheno_related,
         kins=kins,
@@ -1043,18 +1073,14 @@ def _related_common_cond(
     if min(adj_variant_indices) < 0 or max(adj_variant_indices) >= data.geno.shape[1]:
         raise ValueError("adj_variant_indices contains out-of-range indices.")
 
-    use_precomputed_cond_cov = (
-        use_precomputed_artifacts
-        and np.isclose(rare_maf_cutoff, BASELINE_PRECOMPUTED_RARE_MAF_CUTOFF)
-        and method_cond == BASELINE_COND_METHOD
-        and adj_variant_indices == BASELINE_COND_ADJ_VARIANT_INDICES
-        and cond_cov_path.exists()
+    precomputed_cov_cond = _load_related_cond_precomputed_cov(
+        genotype=data.geno,
+        sparse=sparse,
+        rare_maf_cutoff=rare_maf_cutoff,
+        method_cond=method_cond,
+        adj_variant_indices=adj_variant_indices,
+        use_precomputed_artifacts=use_precomputed_artifacts,
     )
-    if use_precomputed_cond_cov:
-        candidate_cond_cov = pd.read_csv(cond_cov_path).to_numpy()
-        expected_num_variants = _num_rare_variants(data.geno, rare_maf_cutoff)
-        if candidate_cond_cov.shape == (expected_num_variants, expected_num_variants):
-            precomputed_cov_cond = candidate_cond_cov
 
     genotype_adj = data.geno[:, adj_variant_indices]
 
@@ -1102,26 +1128,6 @@ def _related_indiv_common_cond(
         rare_maf_cutoff=rare_maf_cutoff,
         use_precomputed_artifacts=use_precomputed_artifacts,
     )
-    precomputed_cov_cond = None
-    use_precomputed_cond_cov = use_precomputed_artifacts and np.isclose(
-        rare_maf_cutoff, BASELINE_PRECOMPUTED_RARE_MAF_CUTOFF
-    )
-    if use_precomputed_cond_cov:
-        cov_cond_name = (
-            "example_glmmkin_cov_cond_sparse.csv"
-            if sparse
-            else "example_glmmkin_cov_cond_dense.csv"
-        )
-        cov_cond_path = DATA_DIR / cov_cond_name
-        if cov_cond_path.exists():
-            expected_num_variants = _num_rare_variants(data.geno, rare_maf_cutoff)
-            candidate_cov_cond = pd.read_csv(cov_cond_path).to_numpy()
-            if candidate_cov_cond.shape == (
-                expected_num_variants,
-                expected_num_variants,
-            ):
-                precomputed_cov_cond = candidate_cov_cond
-
     obj_nullmodel = fit_null_glmmkin(
         data.pheno_related,
         kins=kins,
@@ -1135,6 +1141,15 @@ def _related_indiv_common_cond(
         raise ValueError("adj_variant_indices must contain at least one variant index.")
     if min(adj_variant_indices) < 0 or max(adj_variant_indices) >= data.geno.shape[1]:
         raise ValueError("adj_variant_indices contains out-of-range indices.")
+
+    precomputed_cov_cond = _load_related_cond_precomputed_cov(
+        genotype=data.geno,
+        sparse=sparse,
+        rare_maf_cutoff=rare_maf_cutoff,
+        method_cond=method_cond,
+        adj_variant_indices=adj_variant_indices,
+        use_precomputed_artifacts=use_precomputed_artifacts,
+    )
 
     genotype_adj = data.geno[:, adj_variant_indices]
     results = indiv_score_test_region_cond(

@@ -433,6 +433,48 @@ def test_indiv_score_related_cond_workflow_runs():
     assert len(results["pvalue_cond_samples"]) > 0
 
 
+def test_related_dense_cond_workflow_uses_shared_cond_cov_artifact(monkeypatch):
+    original_read_csv = workflows.pd.read_csv
+
+    def _guard_dense_cond_cov_reads(*args, **kwargs):
+        path = str(args[0]) if args else ""
+        if path.endswith("example_glmmkin_cov_cond_dense.csv"):
+            raise AssertionError("dense conditional workflow should use shared cond covariance")
+        return original_read_csv(*args, **kwargs)
+
+    monkeypatch.setattr(workflows.pd, "read_csv", _guard_dense_cond_cov_reads)
+
+    results = workflows.staar_related_dense_glmmkin_cond(
+        dataset="example",
+        seed=600,
+        rare_maf_cutoff=0.05,
+        use_precomputed_artifacts=True,
+    )
+    assert results["num_variant"] == 163.0
+    assert 0.0 <= results["results_STAAR_O_cond"] <= 1.0
+
+
+def test_related_dense_indiv_cond_workflow_uses_shared_cond_cov_artifact(monkeypatch):
+    original_read_csv = workflows.pd.read_csv
+
+    def _guard_dense_cond_cov_reads(*args, **kwargs):
+        path = str(args[0]) if args else ""
+        if path.endswith("example_glmmkin_cov_cond_dense.csv"):
+            raise AssertionError("dense conditional workflow should use shared cond covariance")
+        return original_read_csv(*args, **kwargs)
+
+    monkeypatch.setattr(workflows.pd, "read_csv", _guard_dense_cond_cov_reads)
+
+    results = workflows.indiv_score_related_dense_glmmkin_cond(
+        dataset="example",
+        seed=600,
+        rare_maf_cutoff=0.05,
+        use_precomputed_artifacts=True,
+    )
+    assert results["num_variant"] == 163.0
+    assert results["num_tested"] > 0
+
+
 def test_ai_staar_unrelated_workflow_runs():
     results = workflows.ai_staar_unrelated_glm(
         dataset="example",

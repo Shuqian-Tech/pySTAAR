@@ -40,13 +40,7 @@ The following precomputed artifacts are still used for baseline parity when `use
 - `data/example_glmmkin_cov_cond_sparse.csv`
 - `data/example_glmmkin_cov_cond_dense.csv`
 - `data/example_glmmkin_binary_spa_sparse_fitted.csv`
-- `data/example_glmmkin_binary_spa_sparse_scaled_residuals.csv`
-- `data/example_glmmkin_binary_spa_sparse_XW.csv`
-- `data/example_glmmkin_binary_spa_sparse_XXWX_inv.csv`
 - `data/example_glmmkin_binary_spa_dense_fitted.csv`
-- `data/example_glmmkin_binary_spa_dense_scaled_residuals.csv`
-- `data/example_glmmkin_binary_spa_dense_XW.csv`
-- `data/example_glmmkin_binary_spa_dense_XXWX_inv.csv`
 - `data/example_ai_cov_sparse_s1_b1.csv`
 - `data/example_ai_cov_sparse_s1_b2.csv`
 - `data/example_ai_cov_sparse_s2_b1.csv`
@@ -58,7 +52,7 @@ The following precomputed artifacts are still used for baseline parity when `use
 
 These are passed into the Python null-model/STAAR pipeline to reduce backend-specific numeric drift and match baseline sentinels for the `example` scenario.
 
-For related `SPA_p_filter=TRUE`, covariance is now computed in Python from precomputed fitted values + kinship and no longer loaded from precomputed `*_cov_filter.csv` artifacts.
+For related binary-SPA parity paths, Python now reconstructs `scaled_residuals`, `XW`, and `XXWX_inv` from precomputed fitted values and computes `SPA_p_filter` covariance from fitted values + kinship; precomputed `*_cov_filter.csv`, `*_scaled_residuals.csv`, `*_XW.csv`, and `*_XXWX_inv.csv` artifacts are no longer loaded.
 
 ### Why
 
@@ -80,6 +74,7 @@ Observed on 2026-02-06 (reference backend):
 - Related binary SPA now has a fully computed Python PQL-style fallback path and uses that path by default.
 - Unrelated binary SPA prefilter now computes covariance directly from the Python null model (no precomputed covariance artifact needed) while preserving strict parity.
 - Related binary SPA prefilter now computes covariance in Python from precomputed fitted values + kinship (no precomputed covariance artifact needed) while preserving strict parity.
+- Related binary SPA precomputed parity path now reconstructs `scaled_residuals`, `XW`, and `XXWX_inv` from fitted values (no precomputed component artifacts needed) while preserving strict parity.
 - Current related binary pure-path deltas against baseline sentinels (`example`):
   - Sparse `results_STAAR_B`: `0.23360206101344283` vs baseline `0.2336049736705653` (delta `-2.92187712246116e-06`)
   - Dense `results_STAAR_B`: `0.2336021825223668` vs baseline `0.233605092772099` (delta `-2.9102497322207713e-06`)
@@ -102,7 +97,7 @@ Parity test status with current hybrid path:
 ### Acceptability Criteria
 
 - Temporary acceptance only for Phase 2 parity closure on the `example` scenarios.
-- Related binary SPA default path is already fully computed in Python; remaining work is to reduce/remove parity-only precomputed artifact usage (especially `SPA_p_filter` covariance artifacts), or explicitly re-baseline/approve.
+- Related binary SPA default path is already fully computed in Python; remaining work is to reduce/remove remaining parity-only precomputed artifact usage (notably related binary fitted-value artifacts and related GLMM/conditional/AI covariance artifacts), or explicitly re-baseline/approve.
 
 ### Approval Record
 

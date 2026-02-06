@@ -167,13 +167,15 @@ def _sample_variant_mapping(values: np.ndarray, indices: tuple[int, ...]) -> dic
     return mapping
 
 
-def _compute_related_binary_prefilter_cov_from_fitted(
+def _compute_related_binary_precomputed_components(
     genotype: np.ndarray,
     pheno: pd.DataFrame,
     kins: sp.csc_matrix,
     fitted: np.ndarray,
     rare_maf_cutoff: float,
-) -> np.ndarray | None:
+    sparse: bool,
+    include_prefilter_cov: bool,
+) -> tuple[np.ndarray | None, np.ndarray | None, np.ndarray | None, np.ndarray | None]:
     y = pheno["Y"].to_numpy(dtype=float)
     X = np.column_stack(
         [
@@ -184,46 +186,76 @@ def _compute_related_binary_prefilter_cov_from_fitted(
     )
     mu = np.clip(np.asarray(fitted, dtype=float).reshape(-1), 1e-9, 1.0 - 1e-9)
     if mu.size != y.size:
-        return None
+        return None, None, None, None
 
-    eta = logit(mu)
+    scaled_residuals = y - mu
     weights = np.clip(mu * (1.0 - mu), 1e-9, None)
+    eta = logit(mu)
     z = eta + (y - mu) / weights
     d_inv = 1.0 / weights
 
-    try:
-        opt = minimize_scalar(
-            _reml_nll_binomial_tau,
-            bounds=(-10.0, 5.0),
-            method="bounded",
-            args=(X, z, d_inv, kins),
-            options={"xatol": 1e-6, "maxiter": 200},
-        )
-        tau = float(np.exp(opt.x)) if opt.success else 1.0
-    except Exception:
-        tau = 1.0
+    sigma_solver = None
+    sigma_i_x = None
+    cov = None
+    if sparse or include_prefilter_cov:
+        try:
+            opt = minimize_scalar(
+                _reml_nll_binomial_tau,
+                bounds=(-10.0, 5.0),
+                method="bounded",
+                args=(X, z, d_inv, kins),
+                options={"xatol": 1e-6, "maxiter": 200},
+            )
+            tau = float(np.exp(opt.x)) if opt.success else 1.0
+        except Exception:
+            tau = 1.0
 
-    sigma = sp.diags(d_inv, format="csc")
-    if tau != 0.0:
-        sigma = sigma + kins * tau
+        sigma = sp.diags(d_inv, format="csc")
+        if tau != 0.0:
+            sigma = sigma + kins * tau
 
-    try:
-        sigma_solver = splu(sigma)
-    except Exception:
-        return None
+        try:
+            sigma_solver = splu(sigma)
+        except Exception:
+            if sparse:
+                return None, None, None, None
+            sigma_solver = None
 
-    genotype_flip, _, maf = matrix_flip(genotype)
-    rv_label = (maf < rare_maf_cutoff) & (maf > 0)
-    G = genotype_flip[:, rv_label]
-    if G.shape[1] == 0:
-        return None
+        if sigma_solver is not None:
+            sigma_i_x = sigma_solver.solve(X)
+            cov = np.linalg.inv(X.T @ sigma_i_x)
 
-    sigma_i_x = sigma_solver.solve(X)
-    cov = np.linalg.inv(X.T @ sigma_i_x)
-    sigma_i_g = sigma_solver.solve(G)
-    t_sigma_i_x_g = sigma_i_x.T @ G
-    cov_filter = sigma_i_g.T @ G - t_sigma_i_x_g.T @ cov @ t_sigma_i_x_g
-    return 0.5 * (cov_filter + cov_filter.T)
+    if sparse:
+        if sigma_i_x is None or cov is None:
+            return None, None, None, None
+        XW = sigma_i_x.T
+        XXWX_inv = X @ cov
+    else:
+        XW = (X * weights[:, None]).T
+        try:
+            XtWX = X.T @ (X * weights[:, None])
+            XXWX_inv = X @ np.linalg.inv(XtWX)
+        except np.linalg.LinAlgError:
+            return None, None, None, None
+
+    precomputed_cov_filter = None
+    if include_prefilter_cov:
+        if sigma_solver is None:
+            return scaled_residuals, XW, XXWX_inv, None
+
+        genotype_flip, _, maf = matrix_flip(genotype)
+        rv_label = (maf < rare_maf_cutoff) & (maf > 0)
+        G = genotype_flip[:, rv_label]
+        if G.shape[1] > 0:
+            if sigma_i_x is None or cov is None:
+                sigma_i_x = sigma_solver.solve(X)
+                cov = np.linalg.inv(X.T @ sigma_i_x)
+            sigma_i_g = sigma_solver.solve(G)
+            t_sigma_i_x_g = sigma_i_x.T @ G
+            cov_filter = sigma_i_g.T @ G - t_sigma_i_x_g.T @ cov @ t_sigma_i_x_g
+            precomputed_cov_filter = 0.5 * (cov_filter + cov_filter.T)
+
+    return scaled_residuals, XW, XXWX_inv, precomputed_cov_filter
 
 
 def _flatten_ai_weight_matrix(weight_matrix: np.ndarray, pop_levels: list[str]) -> dict[str, float]:
@@ -570,35 +602,31 @@ def _related_binary_spa_common(
 
     suffix = "sparse" if sparse else "dense"
     fitted_path = DATA_DIR / f"example_glmmkin_binary_spa_{suffix}_fitted.csv"
-    scaled_path = DATA_DIR / f"example_glmmkin_binary_spa_{suffix}_scaled_residuals.csv"
-    xw_path = DATA_DIR / f"example_glmmkin_binary_spa_{suffix}_XW.csv"
-    xxwx_inv_path = DATA_DIR / f"example_glmmkin_binary_spa_{suffix}_XXWX_inv.csv"
 
     obj_nullmodel = None
-    if use_precomputed and (fitted_path.exists() and scaled_path.exists() and xw_path.exists() and xxwx_inv_path.exists()):
+    if use_precomputed and fitted_path.exists():
         fitted = pd.read_csv(fitted_path).to_numpy().reshape(-1)
-        scaled_residuals = pd.read_csv(scaled_path).to_numpy().reshape(-1)
-        XW = pd.read_csv(xw_path).to_numpy()
-        XXWX_inv = pd.read_csv(xxwx_inv_path).to_numpy()
-        precomputed_cov_filter = None
-        if SPA_p_filter:
-            precomputed_cov_filter = _compute_related_binary_prefilter_cov_from_fitted(
+        scaled_residuals, XW, XXWX_inv, precomputed_cov_filter = (
+            _compute_related_binary_precomputed_components(
                 genotype=data.geno,
                 pheno=pheno,
                 kins=kins,
                 fitted=fitted,
                 rare_maf_cutoff=rare_maf_cutoff,
+                sparse=sparse,
+                include_prefilter_cov=SPA_p_filter,
             )
-
-        obj_nullmodel = SimpleNamespace(
-            relatedness=True,
-            sparse_kins=sparse,
-            fitted=fitted,
-            scaled_residuals=scaled_residuals,
-            XW=XW,
-            XXWX_inv=XXWX_inv,
-            precomputed_cov_filter=precomputed_cov_filter,
         )
+        if XW is not None and XXWX_inv is not None and scaled_residuals is not None:
+            obj_nullmodel = SimpleNamespace(
+                relatedness=True,
+                sparse_kins=sparse,
+                fitted=fitted,
+                scaled_residuals=scaled_residuals,
+                XW=XW,
+                XXWX_inv=XXWX_inv,
+                precomputed_cov_filter=precomputed_cov_filter,
+            )
 
     if obj_nullmodel is None:
         obj_nullmodel = fit_null_glmmkin_binary_spa(

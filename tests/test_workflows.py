@@ -241,6 +241,55 @@ def test_related_binary_spa_prefilter_does_not_load_precomputed_cov_file(
     assert 0.0 < results["results_STAAR_B"] <= 1.0
 
 
+@pytest.mark.parametrize(
+    "workflow,blocked_files",
+    [
+        (
+            workflows.staar_related_sparse_binary_spa,
+            (
+                "example_glmmkin_binary_spa_sparse_scaled_residuals.csv",
+                "example_glmmkin_binary_spa_sparse_XW.csv",
+                "example_glmmkin_binary_spa_sparse_XXWX_inv.csv",
+            ),
+        ),
+        (
+            workflows.staar_related_dense_binary_spa,
+            (
+                "example_glmmkin_binary_spa_dense_scaled_residuals.csv",
+                "example_glmmkin_binary_spa_dense_XW.csv",
+                "example_glmmkin_binary_spa_dense_XXWX_inv.csv",
+            ),
+        ),
+    ],
+)
+def test_related_binary_spa_precomputed_path_reconstructs_nullmodel_components(
+    monkeypatch,
+    workflow,
+    blocked_files,
+):
+    original_read_csv = workflows.pd.read_csv
+
+    def _guard_component_reads(*args, **kwargs):
+        path = str(args[0]) if args else ""
+        if any(path.endswith(name) for name in blocked_files):
+            raise AssertionError("related SPA precomputed path should reconstruct components")
+        return original_read_csv(*args, **kwargs)
+
+    monkeypatch.setattr(workflows.pd, "read_csv", _guard_component_reads)
+
+    results = workflow(
+        dataset="example",
+        seed=600,
+        rare_maf_cutoff=0.05,
+        SPA_p_filter=True,
+        p_filter_cutoff=0.05,
+        use_precomputed_artifacts=True,
+    )
+
+    assert results["num_variant"] == 163.0
+    assert 0.0 < results["results_STAAR_B"] <= 1.0
+
+
 def test_related_binary_spa_prefilter_defaults_to_pure_covariance(monkeypatch):
     original_staar_binary_spa = workflows.staar_binary_spa
     captured = {}

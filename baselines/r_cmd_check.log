@@ -1,0 +1,123 @@
+* using log directory ‘/Users/xiaozhouwang/Documents/SHUQ/RPack/staar_migration/STAAR/..Rcheck’
+* using R version 4.5.0 (2025-04-11)
+* using platform: aarch64-apple-darwin24.2.0
+* R was compiled by
+    Apple clang version 16.0.0 (clang-1600.0.26.6)
+    GNU Fortran (Homebrew GCC 14.2.0_1) 14.2.0
+* running under: macOS Sequoia 15.6.1
+* using session charset: UTF-8
+* using option ‘--no-manual’
+* checking for file ‘./DESCRIPTION’ ... OK
+* checking extension type ... Package
+* this is package ‘STAAR’ version ‘0.9.8’
+* package encoding: UTF-8
+* checking package namespace information ... OK
+* checking package dependencies ...警告: 无法在貯藏處https://CRAN.R-project.org/src/contrib中读写索引:
+  download from 'https://CRAN.R-project.org/src/contrib/PACKAGES' failed
+ INFO
+Vignette dependency required without any vignettes: ‘knitr’
+* checking if this is a source package ... WARNING
+Subdirectory ‘STAAR/src’ contains apparent object files/libraries
+  Bisection.o Bisection_Binary_SPA.o CCT_pval.o Indiv_Score_Test.o
+  Indiv_Score_Test_SMMAT.o Indiv_Score_Test_SMMAT_sparse.o
+  Indiv_Score_Test_SMMAT_sparse_cond.o K.o K1.o K1_Binary_SPA.o
+  K1_Binary_SPA_alt.o K2.o K2_Binary_SPA.o K2_Binary_SPA_alt.o
+  K_Binary_SPA.o K_Binary_SPA_alt.o NR_Binary_SPA.o RcppExports.o
+  STAAR.so STAAR_B_Binary_SPA.o STAAR_B_SPA.o STAAR_B_SPA_SMMAT.o
+  STAAR_B_SPA_SMMAT_sparse.o STAAR_O.o STAAR_O_SMMAT.o
+  STAAR_O_SMMAT_sparse.o STAAR_O_SMMAT_sparse_cond.o Saddle.o
+  Saddle_Binary_SPA.o Saddle_Binary_SPA_Bisection.o check_is_na.o
+  goldenSectionSearchForSignChange.o haveSameSign.o matrix_flip.o
+  matrix_impute.o
+Object files/libraries should not be included in a source package.
+* checking if there is a namespace ... OK
+* checking for executable files ... OK
+* checking for hidden files and directories ... NOTE
+Found the following hidden files and directories:
+  .gitignore
+  .travis.yml
+  ..Rcheck
+  .git
+  .github
+These were most likely included in error. See section ‘Package
+structure’ in the ‘Writing R Extensions’ manual.
+* checking for portable file names ... OK
+* checking for sufficient/correct file permissions ... OK
+* checking whether package ‘STAAR’ can be installed ... OK
+* used C++ compiler: ‘Apple clang version 17.0.0 (clang-1700.6.3.2)’
+* used SDK: ‘MacOSX26.2.sdk’
+* checking installed package size ... OK
+* checking package directory ... OK
+* checking DESCRIPTION meta-information ... NOTE
+Checking should be performed on sources prepared by ‘R CMD build’.
+* checking top-level files ... OK
+* checking for left-over files ... OK
+* checking index information ... OK
+* checking package subdirectories ... WARNING
+Found the following directory with the name of a check directory:
+  ./..Rcheck
+Most likely, these were included erroneously.
+* checking code files for non-ASCII characters ... OK
+* checking R files for syntax errors ... OK
+* checking whether the package can be loaded ... OK
+* checking whether the package can be loaded with stated dependencies ... OK
+* checking whether the package can be unloaded cleanly ... OK
+* checking whether the namespace can be loaded with stated dependencies ... OK
+* checking whether the namespace can be unloaded cleanly ... OK
+* checking loading without being on the library search path ... OK
+* checking dependencies in R code ... OK
+* checking S3 generic/method consistency ... OK
+* checking replacement functions ... OK
+* checking foreign function calls ... OK
+* checking R code for possible problems ... OK
+* checking Rd files ... OK
+* checking Rd metadata ... OK
+* checking Rd cross-references ... OK
+* checking for missing documentation entries ... WARNING
+未公开的编码对象:
+  ‘Bisection’ ‘Bisection_Binary_SPA’ ‘CCT_pval’
+  ‘Indiv_Score_Test’ ‘Indiv_Score_Test_SMMAT’
+  ‘Indiv_Score_Test_SMMAT_sparse’
+  ‘Indiv_Score_Test_SMMAT_sparse_cond’ ‘K’ ‘K1’ ‘K1_Binary_SPA’
+  ‘K1_Binary_SPA_alt’ ‘K2’ ‘K2_Binary_SPA’ ‘K2_Binary_SPA_alt’
+  ‘K_Binary_SPA’ ‘K_Binary_SPA_alt’ ‘NR_Binary_SPA’
+  ‘STAAR_B_Binary_SPA’ ‘STAAR_B_SPA’ ‘STAAR_B_SPA_SMMAT’
+  ‘STAAR_B_SPA_SMMAT_sparse’ ‘STAAR_O’ ‘STAAR_O_SMMAT’
+  ‘STAAR_O_SMMAT_sparse’ ‘STAAR_O_SMMAT_sparse_cond’ ‘Saddle’
+  ‘Saddle_Binary_SPA’ ‘Saddle_Binary_SPA_Bisection’ ‘check_is_na’
+  ‘example’ ‘goldenSectionSearchForSignChange’ ‘haveSameSign’
+  ‘matrix_flip’ ‘matrix_impute’
+未公开的数据集:
+  ‘example’
+All user-level objects in a package should have documentation entries.
+See chapter ‘Writing R documentation files’ in the ‘Writing R
+Extensions’ manual.
+* checking for code/documentation mismatches ... OK
+* checking Rd \usage sections ... OK
+* checking Rd contents ... OK
+* checking for unstated dependencies in examples ... OK
+* checking contents of ‘data’ directory ... OK
+* checking data for non-ASCII characters ... OK
+* checking LazyData ... OK
+* checking data for ASCII and uncompressed saves ... OK
+* checking line endings in C/C++/Fortran sources/headers ... NOTE
+Found the following sources/headers with CR or CRLF line endings:
+  src/STAAR_O_SMMAT.cpp
+Some Unix compilers require LF line endings.
+* checking line endings in Makefiles ... NOTE
+Found the following Makefile(s) without a final LF:
+  src/Makevars
+Some ‘make’ programs ignore lines not ending in LF.
+* checking compilation flags in Makevars ... OK
+* checking for GNU extensions in Makefiles ... OK
+* checking for portable use of $(BLAS_LIBS) and $(LAPACK_LIBS) ... OK
+* checking use of PKG_*FLAGS in Makefiles ... OK
+* checking compiled code ... OK
+* checking examples ... OK
+* DONE
+
+Status: 3 WARNINGs, 4 NOTEs
+See
+  ‘/Users/xiaozhouwang/Documents/SHUQ/RPack/staar_migration/STAAR/..Rcheck/00check.log’
+for details.
+

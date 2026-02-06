@@ -1,0 +1,84 @@
+scenario_id: staar_unrelated_glm
+description: STAAR vignette workflow for unrelated samples (fit_null_glm + STAAR)
+r_entry_point: fit_null_glm(Y ~ X1 + X2, data=pheno_unrelated, family="gaussian") then STAAR(...)
+python_entry_point: staar_unrelated_glm(example, seed=600)
+
+inputs:
+  dataset: example
+  dataset_fingerprint: baselines/example_fingerprint.json
+  simulation_metadata: baselines/example_sim_metadata.json
+
+parameters:
+  seed: 600
+  rare_maf_cutoff: 0.05
+
+sentinels:
+  - name: num_variant
+    file: baselines/unrelated_glm_sentinels.json
+    path: $.num_variant
+    comparison: scalar_approx
+    rtol: 1e-8
+    atol: 0
+
+  - name: results_STAAR_O
+    file: baselines/unrelated_glm_sentinels.json
+    path: $.results_STAAR_O
+    comparison: scalar_approx
+    rtol: 1e-6
+    atol: 1e-8
+
+  - name: results_STAAR_S_1_25
+    file: baselines/unrelated_glm_sentinels.json
+    path: $.results_STAAR_S_1_25
+    comparison: mapping_approx
+    rtol: 1e-6
+    atol: 1e-8
+
+  - name: results_STAAR_S_1_1
+    file: baselines/unrelated_glm_sentinels.json
+    path: $.results_STAAR_S_1_1
+    comparison: mapping_approx
+    rtol: 1e-6
+    atol: 1e-8
+
+  - name: results_STAAR_B_1_25
+    file: baselines/unrelated_glm_sentinels.json
+    path: $.results_STAAR_B_1_25
+    comparison: mapping_approx
+    rtol: 1e-6
+    atol: 1e-8
+
+  - name: results_STAAR_B_1_1
+    file: baselines/unrelated_glm_sentinels.json
+    path: $.results_STAAR_B_1_1
+    comparison: mapping_approx
+    rtol: 1e-6
+    atol: 1e-8
+
+  - name: results_STAAR_A_1_25
+    file: baselines/unrelated_glm_sentinels.json
+    path: $.results_STAAR_A_1_25
+    comparison: mapping_approx
+    rtol: 1e-6
+    atol: 1e-8
+
+  - name: results_STAAR_A_1_1
+    file: baselines/unrelated_glm_sentinels.json
+    path: $.results_STAAR_A_1_1
+    comparison: mapping_approx
+    rtol: 1e-6
+    atol: 1e-8
+
+  - name: nullmodel_beta
+    file: baselines/unrelated_glm_sentinels.json
+    path: $.nullmodel_beta
+    comparison: mapping_approx
+    rtol: 1e-6
+    atol: 1e-8
+
+  - name: nullmodel_dispersion
+    file: baselines/unrelated_glm_sentinels.json
+    path: $.nullmodel_dispersion
+    comparison: scalar_approx
+    rtol: 1e-6
+    atol: 1e-8

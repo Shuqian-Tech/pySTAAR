@@ -1,0 +1,71 @@
+scenario_id: indiv_score_unrelated_glm_cond
+description: Conditional individual variant score tests for unrelated samples (fit_null_glm + Indiv_Score_Test_Region_cond)
+r_entry_point: fit_null_glm(Y ~ X1 + X2, data=pheno_unrelated, family="gaussian") then Indiv_Score_Test_Region_cond(...)
+python_entry_point: indiv_score_unrelated_glm_cond(example, seed=600)
+
+inputs:
+  dataset: example
+  dataset_fingerprint: baselines/example_fingerprint.json
+  simulation_metadata: baselines/example_sim_metadata.json
+
+parameters:
+  seed: 600
+  rare_maf_cutoff: 0.05
+  method_cond: optimal
+  adj_variant_indices: [0, 3]
+
+sentinels:
+  - name: num_variant
+    file: baselines/indiv_score_unrelated_glm_cond_sentinels.json
+    path: $.num_variant
+    comparison: scalar_approx
+    rtol: 1e-8
+    atol: 0
+  - name: num_tested
+    file: baselines/indiv_score_unrelated_glm_cond_sentinels.json
+    path: $.num_tested
+    comparison: scalar_approx
+    rtol: 1e-8
+    atol: 0
+  - name: pvalue_min
+    file: baselines/indiv_score_unrelated_glm_cond_sentinels.json
+    path: $.pvalue_min
+    comparison: scalar_approx
+    rtol: 1e-6
+    atol: 1e-8
+  - name: pvalue_median
+    file: baselines/indiv_score_unrelated_glm_cond_sentinels.json
+    path: $.pvalue_median
+    comparison: scalar_approx
+    rtol: 1e-6
+    atol: 1e-8
+  - name: top_variant_index
+    file: baselines/indiv_score_unrelated_glm_cond_sentinels.json
+    path: $.top_variant_index
+    comparison: scalar_approx
+    rtol: 1e-8
+    atol: 0
+  - name: top_pvalue
+    file: baselines/indiv_score_unrelated_glm_cond_sentinels.json
+    path: $.top_pvalue
+    comparison: scalar_approx
+    rtol: 1e-6
+    atol: 1e-8
+  - name: score_cond_samples
+    file: baselines/indiv_score_unrelated_glm_cond_sentinels.json
+    path: $.score_cond_samples
+    comparison: mapping_approx
+    rtol: 1e-6
+    atol: 1e-8
+  - name: se_cond_samples
+    file: baselines/indiv_score_unrelated_glm_cond_sentinels.json
+    path: $.se_cond_samples
+    comparison: mapping_approx
+    rtol: 1e-6
+    atol: 1e-8
+  - name: pvalue_cond_samples
+    file: baselines/indiv_score_unrelated_glm_cond_sentinels.json
+    path: $.pvalue_cond_samples
+    comparison: mapping_approx
+    rtol: 1e-6
+    atol: 1e-8

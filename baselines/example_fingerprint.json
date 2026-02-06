@@ -1,0 +1,20 @@
+{
+  "name": ["example"],
+  "source": ["STAAR package dataset"],
+  "components": {
+    "genotype": {
+      "class": ["dgCMatrix"],
+      "dim": {}
+    },
+    "maf": {
+      "class": ["numeric"],
+      "length": [30095]
+    },
+    "snploc": {
+      "class": ["data.frame"],
+      "dim": [30095, 7],
+      "colnames": ["SNP", "CHROM", "CHROM_POS", "ALLELE1", "FREQ1", "ALLELE2", "FREQ2"]
+    }
+  },
+  "checksum": ["d4a38fa55706520d1796c998045677ffb0af785287aa81a7f112f8a87aba230e"]
+}

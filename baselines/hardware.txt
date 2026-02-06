@@ -1,0 +1,20 @@
+== date ==
+Thu Feb  5 17:54:17 CST 2026
+
+== uname ==
+Darwin XiaozhoudeMacBook-Pro.local 24.6.0 Darwin Kernel Version 24.6.0: Mon Jul 14 11:30:40 PDT 2025; root:xnu-11417.140.69~1/RELEASE_ARM64_T8132 arm64
+
+== os (linux) ==
+
+== os (mac) ==
+ProductName:		macOS
+ProductVersion:		15.6.1
+BuildVersion:		24G90
+
+== cpu ==
+Apple M4
+
+== mem ==
+17179869184
+
+== gpu (nvidia) ==

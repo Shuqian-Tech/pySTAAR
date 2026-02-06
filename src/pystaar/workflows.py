@@ -15,7 +15,7 @@ from scipy.optimize import minimize_scalar
 from scipy.special import logit
 from scipy.sparse.linalg import splu
 
-from .data import load_example_dataset
+from .data import load_dataset
 from .models import (
     _reml_nll_binomial_tau,
     fit_null_glm,
@@ -51,12 +51,6 @@ AI_POP_GROUPS_FILE = "example_ai_pop_groups.csv"
 AI_POP_WEIGHTS_1_1_FILE = "example_ai_pop_weights_1_1.csv"
 AI_POP_WEIGHTS_1_25_FILE = "example_ai_pop_weights_1_25.csv"
 AI_COV_FILE_TEMPLATE = "example_ai_cov_{suffix}_s{scenario}_b{base}.csv"
-
-
-
-def _ensure_example(dataset: str):
-    if dataset != "example":
-        raise ValueError(f"Unsupported dataset '{dataset}'. Only 'example' is available.")
 
 
 def _num_rare_variants(genotype: np.ndarray, rare_maf_cutoff: float) -> int:
@@ -509,10 +503,9 @@ def indiv_score_unrelated_glm(
     rare_maf_cutoff: float = 0.05,
 ):
     """Individual score-test workflow for unrelated samples (GLM null model)."""
-    _ensure_example(dataset)
     np.random.seed(seed)
 
-    data = load_example_dataset()
+    data = load_dataset(dataset)
     obj_nullmodel = fit_null_glm(data.pheno_unrelated)
     results = indiv_score_test_region(
         genotype=data.geno,
@@ -535,10 +528,9 @@ def indiv_score_unrelated_glm_cond(
     adj_variant_indices: tuple[int, ...] = BASELINE_COND_ADJ_VARIANT_INDICES,
 ):
     """Conditional individual score-test workflow for unrelated samples."""
-    _ensure_example(dataset)
     np.random.seed(seed)
 
-    data = load_example_dataset()
+    data = load_dataset(dataset)
     obj_nullmodel = fit_null_glm(data.pheno_unrelated)
 
     adj_variant_indices = tuple(int(idx) for idx in adj_variant_indices)
@@ -572,10 +564,9 @@ def indiv_score_unrelated_glm_cond(
 
 def staar_unrelated_glm(dataset: str, seed: int = 600, rare_maf_cutoff: float = 0.05):
     """STAAR workflow for unrelated samples (GLM-based null model)."""
-    _ensure_example(dataset)
     np.random.seed(seed)
 
-    data = load_example_dataset()
+    data = load_dataset(dataset)
     obj_nullmodel = fit_null_glm(data.pheno_unrelated)
 
     results = staar(
@@ -606,10 +597,9 @@ def ai_staar_unrelated_glm(
     rare_maf_cutoff: float = 0.05,
 ):
     """AI-STAAR workflow for unrelated samples (GLM-based null model)."""
-    _ensure_example(dataset)
     np.random.seed(seed)
 
-    data = load_example_dataset()
+    data = load_dataset(dataset)
     obj_nullmodel = fit_null_glm(data.pheno_unrelated)
 
     pop_groups, pop_levels, pop_weights_1_1, pop_weights_1_25 = _load_ai_metadata(
@@ -647,10 +637,9 @@ def ai_staar_unrelated_glm_find_weight(
     rare_maf_cutoff: float = 0.05,
 ):
     """AI-STAAR workflow for unrelated samples with find_weight enabled."""
-    _ensure_example(dataset)
     np.random.seed(seed)
 
-    data = load_example_dataset()
+    data = load_dataset(dataset)
     obj_nullmodel = fit_null_glm(data.pheno_unrelated)
 
     pop_groups, pop_levels, pop_weights_1_1, pop_weights_1_25 = _load_ai_metadata(
@@ -681,10 +670,9 @@ def staar_unrelated_binary_spa(
     p_filter_cutoff: float = 0.05,
 ):
     """STAAR-Binary-SPA workflow for unrelated samples."""
-    _ensure_example(dataset)
     np.random.seed(seed)
 
-    data = load_example_dataset()
+    data = load_dataset(dataset)
     pheno = data.pheno_unrelated.copy()
     threshold = float(np.quantile(pheno["Y"].to_numpy(dtype=float), case_quantile))
     pheno["Y"] = (pheno["Y"].to_numpy(dtype=float) > threshold).astype(float)
@@ -721,7 +709,6 @@ def _related_binary_spa_common(
     p_filter_cutoff: float,
     use_precomputed_artifacts: bool = False,
 ):
-    _ensure_example(dataset)
     np.random.seed(seed)
 
     if not np.isclose(case_quantile, BASELINE_BINARY_SPA_CASE_QUANTILE):
@@ -729,7 +716,7 @@ def _related_binary_spa_common(
             "Related binary SPA currently supports only the baseline case_quantile=0.95."
         )
 
-    data = load_example_dataset()
+    data = load_dataset(dataset)
     pheno = data.pheno_related.copy()
     threshold = float(np.quantile(pheno["Y"].to_numpy(dtype=float), case_quantile))
     pheno["Y"] = (pheno["Y"].to_numpy(dtype=float) > threshold).astype(float)
@@ -846,10 +833,9 @@ def staar_unrelated_glm_cond(
     adj_variant_indices: tuple[int, ...] = BASELINE_COND_ADJ_VARIANT_INDICES,
 ):
     """Conditional STAAR workflow for unrelated samples (GLM-based null model)."""
-    _ensure_example(dataset)
     np.random.seed(seed)
 
-    data = load_example_dataset()
+    data = load_dataset(dataset)
     obj_nullmodel = fit_null_glm(data.pheno_unrelated)
 
     adj_variant_indices = tuple(int(idx) for idx in adj_variant_indices)
@@ -889,10 +875,9 @@ def _related_common(
     sparse: bool,
     use_precomputed_artifacts: bool = False,
 ):
-    _ensure_example(dataset)
     np.random.seed(seed)
 
-    data = load_example_dataset()
+    data = load_dataset(dataset)
     kins = data.kins_sparse if sparse else data.kins_dense
 
     precomputed_cov, precomputed_scaled = _load_related_precomputed_cov_scaled(
@@ -946,10 +931,9 @@ def _related_ai_common(
     find_weight: bool = False,
     use_precomputed_artifacts: bool = False,
 ):
-    _ensure_example(dataset)
     np.random.seed(seed)
 
-    data = load_example_dataset()
+    data = load_dataset(dataset)
     kins = data.kins_sparse if sparse else data.kins_dense
     pop_groups, pop_levels, pop_weights_1_1, pop_weights_1_25 = _load_ai_metadata(
         num_samples=data.geno.shape[0]
@@ -1020,10 +1004,9 @@ def _related_indiv_common(
     sparse: bool,
     use_precomputed_artifacts: bool = False,
 ):
-    _ensure_example(dataset)
     np.random.seed(seed)
 
-    data = load_example_dataset()
+    data = load_dataset(dataset)
     kins = data.kins_sparse if sparse else data.kins_dense
 
     precomputed_cov, precomputed_scaled = _load_related_precomputed_cov_scaled(
@@ -1098,10 +1081,9 @@ def _related_common_cond(
     adj_variant_indices: tuple[int, ...],
     use_precomputed_artifacts: bool = False,
 ):
-    _ensure_example(dataset)
     np.random.seed(seed)
 
-    data = load_example_dataset()
+    data = load_dataset(dataset)
     kins = data.kins_sparse if sparse else data.kins_dense
 
     precomputed_cov, precomputed_scaled = _load_related_precomputed_cov_scaled(
@@ -1171,10 +1153,9 @@ def _related_indiv_common_cond(
     adj_variant_indices: tuple[int, ...],
     use_precomputed_artifacts: bool = False,
 ):
-    _ensure_example(dataset)
     np.random.seed(seed)
 
-    data = load_example_dataset()
+    data = load_dataset(dataset)
     kins = data.kins_sparse if sparse else data.kins_dense
 
     precomputed_cov, precomputed_scaled = _load_related_precomputed_cov_scaled(

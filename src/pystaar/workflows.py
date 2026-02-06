@@ -56,6 +56,44 @@ def _num_rare_variants(genotype: np.ndarray, rare_maf_cutoff: float) -> int:
     return int(np.sum((maf < rare_maf_cutoff) & (maf > 0)))
 
 
+def _rare_maf_cutoff_tag(rare_maf_cutoff: float) -> str:
+    cutoff_text = format(float(rare_maf_cutoff), ".10g")
+    return cutoff_text.replace(".", "_")
+
+
+def _related_cov_path_for_cutoff(rare_maf_cutoff: float) -> Path:
+    if np.isclose(rare_maf_cutoff, BASELINE_PRECOMPUTED_RARE_MAF_CUTOFF):
+        return DATA_DIR / "example_glmmkin_cov.csv"
+    return DATA_DIR / (
+        f"example_glmmkin_cov_rare_maf_{_rare_maf_cutoff_tag(rare_maf_cutoff)}.csv"
+    )
+
+
+def _load_related_precomputed_cov_scaled(
+    genotype: np.ndarray,
+    rare_maf_cutoff: float,
+    use_precomputed_artifacts: bool,
+) -> tuple[np.ndarray | None, np.ndarray | None]:
+    if not use_precomputed_artifacts:
+        return None, None
+
+    cov_path = _related_cov_path_for_cutoff(rare_maf_cutoff)
+    scaled_path = DATA_DIR / "example_glmmkin_scaled_residuals.csv"
+    if not (cov_path.exists() and scaled_path.exists()):
+        return None, None
+
+    candidate_cov = pd.read_csv(cov_path).to_numpy()
+    candidate_scaled = pd.read_csv(scaled_path).to_numpy().reshape(-1)
+    expected_num_variants = _num_rare_variants(genotype, rare_maf_cutoff)
+    expected_num_samples = genotype.shape[0]
+    if candidate_cov.shape != (
+        expected_num_variants,
+        expected_num_variants,
+    ) or candidate_scaled.size != expected_num_samples:
+        return None, None
+    return candidate_cov, candidate_scaled
+
+
 def _load_ai_metadata(num_samples: int):
     groups_path = DATA_DIR / AI_POP_GROUPS_FILE
     w11_path = DATA_DIR / AI_POP_WEIGHTS_1_1_FILE
@@ -653,24 +691,11 @@ def _related_common(
     data = load_example_dataset()
     kins = data.kins_sparse if sparse else data.kins_dense
 
-    precomputed_cov = None
-    precomputed_scaled = None
-    cov_path = DATA_DIR / "example_glmmkin_cov.csv"
-    scaled_path = DATA_DIR / "example_glmmkin_scaled_residuals.csv"
-    use_precomputed = use_precomputed_artifacts and np.isclose(
-        rare_maf_cutoff, BASELINE_PRECOMPUTED_RARE_MAF_CUTOFF
+    precomputed_cov, precomputed_scaled = _load_related_precomputed_cov_scaled(
+        genotype=data.geno,
+        rare_maf_cutoff=rare_maf_cutoff,
+        use_precomputed_artifacts=use_precomputed_artifacts,
     )
-    if use_precomputed and cov_path.exists() and scaled_path.exists():
-        candidate_cov = pd.read_csv(cov_path).to_numpy()
-        candidate_scaled = pd.read_csv(scaled_path).to_numpy().reshape(-1)
-        expected_num_variants = _num_rare_variants(data.geno, rare_maf_cutoff)
-        expected_num_samples = data.geno.shape[0]
-        if candidate_cov.shape == (
-            expected_num_variants,
-            expected_num_variants,
-        ) and candidate_scaled.size == expected_num_samples:
-            precomputed_cov = candidate_cov
-            precomputed_scaled = candidate_scaled
 
     obj_nullmodel = fit_null_glmmkin(
         data.pheno_related,
@@ -722,33 +747,24 @@ def _related_ai_common(
         num_samples=data.geno.shape[0]
     )
 
-    precomputed_cov = None
-    precomputed_scaled = None
     precomputed_ai_cov_s1 = None
     precomputed_ai_cov_s2 = None
-    cov_path = DATA_DIR / "example_glmmkin_cov.csv"
-    scaled_path = DATA_DIR / "example_glmmkin_scaled_residuals.csv"
-    use_precomputed = use_precomputed_artifacts and np.isclose(
-        rare_maf_cutoff, BASELINE_PRECOMPUTED_RARE_MAF_CUTOFF
+    precomputed_cov, precomputed_scaled = _load_related_precomputed_cov_scaled(
+        genotype=data.geno,
+        rare_maf_cutoff=rare_maf_cutoff,
+        use_precomputed_artifacts=use_precomputed_artifacts,
     )
-    if use_precomputed and cov_path.exists() and scaled_path.exists():
-        candidate_cov = pd.read_csv(cov_path).to_numpy()
-        candidate_scaled = pd.read_csv(scaled_path).to_numpy().reshape(-1)
-        expected_num_variants = _num_rare_variants(data.geno, rare_maf_cutoff)
-        expected_num_samples = data.geno.shape[0]
-        if candidate_cov.shape == (
-            expected_num_variants,
-            expected_num_variants,
-        ) and candidate_scaled.size == expected_num_samples:
-            precomputed_cov = candidate_cov
-            precomputed_scaled = candidate_scaled
-            precomputed_ai_cov_s1, precomputed_ai_cov_s2 = _load_ai_precomputed_covariances(
-                sparse=sparse,
-                num_base_tests=pop_weights_1_1.shape[1],
-                expected_num_variants=expected_num_variants,
-            )
+    if precomputed_cov is not None:
+        expected_num_variants = precomputed_cov.shape[0]
+        precomputed_ai_cov_s1, precomputed_ai_cov_s2 = _load_ai_precomputed_covariances(
+            sparse=sparse,
+            num_base_tests=pop_weights_1_1.shape[1],
+            expected_num_variants=expected_num_variants,
+        )
 
-    precomputed_theta = _load_precomputed_theta(sparse=sparse) if use_precomputed else None
+    precomputed_theta = (
+        _load_precomputed_theta(sparse=sparse) if use_precomputed_artifacts else None
+    )
 
     obj_nullmodel = fit_null_glmmkin(
         data.pheno_related,
@@ -804,24 +820,11 @@ def _related_indiv_common(
     data = load_example_dataset()
     kins = data.kins_sparse if sparse else data.kins_dense
 
-    precomputed_cov = None
-    precomputed_scaled = None
-    cov_path = DATA_DIR / "example_glmmkin_cov.csv"
-    scaled_path = DATA_DIR / "example_glmmkin_scaled_residuals.csv"
-    use_precomputed = use_precomputed_artifacts and np.isclose(
-        rare_maf_cutoff, BASELINE_PRECOMPUTED_RARE_MAF_CUTOFF
+    precomputed_cov, precomputed_scaled = _load_related_precomputed_cov_scaled(
+        genotype=data.geno,
+        rare_maf_cutoff=rare_maf_cutoff,
+        use_precomputed_artifacts=use_precomputed_artifacts,
     )
-    if use_precomputed and cov_path.exists() and scaled_path.exists():
-        candidate_cov = pd.read_csv(cov_path).to_numpy()
-        candidate_scaled = pd.read_csv(scaled_path).to_numpy().reshape(-1)
-        expected_num_variants = _num_rare_variants(data.geno, rare_maf_cutoff)
-        expected_num_samples = data.geno.shape[0]
-        if candidate_cov.shape == (
-            expected_num_variants,
-            expected_num_variants,
-        ) and candidate_scaled.size == expected_num_samples:
-            precomputed_cov = candidate_cov
-            precomputed_scaled = candidate_scaled
 
     obj_nullmodel = fit_null_glmmkin(
         data.pheno_related,
@@ -891,25 +894,12 @@ def _related_common_cond(
     data = load_example_dataset()
     kins = data.kins_sparse if sparse else data.kins_dense
 
-    precomputed_cov = None
-    precomputed_scaled = None
-    precomputed_cov_cond = None
-    cov_path = DATA_DIR / "example_glmmkin_cov.csv"
-    scaled_path = DATA_DIR / "example_glmmkin_scaled_residuals.csv"
-    use_precomputed = use_precomputed_artifacts and np.isclose(
-        rare_maf_cutoff, BASELINE_PRECOMPUTED_RARE_MAF_CUTOFF
+    precomputed_cov, precomputed_scaled = _load_related_precomputed_cov_scaled(
+        genotype=data.geno,
+        rare_maf_cutoff=rare_maf_cutoff,
+        use_precomputed_artifacts=use_precomputed_artifacts,
     )
-    if use_precomputed and cov_path.exists() and scaled_path.exists():
-        candidate_cov = pd.read_csv(cov_path).to_numpy()
-        candidate_scaled = pd.read_csv(scaled_path).to_numpy().reshape(-1)
-        expected_num_variants = _num_rare_variants(data.geno, rare_maf_cutoff)
-        expected_num_samples = data.geno.shape[0]
-        if candidate_cov.shape == (
-            expected_num_variants,
-            expected_num_variants,
-        ) and candidate_scaled.size == expected_num_samples:
-            precomputed_cov = candidate_cov
-            precomputed_scaled = candidate_scaled
+    precomputed_cov_cond = None
 
     cond_cov_path = (
         DATA_DIR / "example_glmmkin_cov_cond_sparse.csv"
@@ -932,7 +922,8 @@ def _related_common_cond(
         raise ValueError("adj_variant_indices contains out-of-range indices.")
 
     use_precomputed_cond_cov = (
-        use_precomputed
+        use_precomputed_artifacts
+        and np.isclose(rare_maf_cutoff, BASELINE_PRECOMPUTED_RARE_MAF_CUTOFF)
         and method_cond == BASELINE_COND_METHOD
         and adj_variant_indices == BASELINE_COND_ADJ_VARIANT_INDICES
         and cond_cov_path.exists()
@@ -984,26 +975,16 @@ def _related_indiv_common_cond(
     data = load_example_dataset()
     kins = data.kins_sparse if sparse else data.kins_dense
 
-    precomputed_cov = None
-    precomputed_scaled = None
+    precomputed_cov, precomputed_scaled = _load_related_precomputed_cov_scaled(
+        genotype=data.geno,
+        rare_maf_cutoff=rare_maf_cutoff,
+        use_precomputed_artifacts=use_precomputed_artifacts,
+    )
     precomputed_cov_cond = None
-    cov_path = DATA_DIR / "example_glmmkin_cov.csv"
-    scaled_path = DATA_DIR / "example_glmmkin_scaled_residuals.csv"
-    use_precomputed = use_precomputed_artifacts and np.isclose(
+    use_precomputed_cond_cov = use_precomputed_artifacts and np.isclose(
         rare_maf_cutoff, BASELINE_PRECOMPUTED_RARE_MAF_CUTOFF
     )
-    if use_precomputed and cov_path.exists() and scaled_path.exists():
-        candidate_cov = pd.read_csv(cov_path).to_numpy()
-        candidate_scaled = pd.read_csv(scaled_path).to_numpy().reshape(-1)
-        expected_num_variants = _num_rare_variants(data.geno, rare_maf_cutoff)
-        expected_num_samples = data.geno.shape[0]
-        if candidate_cov.shape == (
-            expected_num_variants,
-            expected_num_variants,
-        ) and candidate_scaled.size == expected_num_samples:
-            precomputed_cov = candidate_cov
-            precomputed_scaled = candidate_scaled
-
+    if use_precomputed_cond_cov:
         cov_cond_name = (
             "example_glmmkin_cov_cond_sparse.csv"
             if sparse
@@ -1011,6 +992,7 @@ def _related_indiv_common_cond(
         )
         cov_cond_path = DATA_DIR / cov_cond_name
         if cov_cond_path.exists():
+            expected_num_variants = _num_rare_variants(data.geno, rare_maf_cutoff)
             candidate_cov_cond = pd.read_csv(cov_cond_path).to_numpy()
             if candidate_cov_cond.shape == (
                 expected_num_variants,

@@ -27,6 +27,32 @@ def test_related_workflow_skips_precomputed_cov_for_nonbaseline_cutoff(monkeypat
     assert results["num_variant"] != 163.0
 
 
+def test_related_workflow_uses_cutoff_specific_precomputed_cov(monkeypatch):
+    original_read_csv = workflows.pd.read_csv
+    saw_cutoff_specific_cov = False
+
+    def _guard_precomputed_reads(*args, **kwargs):
+        nonlocal saw_cutoff_specific_cov
+        path = str(args[0]) if args else ""
+        if path.endswith("example_glmmkin_cov.csv"):
+            raise AssertionError("baseline cutoff precomputed cov should not be loaded")
+        if path.endswith("example_glmmkin_cov_rare_maf_0_01.csv"):
+            saw_cutoff_specific_cov = True
+        return original_read_csv(*args, **kwargs)
+
+    monkeypatch.setattr(workflows.pd, "read_csv", _guard_precomputed_reads)
+
+    results = workflows.staar_related_sparse_glmmkin(
+        dataset="example",
+        seed=600,
+        rare_maf_cutoff=0.01,
+        use_precomputed_artifacts=True,
+    )
+
+    assert results["num_variant"] == 153.0
+    assert saw_cutoff_specific_cov is True
+
+
 def test_related_workflow_uses_precomputed_cov_for_baseline_cutoff(monkeypatch):
     original_fit_null_glmmkin = workflows.fit_null_glmmkin
     captured = {}

@@ -103,3 +103,11 @@
 26. **staar_unrelated_binary_spa_case_q90** — unrelated binary SPA workflow parameter variant at `case_quantile=0.90`
 - Inputs: STAAR `example` dataset, unrelated phenotype/covariates thresholded at `quantile(Y, 0.90)`, annotations
 - Key sentinels: same sentinel set as `staar_unrelated_binary_spa`, with updated `case_count` and STAAR-B outputs
+
+27. **staar_related_sparse_glmmkin_rare_maf_0_01** — related sparse STAAR workflow parameter variant at `rare_maf_cutoff=0.01`
+- Inputs: STAAR `example` dataset, related phenotype/covariates, sparse kinship matrix, annotations
+- Key sentinels: same sentinel set as `staar_related_sparse_glmmkin`, recalculated at `rare_maf_cutoff=0.01` with matching null-model theta sentinels
+
+28. **staar_related_dense_glmmkin_rare_maf_0_01** — related dense STAAR workflow parameter variant at `rare_maf_cutoff=0.01`
+- Inputs: STAAR `example` dataset, related phenotype/covariates, dense kinship matrix, annotations
+- Key sentinels: same sentinel set as `staar_related_dense_glmmkin`, recalculated at `rare_maf_cutoff=0.01` with matching null-model theta sentinels

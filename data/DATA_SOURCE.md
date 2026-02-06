@@ -31,6 +31,7 @@
 | `data/example_pheno_unrelated.csv` | 381409 | `e0f4caf7398060761040d4f709b546e6531a6808b713ea5681e8921b5becd8f3` |
 | `data/example_pheno_related.csv` | 429554 | `3f0a8ba32fe7bcf1c8eafc6666b64b3bbbf0b9a145f58b5a065442ff2f3c6396` |
 | `data/example_glmmkin_cov.csv` | 555749 | `f6893ba9f034143c0b8eab7fda2fe020e8e43ac0280fbd1bd3824fa20c3311e6` |
+| `data/example_glmmkin_cov_rare_maf_0_01.csv` | 495166 | `c08479c923d9207da12c4e4d8faa64cf80390291223700b423eb15a1cf649ebc` |
 | `data/example_glmmkin_scaled_residuals.csv` | 182493 | `55ebe906e9c63fb25e8bbc4bf4f4ac05966401af8a66bbba972cd48a4a3c29ca` |
 | `data/example_glmmkin_cov_cond_sparse.csv` | 554222 | `a816f345142065cd3a95c3616f9c00e64f433e26ea57704b9dd1670b604130b2` |
 | `data/example_glmmkin_cov_cond_dense.csv` | 555130 | `05ad3b8d587404a850182310edac55fdc11e48c3092ddb954653145250c43a55` |
@@ -66,6 +67,7 @@
 - `data/example_kins_sparse.mtx`: shape=`10000x10000`, nnz=35000
 - `data/example_kins_dense.mtx`: shape=`10000x10000`, nnz=35000
 - `data/example_glmmkin_cov.csv`: shape=`163x163`
+- `data/example_glmmkin_cov_rare_maf_0_01.csv`: shape=`153x153`
 - `data/example_glmmkin_cov_cond_sparse.csv`: shape=`163x163`
 - `data/example_glmmkin_cov_cond_dense.csv`: shape=`163x163`
 - `data/example_glmmkin_binary_spa_sparse_fitted.csv`: shape=`10000x1`

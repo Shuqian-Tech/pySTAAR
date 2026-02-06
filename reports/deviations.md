@@ -11,7 +11,9 @@
   - `indiv_score_related_sparse_glmmkin_cond`
   - `indiv_score_related_dense_glmmkin_cond`
   - `staar_related_sparse_glmmkin`
+  - `staar_related_sparse_glmmkin_rare_maf_0_01`
   - `staar_related_dense_glmmkin`
+  - `staar_related_dense_glmmkin_rare_maf_0_01`
   - `staar_related_sparse_glmmkin_cond`
   - `staar_related_dense_glmmkin_cond`
   - `staar_related_sparse_binary_spa`
@@ -34,6 +36,7 @@ Related GLMM, conditional, individual-score, AI, and binary-SPA workflows now de
 The following precomputed artifacts are still used for baseline parity when `use_precomputed_artifacts=TRUE` is enabled in specs:
 
 - `data/example_glmmkin_cov.csv`
+- `data/example_glmmkin_cov_rare_maf_0_01.csv`
 - `data/example_glmmkin_scaled_residuals.csv`
 - `data/example_glmmkin_cov_cond_sparse.csv`
 - `data/example_glmmkin_cov_cond_dense.csv`
@@ -92,7 +95,7 @@ Observed on 2026-02-06 (reference backend):
 
 Parity test status with current hybrid path:
 
-- `pytest tests/parity -q` -> `24 passed`
+- `pytest tests/parity -q` -> `28 passed`
 
 ### Scientific Impact
 

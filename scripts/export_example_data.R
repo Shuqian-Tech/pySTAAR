@@ -24,19 +24,23 @@ obj <- fit_null_glmmkin(
   kins = sim$kins_sparse
 )
 
-G <- as.matrix(sim$Geno)
-G <- matrix_flip(G)
-MAF <- G$MAF
-RV_label <- (MAF < 0.05) & (MAF > 0)
-G <- G$Geno[, RV_label]
-G <- as(G, "dgCMatrix")
+compute_cov_for_cutoff <- function(genotype, obj_nullmodel, rare_maf_cutoff) {
+  geno_flip <- matrix_flip(as.matrix(genotype))
+  maf <- geno_flip$MAF
+  rv_label <- (maf < rare_maf_cutoff) & (maf > 0)
+  G <- as(geno_flip$Geno[, rv_label], "dgCMatrix")
 
-Sigma_i <- obj$Sigma_i
-Sigma_iX <- as.matrix(obj$Sigma_iX)
-cov <- obj$cov
-tSigma_iX_G <- t(Sigma_iX) %*% G
-Sigma_iG <- Sigma_i %*% G
-Cov <- t(Sigma_iG) %*% G - t(tSigma_iX_G) %*% cov %*% tSigma_iX_G
+  Sigma_i <- obj_nullmodel$Sigma_i
+  Sigma_iX <- as.matrix(obj_nullmodel$Sigma_iX)
+  cov <- obj_nullmodel$cov
+  tSigma_iX_G <- t(Sigma_iX) %*% G
+  Sigma_iG <- Sigma_i %*% G
+  t(Sigma_iG) %*% G - t(tSigma_iX_G) %*% cov %*% tSigma_iX_G
+}
+
+Cov <- compute_cov_for_cutoff(sim$Geno, obj, rare_maf_cutoff = 0.05)
+Cov_rare_maf_0_01 <- compute_cov_for_cutoff(sim$Geno, obj, rare_maf_cutoff = 0.01)
 
 write.csv(obj$scaled.residuals, "data/example_glmmkin_scaled_residuals.csv", row.names = FALSE)
 write.csv(as.matrix(Cov), "data/example_glmmkin_cov.csv", row.names = FALSE)
+write.csv(as.matrix(Cov_rare_maf_0_01), "data/example_glmmkin_cov_rare_maf_0_01.csv", row.names = FALSE)

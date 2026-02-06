@@ -35,7 +35,9 @@ ISSUE_BY_SCENARIO = {
     "staar_related_dense_binary_spa": "STAAR-9",
     "staar_related_dense_binary_spa_filter": "STAAR-13",
     "staar_related_sparse_glmmkin": "STAAR-2",
+    "staar_related_sparse_glmmkin_rare_maf_0_01": "STAAR-28",
     "staar_related_dense_glmmkin": "STAAR-3",
+    "staar_related_dense_glmmkin_rare_maf_0_01": "STAAR-29",
     "staar_related_sparse_glmmkin_cond": "STAAR-5",
     "staar_related_dense_glmmkin_cond": "STAAR-6",
 }

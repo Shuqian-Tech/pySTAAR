@@ -27,17 +27,17 @@ def test_related_workflow_skips_precomputed_cov_for_nonbaseline_cutoff(monkeypat
     assert results["num_variant"] != 163.0
 
 
-def test_related_workflow_uses_cutoff_specific_precomputed_cov(monkeypatch):
+def test_related_workflow_derives_subcutoff_cov_from_baseline_precomputed_cov(monkeypatch):
     original_read_csv = workflows.pd.read_csv
-    saw_cutoff_specific_cov = False
+    saw_baseline_cov = False
 
     def _guard_precomputed_reads(*args, **kwargs):
-        nonlocal saw_cutoff_specific_cov
+        nonlocal saw_baseline_cov
         path = str(args[0]) if args else ""
-        if path.endswith("example_glmmkin_cov.csv"):
-            raise AssertionError("baseline cutoff precomputed cov should not be loaded")
         if path.endswith("example_glmmkin_cov_rare_maf_0_01.csv"):
-            saw_cutoff_specific_cov = True
+            raise AssertionError("cutoff-specific precomputed cov should be derived from baseline")
+        if path.endswith("example_glmmkin_cov.csv"):
+            saw_baseline_cov = True
         return original_read_csv(*args, **kwargs)
 
     monkeypatch.setattr(workflows.pd, "read_csv", _guard_precomputed_reads)
@@ -50,7 +50,7 @@ def test_related_workflow_uses_cutoff_specific_precomputed_cov(monkeypatch):
     )
 
     assert results["num_variant"] == 153.0
-    assert saw_cutoff_specific_cov is True
+    assert saw_baseline_cov is True
 
 
 def test_related_workflow_uses_precomputed_cov_for_baseline_cutoff(monkeypatch):

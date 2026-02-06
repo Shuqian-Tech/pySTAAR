@@ -69,6 +69,31 @@ def _related_cov_path_for_cutoff(rare_maf_cutoff: float) -> Path:
     )
 
 
+def _derive_related_cov_from_baseline(
+    genotype: np.ndarray,
+    baseline_cov: np.ndarray,
+    rare_maf_cutoff: float,
+) -> np.ndarray | None:
+    if rare_maf_cutoff > BASELINE_PRECOMPUTED_RARE_MAF_CUTOFF:
+        return None
+
+    _, _, maf = matrix_flip(genotype)
+    rv_base = (maf < BASELINE_PRECOMPUTED_RARE_MAF_CUTOFF) & (maf > 0)
+    rv_target = (maf < rare_maf_cutoff) & (maf > 0)
+    if not np.all(rv_target <= rv_base):
+        return None
+
+    base_indices = np.where(rv_base)[0]
+    target_indices = np.where(rv_target)[0]
+    index_map = {variant_idx: pos for pos, variant_idx in enumerate(base_indices.tolist())}
+    try:
+        subset_positions = [index_map[int(variant_idx)] for variant_idx in target_indices]
+    except KeyError:
+        return None
+
+    return baseline_cov[np.ix_(subset_positions, subset_positions)]
+
+
 def _load_related_precomputed_cov_scaled(
     genotype: np.ndarray,
     rare_maf_cutoff: float,
@@ -77,19 +102,43 @@ def _load_related_precomputed_cov_scaled(
     if not use_precomputed_artifacts:
         return None, None
 
-    cov_path = _related_cov_path_for_cutoff(rare_maf_cutoff)
     scaled_path = DATA_DIR / "example_glmmkin_scaled_residuals.csv"
-    if not (cov_path.exists() and scaled_path.exists()):
+    if not scaled_path.exists():
         return None, None
 
-    candidate_cov = pd.read_csv(cov_path).to_numpy()
     candidate_scaled = pd.read_csv(scaled_path).to_numpy().reshape(-1)
     expected_num_variants = _num_rare_variants(genotype, rare_maf_cutoff)
     expected_num_samples = genotype.shape[0]
-    if candidate_cov.shape != (
+    if candidate_scaled.size != expected_num_samples:
+        return None, None
+
+    candidate_cov = None
+    baseline_cov_path = DATA_DIR / "example_glmmkin_cov.csv"
+    if baseline_cov_path.exists():
+        baseline_cov = pd.read_csv(baseline_cov_path).to_numpy()
+        expected_baseline_variants = _num_rare_variants(
+            genotype,
+            BASELINE_PRECOMPUTED_RARE_MAF_CUTOFF,
+        )
+        if baseline_cov.shape == (expected_baseline_variants, expected_baseline_variants):
+            if np.isclose(rare_maf_cutoff, BASELINE_PRECOMPUTED_RARE_MAF_CUTOFF):
+                candidate_cov = baseline_cov
+            else:
+                candidate_cov = _derive_related_cov_from_baseline(
+                    genotype=genotype,
+                    baseline_cov=baseline_cov,
+                    rare_maf_cutoff=rare_maf_cutoff,
+                )
+
+    if candidate_cov is None:
+        cov_path = _related_cov_path_for_cutoff(rare_maf_cutoff)
+        if cov_path.exists():
+            candidate_cov = pd.read_csv(cov_path).to_numpy()
+
+    if candidate_cov is None or candidate_cov.shape != (
         expected_num_variants,
         expected_num_variants,
-    ) or candidate_scaled.size != expected_num_samples:
+    ):
         return None, None
     return candidate_cov, candidate_scaled
 

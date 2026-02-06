@@ -1,0 +1,90 @@
+scenario_id: staar_related_dense_glmmkin_cond_pure_shadow
+description: STAAR conditional workflow for related samples using dense GRM (fit_null_glmmkin + STAAR_cond) (pure-path shadow)
+r_entry_point: fit_null_glmmkin(Y ~ X1 + X2, data=pheno_related, kins=kins_dense) then STAAR_cond(...)
+python_entry_point: staar_related_dense_glmmkin_cond(example, seed=600)
+
+inputs:
+  dataset: example
+  dataset_fingerprint: baselines/example_fingerprint.json
+  simulation_metadata: baselines/example_sim_metadata.json
+
+parameters:
+  seed: 600
+  rare_maf_cutoff: 0.05
+  use_precomputed_artifacts: false
+  method_cond: optimal
+  adj_variant_indices: [0, 3]
+
+sentinels:
+  - name: num_variant
+    file: baselines/related_dense_glmmkin_cond_sentinels.json
+    path: $.num_variant
+    comparison: scalar_approx
+    rtol: 1e-8
+    atol: 0
+
+  - name: cMAC
+    file: baselines/related_dense_glmmkin_cond_sentinels.json
+    path: $.cMAC
+    comparison: scalar_approx
+    rtol: 1e-8
+    atol: 0
+
+  - name: results_STAAR_O_cond
+    file: baselines/related_dense_glmmkin_cond_sentinels.json
+    path: $.results_STAAR_O_cond
+    comparison: scalar_approx
+    rtol: 1e-6
+    atol: 1e-8
+
+  - name: results_ACAT_O_cond
+    file: baselines/related_dense_glmmkin_cond_sentinels.json
+    path: $.results_ACAT_O_cond
+    comparison: scalar_approx
+    rtol: 1e-6
+    atol: 1e-8
+
+  - name: results_STAAR_S_1_25_cond
+    file: baselines/related_dense_glmmkin_cond_sentinels.json
+    path: $.results_STAAR_S_1_25_cond
+    comparison: mapping_approx
+    rtol: 1e-6
+    atol: 1e-8
+
+  - name: results_STAAR_S_1_1_cond
+    file: baselines/related_dense_glmmkin_cond_sentinels.json
+    path: $.results_STAAR_S_1_1_cond
+    comparison: mapping_approx
+    rtol: 1e-6
+    atol: 1e-8
+
+  - name: results_STAAR_B_1_25_cond
+    file: baselines/related_dense_glmmkin_cond_sentinels.json
+    path: $.results_STAAR_B_1_25_cond
+    comparison: mapping_approx
+    rtol: 1e-6
+    atol: 1e-8
+
+  - name: results_STAAR_B_1_1_cond
+    file: baselines/related_dense_glmmkin_cond_sentinels.json
+    path: $.results_STAAR_B_1_1_cond
+    comparison: mapping_approx
+    rtol: 1e-6
+    atol: 1e-8
+
+  - name: results_STAAR_A_1_25_cond
+    file: baselines/related_dense_glmmkin_cond_sentinels.json
+    path: $.results_STAAR_A_1_25_cond
+    comparison: mapping_approx
+    rtol: 1e-6
+    atol: 1e-8
+
+  - name: results_STAAR_A_1_1_cond
+    file: baselines/related_dense_glmmkin_cond_sentinels.json
+    path: $.results_STAAR_A_1_1_cond
+    comparison: mapping_approx
+    rtol: 1e-6
+    atol: 1e-8
+xfail:
+  issue: STAAR-35
+  reason: Pure-path shadow scenario tracked while DEV-001 remains open.

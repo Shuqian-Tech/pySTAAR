@@ -1,0 +1,91 @@
+scenario_id: ai_staar_related_sparse_glmmkin_find_weight_pure_shadow
+description: Ancestry-informed STAAR workflow for related sparse samples with find_weight enabled (pure-path shadow)
+r_entry_point: fit_null_glmmkin(Y ~ X1 + X2, data=pheno_related, family="gaussian", kins=sparse) with population weights/groups then AI_STAAR(..., find_weight=TRUE)
+python_entry_point: ai_staar_related_sparse_glmmkin_find_weight(example, seed=600)
+
+inputs:
+  dataset: example
+  dataset_fingerprint: baselines/example_fingerprint.json
+  simulation_metadata: baselines/example_sim_metadata.json
+
+parameters:
+  seed: 600
+  rare_maf_cutoff: 0.05
+  use_precomputed_artifacts: false
+
+sentinels:
+  - name: num_variant
+    file: baselines/ai_staar_related_sparse_glmmkin_find_weight_sentinels.json
+    path: $.num_variant
+    comparison: scalar_approx
+    rtol: 1e-8
+    atol: 0
+  - name: cMAC
+    file: baselines/ai_staar_related_sparse_glmmkin_find_weight_sentinels.json
+    path: $.cMAC
+    comparison: scalar_approx
+    rtol: 1e-8
+    atol: 0
+  - name: results_STAAR_O
+    file: baselines/ai_staar_related_sparse_glmmkin_find_weight_sentinels.json
+    path: $.results_STAAR_O
+    comparison: scalar_approx
+    rtol: 1e-6
+    atol: 1e-8
+  - name: results_ACAT_O
+    file: baselines/ai_staar_related_sparse_glmmkin_find_weight_sentinels.json
+    path: $.results_ACAT_O
+    comparison: scalar_approx
+    rtol: 1e-6
+    atol: 1e-8
+  - name: weight_all_1
+    file: baselines/ai_staar_related_sparse_glmmkin_find_weight_sentinels.json
+    path: $.weight_all_1
+    comparison: mapping_approx
+    rtol: 1e-8
+    atol: 1e-10
+  - name: weight_all_2
+    file: baselines/ai_staar_related_sparse_glmmkin_find_weight_sentinels.json
+    path: $.weight_all_2
+    comparison: mapping_approx
+    rtol: 1e-8
+    atol: 1e-10
+  - name: results_weight_staar_o
+    file: baselines/ai_staar_related_sparse_glmmkin_find_weight_sentinels.json
+    path: $.results_weight_staar_o
+    comparison: mapping_approx
+    rtol: 1e-6
+    atol: 1e-8
+  - name: results_weight1_staar_o
+    file: baselines/ai_staar_related_sparse_glmmkin_find_weight_sentinels.json
+    path: $.results_weight1_staar_o
+    comparison: mapping_approx
+    rtol: 1e-6
+    atol: 1e-8
+  - name: results_weight2_staar_o
+    file: baselines/ai_staar_related_sparse_glmmkin_find_weight_sentinels.json
+    path: $.results_weight2_staar_o
+    comparison: mapping_approx
+    rtol: 1e-6
+    atol: 1e-8
+  - name: results_weight_staar_s_1_25
+    file: baselines/ai_staar_related_sparse_glmmkin_find_weight_sentinels.json
+    path: $.results_weight_staar_s_1_25
+    comparison: mapping_approx
+    rtol: 1e-6
+    atol: 1e-8
+  - name: results_weight1_staar_s_1_25
+    file: baselines/ai_staar_related_sparse_glmmkin_find_weight_sentinels.json
+    path: $.results_weight1_staar_s_1_25
+    comparison: mapping_approx
+    rtol: 1e-6
+    atol: 1e-8
+  - name: results_weight2_staar_s_1_25
+    file: baselines/ai_staar_related_sparse_glmmkin_find_weight_sentinels.json
+    path: $.results_weight2_staar_s_1_25
+    comparison: mapping_approx
+    rtol: 1e-6
+    atol: 1e-8
+xfail:
+  issue: STAAR-35
+  reason: Pure-path shadow scenario tracked while DEV-001 remains open.

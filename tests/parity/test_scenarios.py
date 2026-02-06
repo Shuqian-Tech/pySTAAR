@@ -101,6 +101,12 @@ def test_scenario_parity(spec_path: Path):
     spec = yaml.safe_load(spec_path.read_text())
     scenario_id = spec["scenario_id"]
     issue = ISSUE_BY_SCENARIO.get(scenario_id, "STAAR-UNKNOWN")
+    xfail_cfg = spec.get("xfail")
+    xfail_issue = issue
+    xfail_reason = ""
+    if isinstance(xfail_cfg, dict):
+        xfail_issue = str(xfail_cfg.get("issue", issue))
+        xfail_reason = str(xfail_cfg.get("reason", "")).strip()
 
     func_name = _parse_entry_point(spec["python_entry_point"])
     func = getattr(workflows, func_name)
@@ -109,32 +115,45 @@ def test_scenario_parity(spec_path: Path):
     params = spec.get("parameters", {})
 
     try:
-        results = func(dataset, **params)
-    except NotImplementedError as exc:
-        pytest.xfail(f"{scenario_id} not implemented ({issue}): {exc}")
+        try:
+            results = func(dataset, **params)
+        except NotImplementedError as exc:
+            if xfail_cfg:
+                message = f"{scenario_id} expected-fail ({xfail_issue}): {exc}"
+                if xfail_reason:
+                    message = f"{message}; {xfail_reason}"
+                pytest.xfail(message)
+            pytest.xfail(f"{scenario_id} not implemented ({issue}): {exc}")
 
-    if results is None:
-        raise AssertionError(
-            f"{scenario_id} returned None. Expected a dict of sentinel values."
-        )
-
-    for sentinel in spec["sentinels"]:
-        expected = _load_json_path(Path(sentinel["file"]), sentinel["path"])
-        actual = results.get(sentinel["name"]) if isinstance(results, dict) else None
-        if actual is None:
+        if results is None:
             raise AssertionError(
-                f"{scenario_id} missing sentinel '{sentinel['name']}' in results"
+                f"{scenario_id} returned None. Expected a dict of sentinel values."
             )
 
-        comparison = sentinel["comparison"]
-        rtol = float(sentinel.get("rtol", 0.0))
-        atol = float(sentinel.get("atol", 0.0))
+        for sentinel in spec["sentinels"]:
+            expected = _load_json_path(Path(sentinel["file"]), sentinel["path"])
+            actual = results.get(sentinel["name"]) if isinstance(results, dict) else None
+            if actual is None:
+                raise AssertionError(
+                    f"{scenario_id} missing sentinel '{sentinel['name']}' in results"
+                )
 
-        if comparison == "scalar_approx":
-            _assert_scalar_close(sentinel["name"], actual, expected, rtol, atol)
-        elif comparison == "mapping_approx":
-            _assert_mapping_close(sentinel["name"], actual, expected, rtol, atol)
-        else:
-            raise ValueError(
-                f"Unsupported comparison type: {comparison} in {spec_path}"
-            )
+            comparison = sentinel["comparison"]
+            rtol = float(sentinel.get("rtol", 0.0))
+            atol = float(sentinel.get("atol", 0.0))
+
+            if comparison == "scalar_approx":
+                _assert_scalar_close(sentinel["name"], actual, expected, rtol, atol)
+            elif comparison == "mapping_approx":
+                _assert_mapping_close(sentinel["name"], actual, expected, rtol, atol)
+            else:
+                raise ValueError(
+                    f"Unsupported comparison type: {comparison} in {spec_path}"
+                )
+    except AssertionError as exc:
+        if xfail_cfg:
+            message = f"{scenario_id} expected-fail ({xfail_issue}): {exc}"
+            if xfail_reason:
+                message = f"{message}; {xfail_reason}"
+            pytest.xfail(message)
+        raise

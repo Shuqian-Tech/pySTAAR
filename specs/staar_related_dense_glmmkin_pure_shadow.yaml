@@ -1,0 +1,88 @@
+scenario_id: staar_related_dense_glmmkin_pure_shadow
+description: STAAR vignette workflow for related samples using dense GRM (fit_null_glmmkin + STAAR) (pure-path shadow)
+r_entry_point: fit_null_glmmkin(Y ~ X1 + X2, data=pheno_related, kins=kins_dense) then STAAR(...)
+python_entry_point: staar_related_dense_glmmkin(example, seed=600)
+
+inputs:
+  dataset: example
+  dataset_fingerprint: baselines/example_fingerprint.json
+  simulation_metadata: baselines/example_sim_metadata.json
+
+parameters:
+  seed: 600
+  rare_maf_cutoff: 0.05
+  use_precomputed_artifacts: false
+
+sentinels:
+  - name: num_variant
+    file: baselines/related_dense_glmmkin_sentinels.json
+    path: $.num_variant
+    comparison: scalar_approx
+    rtol: 1e-8
+    atol: 0
+
+  - name: results_STAAR_O
+    file: baselines/related_dense_glmmkin_sentinels.json
+    path: $.results_STAAR_O
+    comparison: scalar_approx
+    rtol: 1e-6
+    atol: 1e-8
+
+  - name: results_STAAR_S_1_25
+    file: baselines/related_dense_glmmkin_sentinels.json
+    path: $.results_STAAR_S_1_25
+    comparison: mapping_approx
+    rtol: 1e-6
+    atol: 1e-8
+
+  - name: results_STAAR_S_1_1
+    file: baselines/related_dense_glmmkin_sentinels.json
+    path: $.results_STAAR_S_1_1
+    comparison: mapping_approx
+    rtol: 1e-6
+    atol: 1e-8
+
+  - name: results_STAAR_B_1_25
+    file: baselines/related_dense_glmmkin_sentinels.json
+    path: $.results_STAAR_B_1_25
+    comparison: mapping_approx
+    rtol: 1e-6
+    atol: 1e-8
+
+  - name: results_STAAR_B_1_1
+    file: baselines/related_dense_glmmkin_sentinels.json
+    path: $.results_STAAR_B_1_1
+    comparison: mapping_approx
+    rtol: 1e-6
+    atol: 1e-8
+
+  - name: results_STAAR_A_1_25
+    file: baselines/related_dense_glmmkin_sentinels.json
+    path: $.results_STAAR_A_1_25
+    comparison: mapping_approx
+    rtol: 1e-6
+    atol: 1e-8
+
+  - name: results_STAAR_A_1_1
+    file: baselines/related_dense_glmmkin_sentinels.json
+    path: $.results_STAAR_A_1_1
+    comparison: mapping_approx
+    rtol: 1e-6
+    atol: 1e-8
+
+  - name: nullmodel_beta
+    file: baselines/related_dense_glmmkin_sentinels.json
+    path: $.nullmodel_beta
+    comparison: mapping_approx
+    rtol: 1e-6
+    atol: 1e-8
+
+  - name: nullmodel_theta
+    file: baselines/related_dense_glmmkin_sentinels.json
+    path: $.nullmodel_theta
+    comparison: mapping_approx
+    rtol: 1e-6
+    atol: 1e-8
+xfail:
+  issue: STAAR-35
+  reason: Pure-path shadow scenario tracked while DEV-001 remains open.

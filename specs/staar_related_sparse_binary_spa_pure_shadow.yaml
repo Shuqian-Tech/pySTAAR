@@ -1,0 +1,61 @@
+scenario_id: staar_related_sparse_binary_spa_pure_shadow
+description: STAAR-Binary-SPA workflow for related samples using sparse GRM (pure-path shadow)
+r_entry_point: fit_null_glmmkin_Binary_SPA(Y ~ X1 + X2, data=binary_pheno_related, kins=kins_sparse) then STAAR_Binary_SPA(...)
+python_entry_point: staar_related_sparse_binary_spa(example, seed=600)
+
+inputs:
+  dataset: example
+  dataset_fingerprint: baselines/example_fingerprint.json
+  simulation_metadata: baselines/example_sim_metadata.json
+
+parameters:
+  seed: 600
+  rare_maf_cutoff: 0.05
+  case_quantile: 0.95
+  use_precomputed_artifacts: false
+
+sentinels:
+  - name: num_variant
+    file: baselines/related_sparse_binary_spa_sentinels.json
+    path: $.num_variant
+    comparison: scalar_approx
+    rtol: 1e-8
+    atol: 0
+
+  - name: cMAC
+    file: baselines/related_sparse_binary_spa_sentinels.json
+    path: $.cMAC
+    comparison: scalar_approx
+    rtol: 1e-8
+    atol: 0
+
+  - name: case_count
+    file: baselines/related_sparse_binary_spa_sentinels.json
+    path: $.case_count
+    comparison: scalar_approx
+    rtol: 1e-8
+    atol: 0
+
+  - name: results_STAAR_B
+    file: baselines/related_sparse_binary_spa_sentinels.json
+    path: $.results_STAAR_B
+    comparison: scalar_approx
+    rtol: 1e-6
+    atol: 1e-8
+
+  - name: results_STAAR_B_1_25
+    file: baselines/related_sparse_binary_spa_sentinels.json
+    path: $.results_STAAR_B_1_25
+    comparison: mapping_approx
+    rtol: 1e-6
+    atol: 1e-8
+
+  - name: results_STAAR_B_1_1
+    file: baselines/related_sparse_binary_spa_sentinels.json
+    path: $.results_STAAR_B_1_1
+    comparison: mapping_approx
+    rtol: 1e-6
+    atol: 1e-8
+xfail:
+  issue: STAAR-35
+  reason: Pure-path shadow scenario tracked while DEV-001 remains open.

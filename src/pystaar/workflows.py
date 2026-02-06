@@ -1224,15 +1224,6 @@ def _related_indiv_common_cond(
     if min(adj_variant_indices) < 0 or max(adj_variant_indices) >= data.geno.shape[1]:
         raise ValueError("adj_variant_indices contains out-of-range indices.")
 
-    precomputed_cov_cond = _load_related_cond_precomputed_cov(
-        genotype=data.geno,
-        sparse=sparse,
-        rare_maf_cutoff=rare_maf_cutoff,
-        method_cond=method_cond,
-        adj_variant_indices=adj_variant_indices,
-        use_precomputed_artifacts=use_precomputed_artifacts,
-    )
-
     genotype_adj = data.geno[:, adj_variant_indices]
     results = indiv_score_test_region_cond(
         genotype=data.geno,
@@ -1240,7 +1231,7 @@ def _related_indiv_common_cond(
         obj_nullmodel=obj_nullmodel,
         rare_maf_cutoff=rare_maf_cutoff,
         method_cond=method_cond,
-        precomputed_cov_cond=precomputed_cov_cond,
+        precomputed_cov_cond=None,
     )
     summary = _summarize_indiv_score(
         results["Score_cond"],

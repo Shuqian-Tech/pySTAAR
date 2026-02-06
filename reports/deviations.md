@@ -48,7 +48,7 @@ Related precomputed parity paths also anchor GLMM null-model `theta` to baseline
 
 For related binary-SPA parity paths, Python now reconstructs fitted values (`fitted = Y - scaled_residuals`) from a shared precomputed scaled-residual artifact and computes `XW`, `XXWX_inv`, and `SPA_p_filter` covariance in Python; precomputed `*_cov_filter.csv`, `*_fitted.csv`, `*_XW.csv`, and `*_XXWX_inv.csv` artifacts are no longer loaded. Dense and sparse related-binary parity now share a single scaled-residual artifact (`example_glmmkin_binary_spa_sparse_scaled_residuals.csv`).
 Core related GLMM STAAR parity now loads `example_glmmkin_cov.csv` only for the baseline cutoff (`rare_maf_cutoff=0.05`); non-baseline cutoffs and other related workflows no longer load GLMM covariance artifacts.
-Related conditional sparse/dense parity now share a single conditional covariance artifact (`example_glmmkin_cov_cond_sparse.csv`).
+Core related `staar_*_glmmkin_cond` sparse/dense parity now shares a single conditional covariance artifact (`example_glmmkin_cov_cond_sparse.csv`); related individual conditional score-test parity computes conditional covariance fully in Python.
 Related AI sparse/dense parity now share a single set of AI covariance artifacts (`example_ai_cov_sparse_*`).
 
 ### Why

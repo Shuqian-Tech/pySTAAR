@@ -55,7 +55,7 @@ Open compliance notes:
 - Related `SPA_p_filter=TRUE` now computes covariance in Python from reconstructed fitted values + kinship (no precomputed `*_cov_filter.csv` artifacts).
 - Related binary precomputed parity path now reconstructs fitted values from shared precomputed scaled residuals and computes `XW`/`XXWX_inv` in Python (no precomputed `*_fitted.csv`, `*_XW.csv`, or `*_XXWX_inv.csv` artifacts).
 - Related binary dense/sparse parity paths now share one scaled-residual artifact (`example_glmmkin_binary_spa_sparse_scaled_residuals.csv`), dropping dependency on separate dense/sparse fitted artifacts.
-- Related conditional dense/sparse parity paths now share one conditional covariance artifact (`example_glmmkin_cov_cond_sparse.csv`), dropping dependency on a separate dense conditional covariance artifact.
+- Core related conditional STAAR dense/sparse parity paths now share one conditional covariance artifact (`example_glmmkin_cov_cond_sparse.csv`), while related individual conditional parity no longer loads conditional covariance artifacts.
 - Related AI dense/sparse parity paths now share one AI covariance artifact set (`example_ai_cov_sparse_*`), dropping dependency on separate dense AI covariance artifacts.
 - Related GLMM parity for lower rare-MAF cutoffs now runs without loading GLMM covariance artifacts; only baseline-cutoff core related-GLMM STAAR parity still loads `example_glmmkin_cov.csv`.
 - This behavior is recorded as `DEV-001` in `reports/deviations.md`.

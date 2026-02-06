@@ -38,6 +38,6 @@
 - STAAR-36: Retire related binary-SPA parity fitted-artifact dependency (`example_glmmkin_binary_spa_sparse_fitted.csv`) under strict tolerance checks. (Resolved)
 - STAAR-37: Retire related GLMM parity dependencies on precomputed covariance/scaled residual/theta artifacts. (Open; narrowed: non-baseline cutoff and non-core related workflows no longer load GLMM covariance artifacts)
 - STAAR-38: Retire related conditional parity dependency on precomputed conditional covariance artifact. (Open; narrowed: related indiv conditional parity no longer loads cond covariance artifacts, core STAAR_cond parity still depends on shared sparse cond covariance)
-- STAAR-39: Retire related AI parity dependencies on precomputed AI covariance artifacts. (Open)
+- STAAR-39: Retire related AI parity dependencies on precomputed AI covariance artifacts. (Open; blocker: strict parity miss without AI covariance artifacts remains on find-weight sentinel `results_weight2_staar_o.B2` at ~`1.82e-7`, just above tolerance)
 - STAAR-40: Remove parity reliance on `use_precomputed_artifacts` in specs/workflow paths after pure-path parity closure. (Open)
 - STAAR-41: Close `DEV-001` with final strict-parity documentation updates and release handoff notes. (Open)

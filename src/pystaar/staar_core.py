@@ -1366,9 +1366,17 @@ def _variant_set_pvalues(
     annotation_phred: np.ndarray,
     obj_nullmodel,
     precomputed_cov: np.ndarray | None = None,
+    precomputed_weights: tuple[np.ndarray, np.ndarray, np.ndarray] | None = None,
+    precomputed_mac: np.ndarray | None = None,
 ) -> np.ndarray:
-    w_B, w_S, w_A = _compute_weights(maf, annotation_phred)
-    mac = np.round(maf * 2 * G.shape[0]).astype(int)
+    if precomputed_weights is None:
+        w_B, w_S, w_A = _compute_weights(maf, annotation_phred)
+    else:
+        w_B, w_S, w_A = precomputed_weights
+    if precomputed_mac is None:
+        mac = np.round(maf * 2 * G.shape[0]).astype(int)
+    else:
+        mac = precomputed_mac
 
     if obj_nullmodel.relatedness:
         residuals = obj_nullmodel.scaled_residuals
@@ -1540,7 +1548,16 @@ def ai_staar(
         raise ValueError("AI-STAAR pop-weight matrices must have the same number of base tests.")
     B = pop_weights_1_1.shape[1]
 
-    indices = [np.where(pop_groups == level)[0] for level in pop_levels]
+    level_to_idx = {level: idx for idx, level in enumerate(pop_levels)}
+    pop_idx = np.fromiter(
+        (level_to_idx.get(level, -1) for level in pop_groups.tolist()),
+        dtype=np.int64,
+        count=pop_groups.shape[0],
+    )
+    if np.any(pop_idx < 0):
+        raise ValueError("pop_groups contains levels that are not in pop_levels.")
+
+    indices = [np.where(pop_idx == i)[0] for i in range(n_pop)]
     a_p = np.zeros(n_pop, dtype=float)
     for i, idx in enumerate(indices):
         if idx.size == 0:
@@ -1552,6 +1569,8 @@ def ai_staar(
         a_p[i] = stats.beta.pdf(a_mean, 1, 25) if a_mean > 0 else 0.0
 
     maf = maf_full[rv_label]
+    precomputed_weights = _compute_weights(maf, annotation_phred)
+    precomputed_mac = np.round(maf * 2 * G_base.shape[0]).astype(int)
     precomputed_cov_s1 = getattr(obj_nullmodel, "precomputed_ai_cov_s1", None)
     precomputed_cov_s2 = getattr(obj_nullmodel, "precomputed_ai_cov_s2", None)
 
@@ -1567,13 +1586,8 @@ def ai_staar(
             weight_all_1.append(w_b_1.copy())
             weight_all_2.append(w_b_2.copy())
 
-        G1 = G_base.copy()
-        G2 = G_base.copy()
-        for i, idx in enumerate(indices):
-            if idx.size == 0:
-                continue
-            G1[idx, :] = w_b_1[i] * G1[idx, :]
-            G2[idx, :] = w_b_2[i] * G2[idx, :]
+        G1 = G_base * w_b_1[pop_idx][:, None]
+        G2 = G_base * w_b_2[pop_idx][:, None]
 
         precomputed_cov_1 = None
         precomputed_cov_2 = None
@@ -1592,6 +1606,8 @@ def ai_staar(
             annotation_phred=annotation_phred,
             obj_nullmodel=obj_nullmodel,
             precomputed_cov=precomputed_cov_1,
+            precomputed_weights=precomputed_weights,
+            precomputed_mac=precomputed_mac,
         )
         pvalues_2 = _variant_set_pvalues(
             G=G2,
@@ -1599,6 +1615,8 @@ def ai_staar(
             annotation_phred=annotation_phred,
             obj_nullmodel=obj_nullmodel,
             precomputed_cov=precomputed_cov_2,
+            precomputed_weights=precomputed_weights,
+            precomputed_mac=precomputed_mac,
         )
         pvalues_1_tot.append(pvalues_1)
         pvalues_2_tot.append(pvalues_2)

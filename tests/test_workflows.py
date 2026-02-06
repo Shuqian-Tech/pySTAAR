@@ -200,6 +200,47 @@ def test_related_binary_spa_prefilter_loads_precomputed_cov(monkeypatch):
     assert captured["has_precomputed_cov_filter"] is True
 
 
+@pytest.mark.parametrize(
+    "workflow,blocked_file",
+    [
+        (
+            workflows.staar_related_sparse_binary_spa,
+            "example_glmmkin_binary_spa_sparse_cov_filter.csv",
+        ),
+        (
+            workflows.staar_related_dense_binary_spa,
+            "example_glmmkin_binary_spa_dense_cov_filter.csv",
+        ),
+    ],
+)
+def test_related_binary_spa_prefilter_does_not_load_precomputed_cov_file(
+    monkeypatch,
+    workflow,
+    blocked_file,
+):
+    original_read_csv = workflows.pd.read_csv
+
+    def _guard_cov_filter_reads(*args, **kwargs):
+        path = str(args[0]) if args else ""
+        if path.endswith(blocked_file):
+            raise AssertionError("related SPA prefilter should not load precomputed cov file")
+        return original_read_csv(*args, **kwargs)
+
+    monkeypatch.setattr(workflows.pd, "read_csv", _guard_cov_filter_reads)
+
+    results = workflow(
+        dataset="example",
+        seed=600,
+        rare_maf_cutoff=0.05,
+        SPA_p_filter=True,
+        p_filter_cutoff=0.05,
+        use_precomputed_artifacts=True,
+    )
+
+    assert results["num_variant"] == 163.0
+    assert 0.0 < results["results_STAAR_B"] <= 1.0
+
+
 def test_related_binary_spa_prefilter_defaults_to_pure_covariance(monkeypatch):
     original_staar_binary_spa = workflows.staar_binary_spa
     captured = {}

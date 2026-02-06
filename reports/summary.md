@@ -52,7 +52,7 @@ Open compliance notes:
 - AI-STAAR related parity paths no longer depend on baseline `nullmodel_theta` sentinels; remaining AI parity artifacts are covariance-based.
 - Related binary SPA pure-path deltas against baseline sentinels are now small (roughly `1e-6` to `1e-5` on `example`) but still exceed current strict parity tolerances in some mapped sentinels.
 - Unrelated `SPA_p_filter=TRUE` now runs parity on a fully computed Python covariance path (no precomputed covariance artifact).
-- Related `SPA_p_filter=TRUE` workflows still consume precomputed R-derived covariance artifacts for baseline parity scenarios.
+- Related `SPA_p_filter=TRUE` now computes covariance in Python from precomputed fitted values + kinship (no precomputed `*_cov_filter.csv` artifacts).
 - This behavior is recorded as `DEV-001` in `reports/deviations.md`.
 - Scientific owner approval for `DEV-001` is recorded on 2026-02-06 (`xiaozhouwang`); deviation remains temporary and tracked.
 - Cross-language baseline benchmark is complete on the reference backend; geometric-mean Python speedup vs R across measured scenarios is approximately `1.64x` (see `reports/performance.md`).

@@ -10,9 +10,14 @@ from types import SimpleNamespace
 
 import numpy as np
 import pandas as pd
+import scipy.sparse as sp
+from scipy.optimize import minimize_scalar
+from scipy.special import logit
+from scipy.sparse.linalg import splu
 
 from .data import load_example_dataset
 from .models import (
+    _reml_nll_binomial_tau,
     fit_null_glm,
     fit_null_glm_binary_spa,
     fit_null_glmmkin,
@@ -160,6 +165,65 @@ def _sample_variant_mapping(values: np.ndarray, indices: tuple[int, ...]) -> dic
         if idx < values.size and np.isfinite(values[idx]):
             mapping[f"v{idx + 1}"] = float(values[idx])
     return mapping
+
+
+def _compute_related_binary_prefilter_cov_from_fitted(
+    genotype: np.ndarray,
+    pheno: pd.DataFrame,
+    kins: sp.csc_matrix,
+    fitted: np.ndarray,
+    rare_maf_cutoff: float,
+) -> np.ndarray | None:
+    y = pheno["Y"].to_numpy(dtype=float)
+    X = np.column_stack(
+        [
+            np.ones(len(pheno), dtype=float),
+            pheno["X1"].to_numpy(dtype=float),
+            pheno["X2"].to_numpy(dtype=float),
+        ]
+    )
+    mu = np.clip(np.asarray(fitted, dtype=float).reshape(-1), 1e-9, 1.0 - 1e-9)
+    if mu.size != y.size:
+        return None
+
+    eta = logit(mu)
+    weights = np.clip(mu * (1.0 - mu), 1e-9, None)
+    z = eta + (y - mu) / weights
+    d_inv = 1.0 / weights
+
+    try:
+        opt = minimize_scalar(
+            _reml_nll_binomial_tau,
+            bounds=(-10.0, 5.0),
+            method="bounded",
+            args=(X, z, d_inv, kins),
+            options={"xatol": 1e-6, "maxiter": 200},
+        )
+        tau = float(np.exp(opt.x)) if opt.success else 1.0
+    except Exception:
+        tau = 1.0
+
+    sigma = sp.diags(d_inv, format="csc")
+    if tau != 0.0:
+        sigma = sigma + kins * tau
+
+    try:
+        sigma_solver = splu(sigma)
+    except Exception:
+        return None
+
+    genotype_flip, _, maf = matrix_flip(genotype)
+    rv_label = (maf < rare_maf_cutoff) & (maf > 0)
+    G = genotype_flip[:, rv_label]
+    if G.shape[1] == 0:
+        return None
+
+    sigma_i_x = sigma_solver.solve(X)
+    cov = np.linalg.inv(X.T @ sigma_i_x)
+    sigma_i_g = sigma_solver.solve(G)
+    t_sigma_i_x_g = sigma_i_x.T @ G
+    cov_filter = sigma_i_g.T @ G - t_sigma_i_x_g.T @ cov @ t_sigma_i_x_g
+    return 0.5 * (cov_filter + cov_filter.T)
 
 
 def _flatten_ai_weight_matrix(weight_matrix: np.ndarray, pop_levels: list[str]) -> dict[str, float]:
@@ -509,7 +573,6 @@ def _related_binary_spa_common(
     scaled_path = DATA_DIR / f"example_glmmkin_binary_spa_{suffix}_scaled_residuals.csv"
     xw_path = DATA_DIR / f"example_glmmkin_binary_spa_{suffix}_XW.csv"
     xxwx_inv_path = DATA_DIR / f"example_glmmkin_binary_spa_{suffix}_XXWX_inv.csv"
-    cov_filter_path = DATA_DIR / f"example_glmmkin_binary_spa_{suffix}_cov_filter.csv"
 
     obj_nullmodel = None
     if use_precomputed and (fitted_path.exists() and scaled_path.exists() and xw_path.exists() and xxwx_inv_path.exists()):
@@ -518,11 +581,14 @@ def _related_binary_spa_common(
         XW = pd.read_csv(xw_path).to_numpy()
         XXWX_inv = pd.read_csv(xxwx_inv_path).to_numpy()
         precomputed_cov_filter = None
-        if SPA_p_filter and cov_filter_path.exists():
-            candidate_cov = pd.read_csv(cov_filter_path).to_numpy()
-            expected_num_variants = _num_rare_variants(data.geno, rare_maf_cutoff)
-            if candidate_cov.shape == (expected_num_variants, expected_num_variants):
-                precomputed_cov_filter = candidate_cov
+        if SPA_p_filter:
+            precomputed_cov_filter = _compute_related_binary_prefilter_cov_from_fitted(
+                genotype=data.geno,
+                pheno=pheno,
+                kins=kins,
+                fitted=fitted,
+                rare_maf_cutoff=rare_maf_cutoff,
+            )
 
         obj_nullmodel = SimpleNamespace(
             relatedness=True,

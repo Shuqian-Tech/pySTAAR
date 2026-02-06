@@ -47,8 +47,6 @@ The following precomputed artifacts are still used for baseline parity when `use
 - `data/example_glmmkin_binary_spa_dense_scaled_residuals.csv`
 - `data/example_glmmkin_binary_spa_dense_XW.csv`
 - `data/example_glmmkin_binary_spa_dense_XXWX_inv.csv`
-- `data/example_glmmkin_binary_spa_sparse_cov_filter.csv`
-- `data/example_glmmkin_binary_spa_dense_cov_filter.csv`
 - `data/example_ai_cov_sparse_s1_b1.csv`
 - `data/example_ai_cov_sparse_s1_b2.csv`
 - `data/example_ai_cov_sparse_s2_b1.csv`
@@ -60,7 +58,7 @@ The following precomputed artifacts are still used for baseline parity when `use
 
 These are passed into the Python null-model/STAAR pipeline to reduce backend-specific numeric drift and match baseline sentinels for the `example` scenario.
 
-For related `SPA_p_filter=TRUE`, precomputed covariance artifacts are used in baseline scenarios to align normal-approximation prefilter behavior with R outputs. If these artifacts are unavailable, the implementation falls back to fully computed Python covariance when possible, or full SPA recalculation.
+For related `SPA_p_filter=TRUE`, covariance is now computed in Python from precomputed fitted values + kinship and no longer loaded from precomputed `*_cov_filter.csv` artifacts.
 
 ### Why
 
@@ -81,6 +79,7 @@ Observed on 2026-02-06 (reference backend):
   - `results_STAAR_S_1_25_cond["SKAT(1,25)-Z2"]`: `-2.6103357830986607e-05`
 - Related binary SPA now has a fully computed Python PQL-style fallback path and uses that path by default.
 - Unrelated binary SPA prefilter now computes covariance directly from the Python null model (no precomputed covariance artifact needed) while preserving strict parity.
+- Related binary SPA prefilter now computes covariance in Python from precomputed fitted values + kinship (no precomputed covariance artifact needed) while preserving strict parity.
 - Current related binary pure-path deltas against baseline sentinels (`example`):
   - Sparse `results_STAAR_B`: `0.23360206101344283` vs baseline `0.2336049736705653` (delta `-2.92187712246116e-06`)
   - Dense `results_STAAR_B`: `0.2336021825223668` vs baseline `0.233605092772099` (delta `-2.9102497322207713e-06`)

@@ -95,3 +95,11 @@
 24. **ai_staar_related_dense_glmmkin_find_weight** — ancestry-informed STAAR omnibus test using `AI_STAAR(..., find_weight=TRUE)` with dense related null model
 - Inputs: STAAR `example` dataset, related phenotype/covariates, dense kinship matrix, deterministic ancestry groups and base-test weight matrices
 - Key sentinels: `num_variant`, `cMAC`, `results_STAAR_O`, `results_ACAT_O`, ancestry weight matrices, per-base weighted STAAR metrics
+
+25. **staar_unrelated_glm_rare_maf_0_01** — unrelated STAAR workflow parameter variant at `rare_maf_cutoff=0.01`
+- Inputs: STAAR `example` dataset, unrelated phenotype/covariates, annotations
+- Key sentinels: same sentinel set as `staar_unrelated_glm`, with variant count and p-values recalculated at `rare_maf_cutoff=0.01`
+
+26. **staar_unrelated_binary_spa_case_q90** — unrelated binary SPA workflow parameter variant at `case_quantile=0.90`
+- Inputs: STAAR `example` dataset, unrelated phenotype/covariates thresholded at `quantile(Y, 0.90)`, annotations
+- Key sentinels: same sentinel set as `staar_unrelated_binary_spa`, with updated `case_count` and STAAR-B outputs

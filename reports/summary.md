@@ -3,8 +3,8 @@
 Status as of 2026-02-06:
 
 - Phase: 3 (Performance and backends; baseline benchmark collection started)
-- Parity status: `pytest tests/parity -q` passes (`24 passed`) on the documented reference backend.
-- Full test status: `pytest -q` passes (`47 passed`).
+- Parity status: `pytest tests/parity -q` passes (`26 passed`) on the documented reference backend.
+- Full test status: `pytest -q` passes (`52 passed`).
 - Scenarios implemented:
   - `ai_staar_related_sparse_glmmkin_find_weight`
   - `ai_staar_related_dense_glmmkin_find_weight`
@@ -33,6 +33,7 @@ Status as of 2026-02-06:
 - Artifacts:
   - Issues: `reports/issues.md`
   - Deviations: `reports/deviations.md`
+  - API contract map: `reports/api_contract.md`
   - Reference backend: `reports/reference_backend.md`
   - Python environment capture: `reports/python_environment.md`
   - Data source/fingerprints/checksums: `data/DATA_SOURCE.md`
@@ -49,6 +50,9 @@ Open compliance notes:
 - This behavior is recorded as `DEV-001` in `reports/deviations.md`.
 - Scientific owner approval for `DEV-001` is recorded on 2026-02-06 (`xiaozhouwang`); deviation remains temporary and tracked.
 - Cross-language baseline benchmark is complete on the reference backend; geometric-mean Python speedup vs R across measured scenarios is approximately `1.64x` (see `reports/performance.md`).
+- Strict parity coverage has been expanded with additional R-backed parameter scenarios:
+  - `staar_unrelated_glm_rare_maf_0_01`
+  - `staar_unrelated_binary_spa_case_q90`
 
 Phase 2 handoff status:
 
@@ -58,8 +62,8 @@ Phase 2 handoff status:
 
 PR-ready notes (copy into PR description):
 
-- Parity on reference backend: `pytest tests/parity -q` -> `24 passed`.
-- Full test suite: `pytest -q` -> `47 passed`.
+- Parity on reference backend: `pytest tests/parity -q` -> `26 passed`.
+- Full test suite: `pytest -q` -> `52 passed`.
 - Deviations: `DEV-001` (approved temporary) in `reports/deviations.md`.
 - Required named roles per policy:
   - Migration owner: `<fill>`

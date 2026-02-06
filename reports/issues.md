@@ -25,3 +25,5 @@
 - STAAR-23: Implement `AI_STAAR(..., find_weight=TRUE)` workflow coverage and parity checks. (Resolved)
 - STAAR-24: Implement `AI_STAAR(..., find_weight=TRUE)` workflow for related sparse samples and parity checks. (Resolved)
 - STAAR-25: Implement `AI_STAAR(..., find_weight=TRUE)` workflow for related dense samples and parity checks. (Resolved)
+- STAAR-26: Add strict parity scenario for `staar_unrelated_glm` with `rare_maf_cutoff=0.01`. (Resolved)
+- STAAR-27: Add strict parity scenario for `staar_unrelated_binary_spa` with `case_quantile=0.90`. (Resolved)

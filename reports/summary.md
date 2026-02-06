@@ -3,8 +3,8 @@
 Status as of 2026-02-06:
 
 - Phase: 3 (Performance and backends; baseline benchmark collection started)
-- Parity status: `pytest tests/parity -q` passes (`28 passed`) on the documented reference backend.
-- Full test status: `pytest -q` passes (`66 passed`).
+- Parity status: `pytest tests/parity -q` passes (`28 passed, 18 xfailed`) on the documented reference backend.
+- Full test status: `pytest -q` passes (`82 passed, 18 xfailed`).
 - Scenarios implemented:
   - `ai_staar_related_sparse_glmmkin_find_weight`
   - `ai_staar_related_dense_glmmkin_find_weight`
@@ -57,7 +57,7 @@ Open compliance notes:
 - Related binary dense/sparse parity paths now share one scaled-residual artifact (`example_glmmkin_binary_spa_sparse_scaled_residuals.csv`), dropping dependency on separate dense/sparse fitted artifacts.
 - Related conditional dense/sparse parity paths now share one conditional covariance artifact (`example_glmmkin_cov_cond_sparse.csv`), dropping dependency on a separate dense conditional covariance artifact.
 - Related AI dense/sparse parity paths now share one AI covariance artifact set (`example_ai_cov_sparse_*`), dropping dependency on separate dense AI covariance artifacts.
-- Related GLMM parity for lower rare-MAF cutoffs now derives covariance submatrices from baseline `example_glmmkin_cov.csv` (no precomputed `example_glmmkin_cov_rare_maf_0_01.csv` artifact dependency).
+- Related GLMM parity for lower rare-MAF cutoffs now runs without loading GLMM covariance artifacts; only baseline-cutoff core related-GLMM STAAR parity still loads `example_glmmkin_cov.csv`.
 - This behavior is recorded as `DEV-001` in `reports/deviations.md`.
 - Scientific owner approval for `DEV-001` is recorded on 2026-02-06 (`xiaozhouwang`); deviation remains temporary and tracked.
 - Cross-language baseline benchmark is complete on the reference backend; geometric-mean Python speedup vs R across measured scenarios is approximately `1.64x` (see `reports/performance.md`).
@@ -75,8 +75,8 @@ Phase 2 handoff status:
 
 PR-ready notes (copy into PR description):
 
-- Parity on reference backend: `pytest tests/parity -q` -> `28 passed`.
-- Full test suite: `pytest -q` -> `66 passed`.
+- Parity on reference backend: `pytest tests/parity -q` -> `28 passed, 18 xfailed`.
+- Full test suite: `pytest -q` -> `82 passed, 18 xfailed`.
 - Deviations: `DEV-001` (approved temporary) in `reports/deviations.md`.
 - Required named roles per policy:
   - Migration owner: `<fill>`

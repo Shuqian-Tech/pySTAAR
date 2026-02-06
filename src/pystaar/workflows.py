@@ -58,91 +58,44 @@ def _num_rare_variants(genotype: np.ndarray, rare_maf_cutoff: float) -> int:
     return int(np.sum((maf < rare_maf_cutoff) & (maf > 0)))
 
 
-def _rare_maf_cutoff_tag(rare_maf_cutoff: float) -> str:
-    cutoff_text = format(float(rare_maf_cutoff), ".10g")
-    return cutoff_text.replace(".", "_")
-
-
-def _related_cov_path_for_cutoff(rare_maf_cutoff: float) -> Path:
-    if np.isclose(rare_maf_cutoff, BASELINE_PRECOMPUTED_RARE_MAF_CUTOFF):
-        return DATA_DIR / "example_glmmkin_cov.csv"
-    return DATA_DIR / (
-        f"example_glmmkin_cov_rare_maf_{_rare_maf_cutoff_tag(rare_maf_cutoff)}.csv"
-    )
-
-
-def _derive_related_cov_from_baseline(
+def _load_related_precomputed_scaled_residuals(
     genotype: np.ndarray,
-    baseline_cov: np.ndarray,
-    rare_maf_cutoff: float,
-) -> np.ndarray | None:
-    if rare_maf_cutoff > BASELINE_PRECOMPUTED_RARE_MAF_CUTOFF:
-        return None
-
-    _, _, maf = matrix_flip(genotype)
-    rv_base = (maf < BASELINE_PRECOMPUTED_RARE_MAF_CUTOFF) & (maf > 0)
-    rv_target = (maf < rare_maf_cutoff) & (maf > 0)
-    if not np.all(rv_target <= rv_base):
-        return None
-
-    base_indices = np.where(rv_base)[0]
-    target_indices = np.where(rv_target)[0]
-    index_map = {variant_idx: pos for pos, variant_idx in enumerate(base_indices.tolist())}
-    try:
-        subset_positions = [index_map[int(variant_idx)] for variant_idx in target_indices]
-    except KeyError:
-        return None
-
-    return baseline_cov[np.ix_(subset_positions, subset_positions)]
-
-
-def _load_related_precomputed_cov_scaled(
-    genotype: np.ndarray,
-    rare_maf_cutoff: float,
     use_precomputed_artifacts: bool,
-) -> tuple[np.ndarray | None, np.ndarray | None]:
+) -> np.ndarray | None:
     if not use_precomputed_artifacts:
-        return None, None
+        return None
 
     scaled_path = DATA_DIR / "example_glmmkin_scaled_residuals.csv"
     if not scaled_path.exists():
-        return None, None
+        return None
 
     candidate_scaled = pd.read_csv(scaled_path).to_numpy().reshape(-1)
-    expected_num_variants = _num_rare_variants(genotype, rare_maf_cutoff)
     expected_num_samples = genotype.shape[0]
     if candidate_scaled.size != expected_num_samples:
-        return None, None
+        return None
+    return candidate_scaled
 
-    candidate_cov = None
-    baseline_cov_path = DATA_DIR / "example_glmmkin_cov.csv"
-    if baseline_cov_path.exists():
-        baseline_cov = pd.read_csv(baseline_cov_path).to_numpy()
-        expected_baseline_variants = _num_rare_variants(
-            genotype,
-            BASELINE_PRECOMPUTED_RARE_MAF_CUTOFF,
-        )
-        if baseline_cov.shape == (expected_baseline_variants, expected_baseline_variants):
-            if np.isclose(rare_maf_cutoff, BASELINE_PRECOMPUTED_RARE_MAF_CUTOFF):
-                candidate_cov = baseline_cov
-            else:
-                candidate_cov = _derive_related_cov_from_baseline(
-                    genotype=genotype,
-                    baseline_cov=baseline_cov,
-                    rare_maf_cutoff=rare_maf_cutoff,
-                )
 
-    if candidate_cov is None:
-        cov_path = _related_cov_path_for_cutoff(rare_maf_cutoff)
-        if cov_path.exists():
-            candidate_cov = pd.read_csv(cov_path).to_numpy()
+def _load_related_precomputed_cov_baseline_only(
+    genotype: np.ndarray,
+    rare_maf_cutoff: float,
+    use_precomputed_artifacts: bool,
+) -> np.ndarray | None:
+    if not use_precomputed_artifacts:
+        return None
+    if not np.isclose(rare_maf_cutoff, BASELINE_PRECOMPUTED_RARE_MAF_CUTOFF):
+        return None
 
-    if candidate_cov is None or candidate_cov.shape != (
-        expected_num_variants,
-        expected_num_variants,
-    ):
-        return None, None
-    return candidate_cov, candidate_scaled
+    cov_path = DATA_DIR / "example_glmmkin_cov.csv"
+    if not cov_path.exists():
+        return None
+
+    candidate_cov = pd.read_csv(cov_path).to_numpy()
+    expected_num_variants = _num_rare_variants(genotype, rare_maf_cutoff)
+    expected_shape = (expected_num_variants, expected_num_variants)
+    if candidate_cov.shape != expected_shape:
+        return None
+    return candidate_cov
 
 
 def _load_related_precomputed_theta(
@@ -965,7 +918,11 @@ def _related_common(
     data = load_dataset(dataset)
     kins = data.kins_sparse if sparse else data.kins_dense
 
-    precomputed_cov, precomputed_scaled = _load_related_precomputed_cov_scaled(
+    precomputed_scaled = _load_related_precomputed_scaled_residuals(
+        genotype=data.geno,
+        use_precomputed_artifacts=use_precomputed_artifacts,
+    )
+    precomputed_cov = _load_related_precomputed_cov_baseline_only(
         genotype=data.geno,
         rare_maf_cutoff=rare_maf_cutoff,
         use_precomputed_artifacts=use_precomputed_artifacts,
@@ -1035,13 +992,12 @@ def _related_ai_common(
 
     precomputed_ai_cov_s1 = None
     precomputed_ai_cov_s2 = None
-    precomputed_cov, precomputed_scaled = _load_related_precomputed_cov_scaled(
+    precomputed_scaled = _load_related_precomputed_scaled_residuals(
         genotype=data.geno,
-        rare_maf_cutoff=rare_maf_cutoff,
         use_precomputed_artifacts=use_precomputed_artifacts,
     )
-    if precomputed_cov is not None:
-        expected_num_variants = precomputed_cov.shape[0]
+    expected_num_variants = _num_rare_variants(data.geno, rare_maf_cutoff)
+    if precomputed_scaled is not None and expected_num_variants > 0:
         precomputed_ai_cov_s1, precomputed_ai_cov_s2 = _load_ai_precomputed_covariances(
             sparse=sparse,
             num_base_tests=pop_weights_1_1.shape[1],
@@ -1052,7 +1008,6 @@ def _related_ai_common(
         data.pheno_related,
         kins=kins,
         sparse_kins=sparse,
-        precomputed_cov=precomputed_cov,
         precomputed_scaled_residuals=precomputed_scaled,
         precomputed_theta=_load_related_precomputed_theta(
             sparse=sparse,
@@ -1103,9 +1058,8 @@ def _related_indiv_common(
     data = load_dataset(dataset)
     kins = data.kins_sparse if sparse else data.kins_dense
 
-    precomputed_cov, precomputed_scaled = _load_related_precomputed_cov_scaled(
+    precomputed_scaled = _load_related_precomputed_scaled_residuals(
         genotype=data.geno,
-        rare_maf_cutoff=rare_maf_cutoff,
         use_precomputed_artifacts=use_precomputed_artifacts,
     )
 
@@ -1113,7 +1067,6 @@ def _related_indiv_common(
         data.pheno_related,
         kins=kins,
         sparse_kins=sparse,
-        precomputed_cov=precomputed_cov,
         precomputed_scaled_residuals=precomputed_scaled,
         precomputed_theta=_load_related_precomputed_theta(
             sparse=sparse,
@@ -1180,16 +1133,14 @@ def _related_common_cond(
     data = load_dataset(dataset)
     kins = data.kins_sparse if sparse else data.kins_dense
 
-    precomputed_cov, precomputed_scaled = _load_related_precomputed_cov_scaled(
+    precomputed_scaled = _load_related_precomputed_scaled_residuals(
         genotype=data.geno,
-        rare_maf_cutoff=rare_maf_cutoff,
         use_precomputed_artifacts=use_precomputed_artifacts,
     )
     obj_nullmodel = fit_null_glmmkin(
         data.pheno_related,
         kins=kins,
         sparse_kins=sparse,
-        precomputed_cov=precomputed_cov,
         precomputed_scaled_residuals=precomputed_scaled,
         precomputed_theta=_load_related_precomputed_theta(
             sparse=sparse,
@@ -1252,16 +1203,14 @@ def _related_indiv_common_cond(
     data = load_dataset(dataset)
     kins = data.kins_sparse if sparse else data.kins_dense
 
-    precomputed_cov, precomputed_scaled = _load_related_precomputed_cov_scaled(
+    precomputed_scaled = _load_related_precomputed_scaled_residuals(
         genotype=data.geno,
-        rare_maf_cutoff=rare_maf_cutoff,
         use_precomputed_artifacts=use_precomputed_artifacts,
     )
     obj_nullmodel = fit_null_glmmkin(
         data.pheno_related,
         kins=kins,
         sparse_kins=sparse,
-        precomputed_cov=precomputed_cov,
         precomputed_scaled_residuals=precomputed_scaled,
         precomputed_theta=_load_related_precomputed_theta(
             sparse=sparse,

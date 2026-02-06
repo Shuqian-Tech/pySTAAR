@@ -86,17 +86,15 @@ def test_related_binary_workflow_runs_with_dataset_object():
     assert 0.0 < results["results_STAAR_B"] <= 1.0
 
 
-def test_related_workflow_derives_subcutoff_cov_from_baseline_precomputed_cov(monkeypatch):
+def test_related_workflow_precomputed_mode_does_not_load_glmm_cov_artifacts(monkeypatch):
     original_read_csv = workflows.pd.read_csv
-    saw_baseline_cov = False
 
     def _guard_precomputed_reads(*args, **kwargs):
-        nonlocal saw_baseline_cov
         path = str(args[0]) if args else ""
-        if path.endswith("example_glmmkin_cov_rare_maf_0_01.csv"):
-            raise AssertionError("cutoff-specific precomputed cov should be derived from baseline")
-        if path.endswith("example_glmmkin_cov.csv"):
-            saw_baseline_cov = True
+        if path.endswith("example_glmmkin_cov.csv") or path.endswith(
+            "example_glmmkin_cov_rare_maf_0_01.csv"
+        ):
+            raise AssertionError("related GLMM precomputed mode should not load covariance artifacts")
         return original_read_csv(*args, **kwargs)
 
     monkeypatch.setattr(workflows.pd, "read_csv", _guard_precomputed_reads)
@@ -109,10 +107,9 @@ def test_related_workflow_derives_subcutoff_cov_from_baseline_precomputed_cov(mo
     )
 
     assert results["num_variant"] == 153.0
-    assert saw_baseline_cov is True
 
 
-def test_related_workflow_uses_precomputed_cov_for_baseline_cutoff(monkeypatch):
+def test_related_workflow_precomputed_mode_uses_cov_and_scaled_for_baseline_cutoff(monkeypatch):
     original_fit_null_glmmkin = workflows.fit_null_glmmkin
     captured = {}
 
@@ -133,6 +130,29 @@ def test_related_workflow_uses_precomputed_cov_for_baseline_cutoff(monkeypatch):
     assert results["num_variant"] == 163.0
     assert captured["precomputed_cov"] is not None
     assert captured["precomputed_cov"].shape == (163, 163)
+    assert captured["precomputed_scaled_residuals"] is not None
+
+
+def test_related_workflow_precomputed_mode_omits_cov_for_nonbaseline_cutoff(monkeypatch):
+    original_fit_null_glmmkin = workflows.fit_null_glmmkin
+    captured = {}
+
+    def _track_precomputed_inputs(*args, **kwargs):
+        captured["precomputed_cov"] = kwargs.get("precomputed_cov")
+        captured["precomputed_scaled_residuals"] = kwargs.get("precomputed_scaled_residuals")
+        return original_fit_null_glmmkin(*args, **kwargs)
+
+    monkeypatch.setattr(workflows, "fit_null_glmmkin", _track_precomputed_inputs)
+
+    results = workflows.staar_related_sparse_glmmkin(
+        dataset="example",
+        seed=600,
+        rare_maf_cutoff=0.01,
+        use_precomputed_artifacts=True,
+    )
+
+    assert results["num_variant"] == 153.0
+    assert captured["precomputed_cov"] is None
     assert captured["precomputed_scaled_residuals"] is not None
 
 

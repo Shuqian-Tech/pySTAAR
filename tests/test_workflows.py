@@ -3,6 +3,20 @@ import math
 import pytest
 
 from pystaar import workflows
+from pystaar.data import load_example_dataset
+
+
+def _load_runtime_ai_metadata_from_example_files():
+    groups_df = workflows.pd.read_csv(workflows.DATA_DIR / workflows.AI_POP_GROUPS_FILE)
+    pop_groups = groups_df["pop_group"].astype(str).to_numpy()
+    pop_levels = list(dict.fromkeys(pop_groups.tolist()))
+
+    w11_df = workflows.pd.read_csv(workflows.DATA_DIR / workflows.AI_POP_WEIGHTS_1_1_FILE)
+    w125_df = workflows.pd.read_csv(workflows.DATA_DIR / workflows.AI_POP_WEIGHTS_1_25_FILE)
+    weight_cols = [c for c in w11_df.columns if c != "population"]
+    w11 = w11_df.set_index("population").loc[pop_levels, weight_cols].to_numpy(dtype=float)
+    w125 = w125_df.set_index("population").loc[pop_levels, weight_cols].to_numpy(dtype=float)
+    return pop_groups, pop_levels, w11, w125
 
 
 def test_related_workflow_skips_precomputed_cov_for_nonbaseline_cutoff(monkeypatch):
@@ -576,12 +590,61 @@ def test_ai_staar_unrelated_workflow_runs():
     assert 0.0 <= results["results_STAAR_O"] <= 1.0
 
 
+def test_ai_staar_unrelated_requires_runtime_metadata_for_nonexample_dataset():
+    dataset_obj = load_example_dataset()
+
+    with pytest.raises(ValueError, match="AI metadata must be provided for non-example datasets"):
+        workflows.ai_staar_unrelated_glm(
+            dataset=dataset_obj,
+            seed=600,
+            rare_maf_cutoff=0.05,
+        )
+
+
+def test_ai_staar_unrelated_accepts_runtime_metadata_for_nonexample_dataset():
+    dataset_obj = load_example_dataset()
+    pop_groups, pop_levels, w11, w125 = _load_runtime_ai_metadata_from_example_files()
+
+    results = workflows.ai_staar_unrelated_glm(
+        dataset=dataset_obj,
+        seed=600,
+        rare_maf_cutoff=0.05,
+        pop_groups=pop_groups,
+        pop_levels=pop_levels,
+        pop_weights_1_1=w11,
+        pop_weights_1_25=w125,
+    )
+
+    assert results["num_variant"] > 0
+    assert results["cMAC"] > 0
+    assert 0.0 <= results["results_STAAR_O"] <= 1.0
+
+
 def test_ai_staar_related_sparse_workflow_runs():
     results = workflows.ai_staar_related_sparse_glmmkin(
         dataset="example",
         seed=600,
         rare_maf_cutoff=0.05,
     )
+    assert results["num_variant"] > 0
+    assert results["cMAC"] > 0
+    assert 0.0 <= results["results_STAAR_O"] <= 1.0
+
+
+def test_ai_staar_related_accepts_runtime_metadata_for_nonexample_dataset():
+    dataset_obj = load_example_dataset()
+    pop_groups, pop_levels, w11, w125 = _load_runtime_ai_metadata_from_example_files()
+
+    results = workflows.ai_staar_related_sparse_glmmkin(
+        dataset=dataset_obj,
+        seed=600,
+        rare_maf_cutoff=0.05,
+        pop_groups=pop_groups,
+        pop_levels=pop_levels,
+        pop_weights_1_1=w11,
+        pop_weights_1_25=w125,
+    )
+
     assert results["num_variant"] > 0
     assert results["cMAC"] > 0
     assert 0.0 <= results["results_STAAR_O"] <= 1.0

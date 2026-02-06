@@ -196,7 +196,7 @@ def _load_related_cond_precomputed_cov(
     return None
 
 
-def _load_ai_metadata(num_samples: int):
+def _load_ai_metadata_from_files(num_samples: int):
     groups_path = DATA_DIR / AI_POP_GROUPS_FILE
     w11_path = DATA_DIR / AI_POP_WEIGHTS_1_1_FILE
     w125_path = DATA_DIR / AI_POP_WEIGHTS_1_25_FILE
@@ -233,6 +233,65 @@ def _load_ai_metadata(num_samples: int):
     pop_weights_1_1 = w11_df.loc[pop_levels, weight_cols_11].to_numpy(dtype=float)
     pop_weights_1_25 = w125_df.loc[pop_levels, weight_cols_125].to_numpy(dtype=float)
     return pop_groups, pop_levels, pop_weights_1_1, pop_weights_1_25
+
+
+def _resolve_ai_metadata(
+    dataset: str,
+    num_samples: int,
+    pop_groups: np.ndarray | list[str] | tuple[str, ...] | None,
+    pop_weights_1_1: np.ndarray | list[list[float]] | None,
+    pop_weights_1_25: np.ndarray | list[list[float]] | None,
+    pop_levels: list[str] | tuple[str, ...] | None,
+):
+    runtime_provided = any(
+        value is not None for value in (pop_groups, pop_weights_1_1, pop_weights_1_25, pop_levels)
+    )
+
+    if runtime_provided:
+        if pop_groups is None or pop_weights_1_1 is None or pop_weights_1_25 is None:
+            raise ValueError(
+                "Runtime AI metadata requires pop_groups, pop_weights_1_1, and pop_weights_1_25."
+            )
+
+        resolved_groups = np.asarray(pop_groups, dtype=str).reshape(-1)
+        if resolved_groups.size != num_samples:
+            raise ValueError("AI pop_groups length does not match sample size.")
+
+        if pop_levels is None:
+            resolved_levels = list(dict.fromkeys(resolved_groups.tolist()))
+        else:
+            resolved_levels = [str(level) for level in list(pop_levels)]
+
+        if len(set(resolved_levels)) != len(resolved_levels):
+            raise ValueError("AI pop_levels must be unique.")
+
+        missing_levels = sorted(set(resolved_groups.tolist()) - set(resolved_levels))
+        if missing_levels:
+            raise ValueError(
+                "AI pop_levels must include every population observed in pop_groups. Missing: "
+                + ", ".join(missing_levels)
+            )
+
+        resolved_w11 = np.asarray(pop_weights_1_1, dtype=float)
+        resolved_w125 = np.asarray(pop_weights_1_25, dtype=float)
+        if resolved_w11.ndim != 2 or resolved_w125.ndim != 2:
+            raise ValueError("AI pop-weight inputs must be 2-dimensional arrays.")
+        if resolved_w11.shape != resolved_w125.shape:
+            raise ValueError("AI pop-weight matrices must have matching dimensions.")
+        if resolved_w11.shape[0] != len(resolved_levels):
+            raise ValueError(
+                "AI pop-weight rows must match the number of population levels."
+            )
+
+        return resolved_groups, resolved_levels, resolved_w11, resolved_w125
+
+    if dataset == "example":
+        return _load_ai_metadata_from_files(num_samples=num_samples)
+
+    raise ValueError(
+        "AI metadata must be provided for non-example datasets "
+        "(pop_groups, pop_weights_1_1, pop_weights_1_25)."
+    )
 
 
 def _load_ai_precomputed_covariances(
@@ -595,6 +654,10 @@ def ai_staar_unrelated_glm(
     dataset: str,
     seed: int = 600,
     rare_maf_cutoff: float = 0.05,
+    pop_groups: np.ndarray | list[str] | tuple[str, ...] | None = None,
+    pop_weights_1_1: np.ndarray | list[list[float]] | None = None,
+    pop_weights_1_25: np.ndarray | list[list[float]] | None = None,
+    pop_levels: list[str] | tuple[str, ...] | None = None,
 ):
     """AI-STAAR workflow for unrelated samples (GLM-based null model)."""
     np.random.seed(seed)
@@ -602,8 +665,13 @@ def ai_staar_unrelated_glm(
     data = load_dataset(dataset)
     obj_nullmodel = fit_null_glm(data.pheno_unrelated)
 
-    pop_groups, pop_levels, pop_weights_1_1, pop_weights_1_25 = _load_ai_metadata(
-        num_samples=data.geno.shape[0]
+    pop_groups, pop_levels, pop_weights_1_1, pop_weights_1_25 = _resolve_ai_metadata(
+        dataset=dataset,
+        num_samples=data.geno.shape[0],
+        pop_groups=pop_groups,
+        pop_weights_1_1=pop_weights_1_1,
+        pop_weights_1_25=pop_weights_1_25,
+        pop_levels=pop_levels,
     )
     obj_nullmodel.pop_groups = pop_groups
     obj_nullmodel.pop_levels = pop_levels
@@ -635,6 +703,10 @@ def ai_staar_unrelated_glm_find_weight(
     dataset: str,
     seed: int = 600,
     rare_maf_cutoff: float = 0.05,
+    pop_groups: np.ndarray | list[str] | tuple[str, ...] | None = None,
+    pop_weights_1_1: np.ndarray | list[list[float]] | None = None,
+    pop_weights_1_25: np.ndarray | list[list[float]] | None = None,
+    pop_levels: list[str] | tuple[str, ...] | None = None,
 ):
     """AI-STAAR workflow for unrelated samples with find_weight enabled."""
     np.random.seed(seed)
@@ -642,8 +714,13 @@ def ai_staar_unrelated_glm_find_weight(
     data = load_dataset(dataset)
     obj_nullmodel = fit_null_glm(data.pheno_unrelated)
 
-    pop_groups, pop_levels, pop_weights_1_1, pop_weights_1_25 = _load_ai_metadata(
-        num_samples=data.geno.shape[0]
+    pop_groups, pop_levels, pop_weights_1_1, pop_weights_1_25 = _resolve_ai_metadata(
+        dataset=dataset,
+        num_samples=data.geno.shape[0],
+        pop_groups=pop_groups,
+        pop_weights_1_1=pop_weights_1_1,
+        pop_weights_1_25=pop_weights_1_25,
+        pop_levels=pop_levels,
     )
     obj_nullmodel.pop_groups = pop_groups
     obj_nullmodel.pop_levels = pop_levels
@@ -927,13 +1004,22 @@ def _related_ai_common(
     sparse: bool,
     find_weight: bool = False,
     use_precomputed_artifacts: bool = False,
+    pop_groups: np.ndarray | list[str] | tuple[str, ...] | None = None,
+    pop_weights_1_1: np.ndarray | list[list[float]] | None = None,
+    pop_weights_1_25: np.ndarray | list[list[float]] | None = None,
+    pop_levels: list[str] | tuple[str, ...] | None = None,
 ):
     np.random.seed(seed)
 
     data = load_dataset(dataset)
     kins = data.kins_sparse if sparse else data.kins_dense
-    pop_groups, pop_levels, pop_weights_1_1, pop_weights_1_25 = _load_ai_metadata(
-        num_samples=data.geno.shape[0]
+    pop_groups, pop_levels, pop_weights_1_1, pop_weights_1_25 = _resolve_ai_metadata(
+        dataset=dataset,
+        num_samples=data.geno.shape[0],
+        pop_groups=pop_groups,
+        pop_weights_1_1=pop_weights_1_1,
+        pop_weights_1_25=pop_weights_1_25,
+        pop_levels=pop_levels,
     )
 
     precomputed_ai_cov_s1 = None
@@ -1288,6 +1374,10 @@ def ai_staar_related_sparse_glmmkin(
     seed: int = 600,
     rare_maf_cutoff: float = 0.05,
     use_precomputed_artifacts: bool = False,
+    pop_groups: np.ndarray | list[str] | tuple[str, ...] | None = None,
+    pop_weights_1_1: np.ndarray | list[list[float]] | None = None,
+    pop_weights_1_25: np.ndarray | list[list[float]] | None = None,
+    pop_levels: list[str] | tuple[str, ...] | None = None,
 ):
     """AI-STAAR workflow for related samples using sparse GRM (GLMM kinship)."""
     return _related_ai_common(
@@ -1296,6 +1386,10 @@ def ai_staar_related_sparse_glmmkin(
         rare_maf_cutoff,
         sparse=True,
         use_precomputed_artifacts=use_precomputed_artifacts,
+        pop_groups=pop_groups,
+        pop_weights_1_1=pop_weights_1_1,
+        pop_weights_1_25=pop_weights_1_25,
+        pop_levels=pop_levels,
     )
 
 
@@ -1304,6 +1398,10 @@ def ai_staar_related_dense_glmmkin(
     seed: int = 600,
     rare_maf_cutoff: float = 0.05,
     use_precomputed_artifacts: bool = False,
+    pop_groups: np.ndarray | list[str] | tuple[str, ...] | None = None,
+    pop_weights_1_1: np.ndarray | list[list[float]] | None = None,
+    pop_weights_1_25: np.ndarray | list[list[float]] | None = None,
+    pop_levels: list[str] | tuple[str, ...] | None = None,
 ):
     """AI-STAAR workflow for related samples using dense GRM (GLMM kinship)."""
     return _related_ai_common(
@@ -1312,6 +1410,10 @@ def ai_staar_related_dense_glmmkin(
         rare_maf_cutoff,
         sparse=False,
         use_precomputed_artifacts=use_precomputed_artifacts,
+        pop_groups=pop_groups,
+        pop_weights_1_1=pop_weights_1_1,
+        pop_weights_1_25=pop_weights_1_25,
+        pop_levels=pop_levels,
     )
 
 
@@ -1320,6 +1422,10 @@ def ai_staar_related_sparse_glmmkin_find_weight(
     seed: int = 600,
     rare_maf_cutoff: float = 0.05,
     use_precomputed_artifacts: bool = False,
+    pop_groups: np.ndarray | list[str] | tuple[str, ...] | None = None,
+    pop_weights_1_1: np.ndarray | list[list[float]] | None = None,
+    pop_weights_1_25: np.ndarray | list[list[float]] | None = None,
+    pop_levels: list[str] | tuple[str, ...] | None = None,
 ):
     """AI-STAAR workflow for related sparse samples with find_weight enabled."""
     return _related_ai_common(
@@ -1329,6 +1435,10 @@ def ai_staar_related_sparse_glmmkin_find_weight(
         sparse=True,
         find_weight=True,
         use_precomputed_artifacts=use_precomputed_artifacts,
+        pop_groups=pop_groups,
+        pop_weights_1_1=pop_weights_1_1,
+        pop_weights_1_25=pop_weights_1_25,
+        pop_levels=pop_levels,
     )
 
 
@@ -1337,6 +1447,10 @@ def ai_staar_related_dense_glmmkin_find_weight(
     seed: int = 600,
     rare_maf_cutoff: float = 0.05,
     use_precomputed_artifacts: bool = False,
+    pop_groups: np.ndarray | list[str] | tuple[str, ...] | None = None,
+    pop_weights_1_1: np.ndarray | list[list[float]] | None = None,
+    pop_weights_1_25: np.ndarray | list[list[float]] | None = None,
+    pop_levels: list[str] | tuple[str, ...] | None = None,
 ):
     """AI-STAAR workflow for related dense samples with find_weight enabled."""
     return _related_ai_common(
@@ -1346,6 +1460,10 @@ def ai_staar_related_dense_glmmkin_find_weight(
         sparse=False,
         find_weight=True,
         use_precomputed_artifacts=use_precomputed_artifacts,
+        pop_groups=pop_groups,
+        pop_weights_1_1=pop_weights_1_1,
+        pop_weights_1_25=pop_weights_1_25,
+        pop_levels=pop_levels,
     )
 
 

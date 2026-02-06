@@ -1,4 +1,5 @@
 import math
+import shutil
 
 import pytest
 
@@ -17,6 +18,21 @@ def _load_runtime_ai_metadata_from_example_files():
     w11 = w11_df.set_index("population").loc[pop_levels, weight_cols].to_numpy(dtype=float)
     w125 = w125_df.set_index("population").loc[pop_levels, weight_cols].to_numpy(dtype=float)
     return pop_groups, pop_levels, w11, w125
+
+
+def _copy_example_dataset_to_directory(target_dir):
+    file_map = {
+        "example_geno.mtx": "geno.mtx",
+        "example_phred.csv": "phred.csv",
+        "example_pheno_unrelated.csv": "pheno_unrelated.csv",
+        "example_pheno_related.csv": "pheno_related.csv",
+        "example_kins_sparse.mtx": "kins_sparse.mtx",
+        "example_kins_dense.mtx": "kins_dense.mtx",
+    }
+    target_dir.mkdir(parents=True, exist_ok=True)
+    for src_name, dst_name in file_map.items():
+        shutil.copy2(workflows.DATA_DIR / src_name, target_dir / dst_name)
+    return target_dir
 
 
 def test_related_workflow_skips_precomputed_cov_for_nonbaseline_cutoff(monkeypatch):
@@ -39,6 +55,35 @@ def test_related_workflow_skips_precomputed_cov_for_nonbaseline_cutoff(monkeypat
 
     assert results["num_variant"] > 0
     assert results["num_variant"] != 163.0
+
+
+def test_unrelated_workflow_runs_with_directory_dataset(tmp_path):
+    dataset_dir = _copy_example_dataset_to_directory(tmp_path / "dataset_copy")
+
+    results = workflows.staar_unrelated_glm(
+        dataset=str(dataset_dir),
+        seed=600,
+        rare_maf_cutoff=0.05,
+    )
+
+    assert results["num_variant"] == 163.0
+    assert 0.0 <= results["results_STAAR_O"] <= 1.0
+
+
+def test_related_binary_workflow_runs_with_dataset_object():
+    dataset_obj = load_example_dataset()
+
+    results = workflows.staar_related_sparse_binary_spa(
+        dataset=dataset_obj,
+        seed=600,
+        rare_maf_cutoff=0.05,
+        case_quantile=0.90,
+        use_precomputed_artifacts=False,
+    )
+
+    assert results["num_variant"] == 163.0
+    assert results["case_count"] > 0.0
+    assert 0.0 < results["results_STAAR_B"] <= 1.0
 
 
 def test_related_workflow_derives_subcutoff_cov_from_baseline_precomputed_cov(monkeypatch):

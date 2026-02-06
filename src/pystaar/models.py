@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Tuple
+from typing import Iterable, Tuple
 
 import numpy as np
 import pandas as pd
@@ -68,11 +68,43 @@ class NullModelGLMMKinBinarySPA:
     precomputed_cov_filter: np.ndarray | None = None
 
 
-def _design_matrix(df: pd.DataFrame) -> Tuple[np.ndarray, np.ndarray]:
-    y = df["Y"].to_numpy(dtype=float)
-    X = np.column_stack(
-        [np.ones(len(df)), df["X1"].to_numpy(dtype=float), df["X2"].to_numpy(dtype=float)]
-    )
+def _normalize_covariate_cols(
+    covariate_cols: str | Iterable[str] | None,
+) -> tuple[str, ...]:
+    if covariate_cols is None:
+        return ()
+    if isinstance(covariate_cols, str):
+        return (covariate_cols,)
+    return tuple(covariate_cols)
+
+
+def _design_matrix(
+    df: pd.DataFrame,
+    outcome_col: str = "Y",
+    covariate_cols: str | Iterable[str] | None = ("X1", "X2"),
+    add_intercept: bool = True,
+) -> Tuple[np.ndarray, np.ndarray]:
+    if outcome_col not in df.columns:
+        raise ValueError(f"Outcome column '{outcome_col}' not found in data frame.")
+
+    covariate_names = _normalize_covariate_cols(covariate_cols)
+    missing_covariates = [col for col in covariate_names if col not in df.columns]
+    if missing_covariates:
+        raise ValueError(
+            "Covariate columns not found in data frame: " + ", ".join(missing_covariates)
+        )
+
+    y = df[outcome_col].to_numpy(dtype=float)
+    n = len(df)
+    parts: list[np.ndarray] = []
+    if add_intercept:
+        parts.append(np.ones((n, 1), dtype=float))
+    if covariate_names:
+        parts.append(df.loc[:, list(covariate_names)].to_numpy(dtype=float))
+    if not parts:
+        raise ValueError("Design matrix must include at least one column.")
+
+    X = parts[0] if len(parts) == 1 else np.column_stack(parts)
     return X, y
 
 
@@ -151,8 +183,19 @@ def _fit_binomial_glm_rstyle(
     return beta, mu, weights
 
 
-def fit_null_glm(df: pd.DataFrame) -> NullModelGLM:
-    X, y = _design_matrix(df)
+def fit_null_glm(
+    df: pd.DataFrame,
+    *,
+    outcome_col: str = "Y",
+    covariate_cols: str | Iterable[str] | None = ("X1", "X2"),
+    add_intercept: bool = True,
+) -> NullModelGLM:
+    X, y = _design_matrix(
+        df,
+        outcome_col=outcome_col,
+        covariate_cols=covariate_cols,
+        add_intercept=add_intercept,
+    )
     beta, *_ = np.linalg.lstsq(X, y, rcond=None)
     fitted = X @ beta
     residuals = y - fitted
@@ -175,8 +218,17 @@ def fit_null_glm_binary_spa(
     df: pd.DataFrame,
     max_iter: int = 100,
     tol: float = 1e-8,
+    *,
+    outcome_col: str = "Y",
+    covariate_cols: str | Iterable[str] | None = ("X1", "X2"),
+    add_intercept: bool = True,
 ) -> NullModelGLM:
-    X, y = _design_matrix(df)
+    X, y = _design_matrix(
+        df,
+        outcome_col=outcome_col,
+        covariate_cols=covariate_cols,
+        add_intercept=add_intercept,
+    )
     y = y.astype(float)
     if not np.all(np.isin(y, [0.0, 1.0])):
         raise ValueError("Binary SPA null model requires Y coded as 0/1.")
@@ -287,8 +339,17 @@ def fit_null_glmmkin(
     precomputed_cov: np.ndarray | None = None,
     precomputed_scaled_residuals: np.ndarray | None = None,
     precomputed_theta: np.ndarray | None = None,
+    *,
+    outcome_col: str = "Y",
+    covariate_cols: str | Iterable[str] | None = ("X1", "X2"),
+    add_intercept: bool = True,
 ) -> NullModelGLMMKin:
-    X, y = _design_matrix(df)
+    X, y = _design_matrix(
+        df,
+        outcome_col=outcome_col,
+        covariate_cols=covariate_cols,
+        add_intercept=add_intercept,
+    )
     if precomputed_theta is None:
         theta = estimate_tau_reml(X, y, kins)
     else:
@@ -341,8 +402,17 @@ def fit_null_glmmkin_binary_spa(
     sparse_kins: bool,
     max_iter: int = 80,
     tol: float = 1e-8,
+    *,
+    outcome_col: str = "Y",
+    covariate_cols: str | Iterable[str] | None = ("X1", "X2"),
+    add_intercept: bool = True,
 ) -> NullModelGLMMKinBinarySPA:
-    X, y = _design_matrix(df)
+    X, y = _design_matrix(
+        df,
+        outcome_col=outcome_col,
+        covariate_cols=covariate_cols,
+        add_intercept=add_intercept,
+    )
     y = y.astype(float)
     if not np.all(np.isin(y, [0.0, 1.0])):
         raise ValueError("Binary SPA null model requires Y coded as 0/1.")

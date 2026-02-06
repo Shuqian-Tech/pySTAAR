@@ -44,6 +44,7 @@ The following precomputed artifacts are still used for baseline parity when `use
 - `data/example_ai_cov_sparse_s2_b2.csv`
 
 These are passed into the Python null-model/STAAR pipeline to reduce backend-specific numeric drift and match baseline sentinels for the `example` scenario.
+Related precomputed parity paths also anchor GLMM null-model `theta` to baseline constants (sparse/dense) to reduce residual backend optimization drift.
 
 For related binary-SPA parity paths, Python now reconstructs `scaled_residuals`, `XW`, and `XXWX_inv` from precomputed fitted values and computes `SPA_p_filter` covariance from fitted values + kinship; precomputed `*_cov_filter.csv`, `*_scaled_residuals.csv`, `*_XW.csv`, and `*_XXWX_inv.csv` artifacts are no longer loaded. Dense and sparse related-binary parity now share a single fitted artifact (`example_glmmkin_binary_spa_sparse_fitted.csv`).
 For related GLMM parity paths with `rare_maf_cutoff` below the baseline (`0.05`), Python now derives the covariance submatrix directly from `example_glmmkin_cov.csv`; cutoff-specific covariance artifacts are no longer loaded.
@@ -72,6 +73,7 @@ Observed on 2026-02-06 (reference backend):
 - Related binary SPA prefilter now computes covariance in Python from precomputed fitted values + kinship (no precomputed covariance artifact needed) while preserving strict parity.
 - Related binary SPA precomputed parity path now reconstructs `scaled_residuals`, `XW`, and `XXWX_inv` from fitted values (no precomputed component artifacts needed) while preserving strict parity.
 - Related GLMM parity at `rare_maf_cutoff=0.01` now derives covariance from baseline `example_glmmkin_cov.csv` (no precomputed `example_glmmkin_cov_rare_maf_0_01.csv` dependency) while preserving strict parity.
+- Related GLMM/AI/individual-score precomputed parity paths now use baseline `theta` constants (sparse/dense) to reduce null-model fit drift while preserving strict parity.
 - Current related binary pure-path deltas against baseline sentinels (`example`):
   - Sparse `results_STAAR_B`: `0.23360206101344283` vs baseline `0.2336049736705653` (delta `-2.92187712246116e-06`)
   - Dense `results_STAAR_B`: `0.2336021825223668` vs baseline `0.233605092772099` (delta `-2.9102497322207713e-06`)

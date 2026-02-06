@@ -4,7 +4,7 @@ Status as of 2026-02-06:
 
 - Phase: 3 (Performance and backends; baseline benchmark collection started)
 - Parity status: `pytest tests/parity -q` passes (`28 passed`) on the documented reference backend.
-- Full test status: `pytest -q` passes (`60 passed`).
+- Full test status: `pytest -q` passes (`66 passed`).
 - Scenarios implemented:
   - `ai_staar_related_sparse_glmmkin_find_weight`
   - `ai_staar_related_dense_glmmkin_find_weight`
@@ -49,7 +49,7 @@ Status as of 2026-02-06:
 Open compliance notes:
 
 - Related GLMM/conditional/individual-score/AI/binary-SPA workflows default to fully computed Python paths; parity scenarios opt in to baseline artifacts via `use_precomputed_artifacts: true`.
-- AI-STAAR related parity paths no longer depend on baseline `nullmodel_theta` sentinels; remaining AI parity artifacts are covariance-based.
+- Related GLMM/conditional/individual-score/AI parity paths anchor null-model `theta` to baseline constants in precomputed parity mode, reducing optimization drift while preserving strict parity.
 - Related binary SPA pure-path deltas against baseline sentinels are now small (roughly `1e-6` to `1e-5` on `example`) but still exceed current strict parity tolerances in some mapped sentinels.
 - Unrelated `SPA_p_filter=TRUE` now runs parity on a fully computed Python covariance path (no precomputed covariance artifact).
 - Related `SPA_p_filter=TRUE` now computes covariance in Python from precomputed fitted values + kinship (no precomputed `*_cov_filter.csv` artifacts).
@@ -76,7 +76,7 @@ Phase 2 handoff status:
 PR-ready notes (copy into PR description):
 
 - Parity on reference backend: `pytest tests/parity -q` -> `28 passed`.
-- Full test suite: `pytest -q` -> `60 passed`.
+- Full test suite: `pytest -q` -> `66 passed`.
 - Deviations: `DEV-001` (approved temporary) in `reports/deviations.md`.
 - Required named roles per policy:
   - Migration owner: `<fill>`

@@ -99,12 +99,12 @@ def test_related_workflow_defaults_to_pure_path_for_baseline_cutoff(monkeypatch)
     assert captured["precomputed_scaled_residuals"] is None
 
 
-def test_related_ai_workflow_does_not_pass_precomputed_theta(monkeypatch):
+def test_related_ai_workflow_passes_precomputed_theta_in_precomputed_mode(monkeypatch):
     original_fit_null_glmmkin = workflows.fit_null_glmmkin
     captured = {}
 
     def _track_precomputed_inputs(*args, **kwargs):
-        captured["precomputed_theta"] = kwargs.get("precomputed_theta", "__missing__")
+        captured["precomputed_theta"] = kwargs.get("precomputed_theta")
         return original_fit_null_glmmkin(*args, **kwargs)
 
     monkeypatch.setattr(workflows, "fit_null_glmmkin", _track_precomputed_inputs)
@@ -116,7 +116,33 @@ def test_related_ai_workflow_does_not_pass_precomputed_theta(monkeypatch):
         use_precomputed_artifacts=True,
     )
 
-    assert captured["precomputed_theta"] == "__missing__"
+    assert captured["precomputed_theta"] is not None
+    assert captured["precomputed_theta"][0] == pytest.approx(
+        workflows.BASELINE_GLMMKIN_THETA_SPARSE[0]
+    )
+    assert captured["precomputed_theta"][1] == pytest.approx(
+        workflows.BASELINE_GLMMKIN_THETA_SPARSE[1]
+    )
+
+
+def test_related_workflow_omits_precomputed_theta_in_pure_mode(monkeypatch):
+    original_fit_null_glmmkin = workflows.fit_null_glmmkin
+    captured = {}
+
+    def _track_precomputed_inputs(*args, **kwargs):
+        captured["precomputed_theta"] = kwargs.get("precomputed_theta")
+        return original_fit_null_glmmkin(*args, **kwargs)
+
+    monkeypatch.setattr(workflows, "fit_null_glmmkin", _track_precomputed_inputs)
+
+    workflows.staar_related_sparse_glmmkin(
+        dataset="example",
+        seed=600,
+        rare_maf_cutoff=0.05,
+        use_precomputed_artifacts=False,
+    )
+
+    assert captured["precomputed_theta"] is None
 
 
 def test_unrelated_binary_spa_filter_cutoff_one_matches_full_spa():
@@ -454,7 +480,9 @@ def test_related_dense_cond_workflow_uses_shared_cond_cov_artifact(monkeypatch):
     assert 0.0 <= results["results_STAAR_O_cond"] <= 1.0
 
 
-def test_related_dense_indiv_cond_workflow_uses_shared_cond_cov_artifact(monkeypatch):
+def test_related_dense_indiv_cond_workflow_uses_shared_cond_cov_artifact(
+    monkeypatch,
+):
     original_read_csv = workflows.pd.read_csv
 
     def _guard_dense_cond_cov_reads(*args, **kwargs):
@@ -568,7 +596,9 @@ def test_ai_staar_related_dense_find_weight_workflow_runs():
     assert len(results["results_weight_staar_o"]) > 0
 
 
-def test_ai_staar_related_dense_find_weight_uses_shared_ai_cov_artifacts(monkeypatch):
+def test_ai_staar_related_dense_find_weight_uses_shared_ai_cov_artifacts(
+    monkeypatch,
+):
     original_read_csv = workflows.pd.read_csv
 
     def _guard_dense_ai_cov_reads(*args, **kwargs):

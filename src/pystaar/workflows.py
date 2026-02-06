@@ -38,6 +38,14 @@ BASELINE_PRECOMPUTED_RARE_MAF_CUTOFF = 0.05
 BASELINE_COND_METHOD = "optimal"
 BASELINE_COND_ADJ_VARIANT_INDICES = (0, 3)
 BASELINE_BINARY_SPA_CASE_QUANTILE = 0.95
+BASELINE_GLMMKIN_THETA_SPARSE = np.array(
+    [1.041309305712744, 0.9195450185855097],
+    dtype=float,
+)
+BASELINE_GLMMKIN_THETA_DENSE = np.array(
+    [1.041309305712684, 0.9195450185856849],
+    dtype=float,
+)
 INDIV_SAMPLE_VARIANT_INDICES = (1, 2, 10, 50, 100, 160)
 AI_POP_GROUPS_FILE = "example_ai_pop_groups.csv"
 AI_POP_WEIGHTS_1_1_FILE = "example_ai_pop_weights_1_1.csv"
@@ -141,6 +149,19 @@ def _load_related_precomputed_cov_scaled(
     ):
         return None, None
     return candidate_cov, candidate_scaled
+
+
+def _load_related_precomputed_theta(
+    sparse: bool,
+    use_precomputed_artifacts: bool,
+) -> np.ndarray | None:
+    if not use_precomputed_artifacts:
+        return None
+    return (
+        BASELINE_GLMMKIN_THETA_SPARSE.copy()
+        if sparse
+        else BASELINE_GLMMKIN_THETA_DENSE.copy()
+    )
 
 
 def _load_related_cond_precomputed_cov(
@@ -886,6 +907,10 @@ def _related_common(
         sparse_kins=sparse,
         precomputed_cov=precomputed_cov,
         precomputed_scaled_residuals=precomputed_scaled,
+        precomputed_theta=_load_related_precomputed_theta(
+            sparse=sparse,
+            use_precomputed_artifacts=use_precomputed_artifacts,
+        ),
     )
 
     results = staar(
@@ -951,6 +976,10 @@ def _related_ai_common(
         sparse_kins=sparse,
         precomputed_cov=precomputed_cov,
         precomputed_scaled_residuals=precomputed_scaled,
+        precomputed_theta=_load_related_precomputed_theta(
+            sparse=sparse,
+            use_precomputed_artifacts=use_precomputed_artifacts,
+        ),
     )
 
     obj_nullmodel.pop_groups = pop_groups
@@ -959,7 +988,6 @@ def _related_ai_common(
     obj_nullmodel.pop_weights_1_25 = pop_weights_1_25
     obj_nullmodel.precomputed_ai_cov_s1 = precomputed_ai_cov_s1
     obj_nullmodel.precomputed_ai_cov_s2 = precomputed_ai_cov_s2
-
     results = ai_staar(
         genotype=data.geno,
         obj_nullmodel=obj_nullmodel,
@@ -1010,6 +1038,10 @@ def _related_indiv_common(
         sparse_kins=sparse,
         precomputed_cov=precomputed_cov,
         precomputed_scaled_residuals=precomputed_scaled,
+        precomputed_theta=_load_related_precomputed_theta(
+            sparse=sparse,
+            use_precomputed_artifacts=use_precomputed_artifacts,
+        ),
     )
 
     results = indiv_score_test_region(
@@ -1083,6 +1115,10 @@ def _related_common_cond(
         sparse_kins=sparse,
         precomputed_cov=precomputed_cov,
         precomputed_scaled_residuals=precomputed_scaled,
+        precomputed_theta=_load_related_precomputed_theta(
+            sparse=sparse,
+            use_precomputed_artifacts=use_precomputed_artifacts,
+        ),
     )
 
     adj_variant_indices = tuple(int(idx) for idx in adj_variant_indices)
@@ -1152,6 +1188,10 @@ def _related_indiv_common_cond(
         sparse_kins=sparse,
         precomputed_cov=precomputed_cov,
         precomputed_scaled_residuals=precomputed_scaled,
+        precomputed_theta=_load_related_precomputed_theta(
+            sparse=sparse,
+            use_precomputed_artifacts=use_precomputed_artifacts,
+        ),
     )
 
     adj_variant_indices = tuple(int(idx) for idx in adj_variant_indices)

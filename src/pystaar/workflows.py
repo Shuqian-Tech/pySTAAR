@@ -230,18 +230,36 @@ def _load_ai_precomputed_covariances(
     cov_s2: list[np.ndarray] = []
 
     for b in range(1, num_base_tests + 1):
-        path_s1 = DATA_DIR / AI_COV_FILE_TEMPLATE.format(suffix=suffix, scenario=1, base=b)
-        path_s2 = DATA_DIR / AI_COV_FILE_TEMPLATE.format(suffix=suffix, scenario=2, base=b)
-        if not (path_s1.exists() and path_s2.exists()):
-            return None, None
-
-        candidate_s1 = pd.read_csv(path_s1).to_numpy()
-        candidate_s2 = pd.read_csv(path_s2).to_numpy()
         expected_shape = (expected_num_variants, expected_num_variants)
-        if candidate_s1.shape != expected_shape or candidate_s2.shape != expected_shape:
+
+        # Dense/sparse baselines are numerically equivalent at this precision.
+        candidate_suffixes = ["sparse"] if sparse else ["sparse", suffix]
+        loaded = False
+        for candidate_suffix in candidate_suffixes:
+            path_s1 = DATA_DIR / AI_COV_FILE_TEMPLATE.format(
+                suffix=candidate_suffix,
+                scenario=1,
+                base=b,
+            )
+            path_s2 = DATA_DIR / AI_COV_FILE_TEMPLATE.format(
+                suffix=candidate_suffix,
+                scenario=2,
+                base=b,
+            )
+            if not (path_s1.exists() and path_s2.exists()):
+                continue
+
+            candidate_s1 = pd.read_csv(path_s1).to_numpy()
+            candidate_s2 = pd.read_csv(path_s2).to_numpy()
+            if candidate_s1.shape != expected_shape or candidate_s2.shape != expected_shape:
+                continue
+            cov_s1.append(candidate_s1)
+            cov_s2.append(candidate_s2)
+            loaded = True
+            break
+
+        if not loaded:
             return None, None
-        cov_s1.append(candidate_s1)
-        cov_s2.append(candidate_s2)
 
     return cov_s1, cov_s2
 

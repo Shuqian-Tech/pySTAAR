@@ -508,6 +508,27 @@ def test_ai_staar_related_dense_workflow_runs():
     assert 0.0 <= results["results_STAAR_O"] <= 1.0
 
 
+def test_ai_staar_related_dense_workflow_uses_shared_ai_cov_artifacts(monkeypatch):
+    original_read_csv = workflows.pd.read_csv
+
+    def _guard_dense_ai_cov_reads(*args, **kwargs):
+        path = str(args[0]) if args else ""
+        if "example_ai_cov_dense_" in path:
+            raise AssertionError("dense AI workflow should use shared AI covariance artifacts")
+        return original_read_csv(*args, **kwargs)
+
+    monkeypatch.setattr(workflows.pd, "read_csv", _guard_dense_ai_cov_reads)
+
+    results = workflows.ai_staar_related_dense_glmmkin(
+        dataset="example",
+        seed=600,
+        rare_maf_cutoff=0.05,
+        use_precomputed_artifacts=True,
+    )
+    assert results["num_variant"] == 163.0
+    assert 0.0 <= results["results_STAAR_O"] <= 1.0
+
+
 def test_ai_staar_unrelated_find_weight_workflow_runs():
     results = workflows.ai_staar_unrelated_glm_find_weight(
         dataset="example",
@@ -545,3 +566,26 @@ def test_ai_staar_related_dense_find_weight_workflow_runs():
     assert 0.0 <= results["results_STAAR_O"] <= 1.0
     assert len(results["weight_all_1"]) > 0
     assert len(results["results_weight_staar_o"]) > 0
+
+
+def test_ai_staar_related_dense_find_weight_uses_shared_ai_cov_artifacts(monkeypatch):
+    original_read_csv = workflows.pd.read_csv
+
+    def _guard_dense_ai_cov_reads(*args, **kwargs):
+        path = str(args[0]) if args else ""
+        if "example_ai_cov_dense_" in path:
+            raise AssertionError(
+                "dense AI find-weight workflow should use shared AI covariance artifacts"
+            )
+        return original_read_csv(*args, **kwargs)
+
+    monkeypatch.setattr(workflows.pd, "read_csv", _guard_dense_ai_cov_reads)
+
+    results = workflows.ai_staar_related_dense_glmmkin_find_weight(
+        dataset="example",
+        seed=600,
+        rare_maf_cutoff=0.05,
+        use_precomputed_artifacts=True,
+    )
+    assert results["num_variant"] == 163.0
+    assert 0.0 <= results["results_STAAR_O"] <= 1.0

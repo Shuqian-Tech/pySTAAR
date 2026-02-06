@@ -106,6 +106,51 @@ def _fit_binomial_irls(
     return beta, fitted, weights
 
 
+def _fit_binomial_glm_rstyle(
+    X: np.ndarray,
+    y: np.ndarray,
+    max_iter: int = 100,
+    tol: float = 1e-8,
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Mirror R glm() binomial fit outputs used by fit_null_glm_Binary_SPA.
+
+    R's glm object stores working weights from the last IWLS update step. Those
+    can differ slightly from fitted*(1-fitted), and STAAR's SPA prefilter
+    covariance depends on these exact stored weights.
+    """
+
+    eps = 1e-12
+    prior_weights = np.ones_like(y, dtype=float)
+    mu = np.clip((prior_weights * y + 0.5) / (prior_weights + 1.0), eps, 1.0 - eps)
+    eta = np.log(mu / (1.0 - mu))
+
+    beta = np.zeros(X.shape[1], dtype=float)
+    dev_old = np.inf
+    w_last = np.ones_like(y, dtype=float)
+
+    for _ in range(max_iter):
+        var_mu = np.clip(mu * (1.0 - mu), eps, None)
+        mu_eta = np.clip(mu * (1.0 - mu), eps, None)
+        z = eta + (y - mu) / mu_eta
+        w = np.sqrt(prior_weights * (mu_eta**2) / var_mu)
+
+        Xw = X * w[:, None]
+        zw = z * w
+        beta = np.linalg.lstsq(Xw, zw, rcond=None)[0]
+
+        eta = X @ beta
+        mu = np.clip(expit(eta), eps, 1.0 - eps)
+        dev = -2.0 * np.sum(y * np.log(mu) + (1.0 - y) * np.log(1.0 - mu))
+        w_last = w
+
+        if np.abs(dev - dev_old) / (0.1 + np.abs(dev)) < tol:
+            break
+        dev_old = dev
+
+    weights = w_last**2
+    return beta, mu, weights
+
+
 def fit_null_glm(df: pd.DataFrame) -> NullModelGLM:
     X, y = _design_matrix(df)
     beta, *_ = np.linalg.lstsq(X, y, rcond=None)
@@ -136,7 +181,12 @@ def fit_null_glm_binary_spa(
     if not np.all(np.isin(y, [0.0, 1.0])):
         raise ValueError("Binary SPA null model requires Y coded as 0/1.")
 
-    beta, fitted, weights = _fit_binomial_irls(X=X, y=y, max_iter=max_iter, tol=tol)
+    beta, fitted, weights = _fit_binomial_glm_rstyle(
+        X=X,
+        y=y,
+        max_iter=max_iter,
+        tol=tol,
+    )
     residuals = y - fitted
 
     XtWX = X.T @ (X * weights[:, None])

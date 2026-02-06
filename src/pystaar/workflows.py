@@ -456,13 +456,6 @@ def staar_unrelated_binary_spa(
     case_count = float(np.sum(pheno["Y"].to_numpy(dtype=float)))
 
     obj_nullmodel = fit_null_glm_binary_spa(pheno)
-    if SPA_p_filter and np.isclose(rare_maf_cutoff, BASELINE_PRECOMPUTED_RARE_MAF_CUTOFF):
-        cov_filter_path = DATA_DIR / "example_glm_binary_spa_cov_filter.csv"
-        if cov_filter_path.exists():
-            candidate_cov = pd.read_csv(cov_filter_path).to_numpy()
-            expected_num_variants = _num_rare_variants(data.geno, rare_maf_cutoff)
-            if candidate_cov.shape == (expected_num_variants, expected_num_variants):
-                obj_nullmodel.precomputed_cov_filter = candidate_cov
 
     results = staar_binary_spa(
         genotype=data.geno,

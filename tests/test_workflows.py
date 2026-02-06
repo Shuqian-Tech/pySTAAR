@@ -274,20 +274,18 @@ def test_related_binary_spa_pure_path_tracks_precomputed(workflow, spa_filter):
     assert abs(pure["results_STAAR_B"] - precomputed["results_STAAR_B"]) < 1e-3
 
 
-def test_unrelated_binary_spa_prefilter_loads_precomputed_cov(monkeypatch):
-    original_staar_binary_spa = workflows.staar_binary_spa
-    captured = {}
+def test_unrelated_binary_spa_prefilter_does_not_load_precomputed_cov(monkeypatch):
+    original_read_csv = workflows.pd.read_csv
 
-    def _track_staar_binary_spa(*args, **kwargs):
-        obj = kwargs.get("obj_nullmodel")
-        captured["has_precomputed_cov_filter"] = (
-            obj is not None and getattr(obj, "precomputed_cov_filter", None) is not None
-        )
-        return original_staar_binary_spa(*args, **kwargs)
+    def _guard_cov_filter_reads(*args, **kwargs):
+        path = str(args[0]) if args else ""
+        if path.endswith("example_glm_binary_spa_cov_filter.csv"):
+            raise AssertionError("unrelated SPA prefilter should not load precomputed cov")
+        return original_read_csv(*args, **kwargs)
 
-    monkeypatch.setattr(workflows, "staar_binary_spa", _track_staar_binary_spa)
+    monkeypatch.setattr(workflows.pd, "read_csv", _guard_cov_filter_reads)
 
-    workflows.staar_unrelated_binary_spa(
+    results = workflows.staar_unrelated_binary_spa(
         dataset="example",
         seed=600,
         rare_maf_cutoff=0.05,
@@ -295,7 +293,8 @@ def test_unrelated_binary_spa_prefilter_loads_precomputed_cov(monkeypatch):
         p_filter_cutoff=0.05,
     )
 
-    assert captured["has_precomputed_cov_filter"] is True
+    assert results["num_variant"] == 163.0
+    assert 0.0 < results["results_STAAR_B"] <= 1.0
 
 
 def test_indiv_score_unrelated_workflow_runs():

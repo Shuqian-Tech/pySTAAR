@@ -290,6 +290,30 @@ def test_related_binary_spa_precomputed_path_reconstructs_nullmodel_components(
     assert 0.0 < results["results_STAAR_B"] <= 1.0
 
 
+def test_related_binary_spa_dense_precomputed_path_uses_shared_fitted_artifact(monkeypatch):
+    original_read_csv = workflows.pd.read_csv
+
+    def _guard_dense_fitted_reads(*args, **kwargs):
+        path = str(args[0]) if args else ""
+        if path.endswith("example_glmmkin_binary_spa_dense_fitted.csv"):
+            raise AssertionError("dense related SPA path should use shared fitted artifact")
+        return original_read_csv(*args, **kwargs)
+
+    monkeypatch.setattr(workflows.pd, "read_csv", _guard_dense_fitted_reads)
+
+    results = workflows.staar_related_dense_binary_spa(
+        dataset="example",
+        seed=600,
+        rare_maf_cutoff=0.05,
+        SPA_p_filter=True,
+        p_filter_cutoff=0.05,
+        use_precomputed_artifacts=True,
+    )
+
+    assert results["num_variant"] == 163.0
+    assert 0.0 < results["results_STAAR_B"] <= 1.0
+
+
 def test_related_binary_spa_prefilter_defaults_to_pure_covariance(monkeypatch):
     original_staar_binary_spa = workflows.staar_binary_spa
     captured = {}

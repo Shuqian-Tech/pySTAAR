@@ -39,7 +39,6 @@ The following precomputed artifacts are still used for baseline parity when `use
 - `data/example_glmmkin_cov_cond_sparse.csv`
 - `data/example_glmmkin_cov_cond_dense.csv`
 - `data/example_glmmkin_binary_spa_sparse_fitted.csv`
-- `data/example_glmmkin_binary_spa_dense_fitted.csv`
 - `data/example_ai_cov_sparse_s1_b1.csv`
 - `data/example_ai_cov_sparse_s1_b2.csv`
 - `data/example_ai_cov_sparse_s2_b1.csv`
@@ -51,7 +50,7 @@ The following precomputed artifacts are still used for baseline parity when `use
 
 These are passed into the Python null-model/STAAR pipeline to reduce backend-specific numeric drift and match baseline sentinels for the `example` scenario.
 
-For related binary-SPA parity paths, Python now reconstructs `scaled_residuals`, `XW`, and `XXWX_inv` from precomputed fitted values and computes `SPA_p_filter` covariance from fitted values + kinship; precomputed `*_cov_filter.csv`, `*_scaled_residuals.csv`, `*_XW.csv`, and `*_XXWX_inv.csv` artifacts are no longer loaded.
+For related binary-SPA parity paths, Python now reconstructs `scaled_residuals`, `XW`, and `XXWX_inv` from precomputed fitted values and computes `SPA_p_filter` covariance from fitted values + kinship; precomputed `*_cov_filter.csv`, `*_scaled_residuals.csv`, `*_XW.csv`, and `*_XXWX_inv.csv` artifacts are no longer loaded. Dense and sparse related-binary parity now share a single fitted artifact (`example_glmmkin_binary_spa_sparse_fitted.csv`).
 For related GLMM parity paths with `rare_maf_cutoff` below the baseline (`0.05`), Python now derives the covariance submatrix directly from `example_glmmkin_cov.csv`; cutoff-specific covariance artifacts are no longer loaded.
 
 ### Why

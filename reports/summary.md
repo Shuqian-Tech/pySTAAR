@@ -54,6 +54,7 @@ Open compliance notes:
 - Unrelated `SPA_p_filter=TRUE` now runs parity on a fully computed Python covariance path (no precomputed covariance artifact).
 - Related `SPA_p_filter=TRUE` now computes covariance in Python from precomputed fitted values + kinship (no precomputed `*_cov_filter.csv` artifacts).
 - Related binary precomputed parity path now reconstructs `scaled_residuals`, `XW`, and `XXWX_inv` from fitted values (no precomputed component artifacts).
+- Related binary dense/sparse parity paths now share one fitted artifact (`example_glmmkin_binary_spa_sparse_fitted.csv`), dropping dependency on a separate dense fitted artifact.
 - Related GLMM parity for lower rare-MAF cutoffs now derives covariance submatrices from baseline `example_glmmkin_cov.csv` (no precomputed `example_glmmkin_cov_rare_maf_0_01.csv` artifact dependency).
 - This behavior is recorded as `DEV-001` in `reports/deviations.md`.
 - Scientific owner approval for `DEV-001` is recorded on 2026-02-06 (`xiaozhouwang`); deviation remains temporary and tracked.

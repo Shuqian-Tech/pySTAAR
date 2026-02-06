@@ -307,6 +307,19 @@ def _compute_related_binary_precomputed_components(
     return scaled_residuals, XW, XXWX_inv, precomputed_cov_filter
 
 
+def _load_related_binary_precomputed_fitted(suffix: str) -> np.ndarray | None:
+    # Sparse and dense parity baselines share numerically equivalent fitted values.
+    shared_path = DATA_DIR / "example_glmmkin_binary_spa_sparse_fitted.csv"
+    if shared_path.exists():
+        return pd.read_csv(shared_path).to_numpy().reshape(-1)
+
+    suffix_path = DATA_DIR / f"example_glmmkin_binary_spa_{suffix}_fitted.csv"
+    if suffix_path.exists():
+        return pd.read_csv(suffix_path).to_numpy().reshape(-1)
+
+    return None
+
+
 def _flatten_ai_weight_matrix(weight_matrix: np.ndarray, pop_levels: list[str]) -> dict[str, float]:
     matrix = np.asarray(weight_matrix, dtype=float)
     if matrix.ndim != 2:
@@ -650,11 +663,12 @@ def _related_binary_spa_common(
     )
 
     suffix = "sparse" if sparse else "dense"
-    fitted_path = DATA_DIR / f"example_glmmkin_binary_spa_{suffix}_fitted.csv"
-
     obj_nullmodel = None
-    if use_precomputed and fitted_path.exists():
-        fitted = pd.read_csv(fitted_path).to_numpy().reshape(-1)
+    if use_precomputed:
+        fitted = _load_related_binary_precomputed_fitted(suffix=suffix)
+    else:
+        fitted = None
+    if use_precomputed and fitted is not None:
         scaled_residuals, XW, XXWX_inv, precomputed_cov_filter = (
             _compute_related_binary_precomputed_components(
                 genotype=data.geno,

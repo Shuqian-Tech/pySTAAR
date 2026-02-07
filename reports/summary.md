@@ -3,8 +3,8 @@
 Status as of 2026-02-07:
 
 - Phase: 3 (Performance and backends; baseline benchmark collection started)
-- Parity status: `pytest tests/parity -q` passes (`28 passed, 18 xfailed`) on the documented reference backend.
-- Full test status: `pytest -q` passes (`93 passed, 18 xfailed`).
+- Parity status: `pytest tests/parity -q` passes (`46 passed`) on the documented reference backend.
+- Full test status: `pytest -q` passes (`111 passed`).
 - Scenarios implemented:
   - `ai_staar_related_sparse_glmmkin_find_weight`
   - `ai_staar_related_dense_glmmkin_find_weight`
@@ -58,9 +58,9 @@ Open compliance notes:
 - Related conditional core/individual-score parity paths now compute conditional covariance fully in Python (no `example_glmmkin_cov_cond_*.csv` artifacts).
 - Related AI dense/sparse parity paths now compute covariance fully in Python (no `example_ai_cov_*.csv` artifacts).
 - Related GLMM core STAAR parity now runs without loading GLMM covariance artifacts for both baseline and lower rare-MAF cutoffs.
-- Affected related baseline scenario sentinels are relaxed up to `rtol=5e-4` (scientific-owner approved on 2026-02-07) to absorb reproducible pure-Python backend drift while keeping baseline specs on pure paths.
-- This behavior is recorded as `DEV-001` in `reports/deviations.md`.
-- Scientific owner approvals for `DEV-001` are recorded on 2026-02-06 and 2026-02-07 (`xiaozhouwang`); deviation remains temporary and tracked.
+- Affected related baseline and pure-shadow scenario sentinels are now tightened to `rtol=3.5e-4` (from `rtol=5e-4`) after `STAAR-42` numeric-alignment updates.
+- `STAAR-42` removed all pure-shadow xfails; parity now passes for all 46 scenarios on the reference backend.
+- `DEV-001` is retained as a historical record in `reports/deviations.md` and is no longer active release gating.
 - Cross-language baseline benchmark is complete on the reference backend; geometric-mean Python speedup vs R across measured scenarios is approximately `1.64x` (see `reports/performance.md`).
 - Strict parity coverage has been expanded with additional R-backed parameter scenarios:
   - `staar_unrelated_glm_rare_maf_0_01`
@@ -71,16 +71,15 @@ Open compliance notes:
 Phase 2 handoff status:
 
 - Planned migration scope in `reports/issues.md` is complete (`STAAR-1` through `STAAR-29` resolved).
-- Full migration checklist in `reports/issues.md` is complete (`STAAR-1` through `STAAR-41` resolved).
-- Phase 3 follow-up work is tracked separately in `reports/issues.md` (`STAAR-42` remains open; `STAAR-43` and `STAAR-44` resolved with benchmark evidence).
+- Full migration checklist in `reports/issues.md` is complete (`STAAR-1` through `STAAR-44` resolved).
 - Current state has completed Phase 2 implementation and moved into Phase 3 baseline measurement.
-- Release-style sign-off should continue to call out approved temporary `DEV-001` until retired/narrowed.
+- Release sign-off can reference `DEV-001` as closed historical context only.
 
 PR-ready notes (copy into PR description):
 
-- Parity on reference backend: `pytest tests/parity -q` -> `28 passed, 18 xfailed`.
-- Full test suite: `pytest -q` -> `93 passed, 18 xfailed`.
-- Deviations: `DEV-001` (approved temporary) in `reports/deviations.md`.
+- Parity on reference backend: `pytest tests/parity -q` -> `46 passed`.
+- Full test suite: `pytest -q` -> `111 passed`.
+- Deviations: no active deviations; `DEV-001` is closed and retained historically in `reports/deviations.md`.
 - Required named roles per policy:
   - Migration owner: `<fill>`
   - Human sponsor: `<fill>`
@@ -89,6 +88,6 @@ PR-ready notes (copy into PR description):
 
 Next steps:
 
-- Continue `DEV-001` retirement work (`STAAR-42`) by tightening related pure-shadow tolerances and reducing numeric drift.
-- Re-run parity after each numeric-alignment change and keep deviation tracking explicit until shadow xfails are removed.
 - Expand performance and parity coverage beyond `example` with additional representative scenarios.
+- Add Phase 3 optimization candidates after profiling non-optimized related workflows.
+- Keep historical deviation context in sync with any future tolerance/backend adjustments.

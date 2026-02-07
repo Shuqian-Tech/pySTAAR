@@ -32,13 +32,13 @@ sentinels:
     file: baselines/indiv_score_related_dense_glmmkin_cond_sentinels.json
     path: $.pvalue_min
     comparison: scalar_approx
-    rtol: 5e-4
+    rtol: 3.5e-4
     atol: 1e-8
   - name: pvalue_median
     file: baselines/indiv_score_related_dense_glmmkin_cond_sentinels.json
     path: $.pvalue_median
     comparison: scalar_approx
-    rtol: 5e-4
+    rtol: 3.5e-4
     atol: 1e-8
   - name: top_variant_index
     file: baselines/indiv_score_related_dense_glmmkin_cond_sentinels.json
@@ -50,23 +50,23 @@ sentinels:
     file: baselines/indiv_score_related_dense_glmmkin_cond_sentinels.json
     path: $.top_pvalue
     comparison: scalar_approx
-    rtol: 5e-4
+    rtol: 3.5e-4
     atol: 1e-8
   - name: score_cond_samples
     file: baselines/indiv_score_related_dense_glmmkin_cond_sentinels.json
     path: $.score_cond_samples
     comparison: mapping_approx
-    rtol: 5e-4
+    rtol: 3.5e-4
     atol: 1e-8
   - name: se_cond_samples
     file: baselines/indiv_score_related_dense_glmmkin_cond_sentinels.json
     path: $.se_cond_samples
     comparison: mapping_approx
-    rtol: 5e-4
+    rtol: 3.5e-4
     atol: 1e-8
   - name: pvalue_cond_samples
     file: baselines/indiv_score_related_dense_glmmkin_cond_sentinels.json
     path: $.pvalue_cond_samples
     comparison: mapping_approx
-    rtol: 5e-4
+    rtol: 3.5e-4
     atol: 1e-8

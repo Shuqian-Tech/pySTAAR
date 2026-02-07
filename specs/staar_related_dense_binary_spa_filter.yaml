@@ -42,19 +42,19 @@ sentinels:
     file: baselines/related_dense_binary_spa_filter_sentinels.json
     path: $.results_STAAR_B
     comparison: scalar_approx
-    rtol: 5e-4
+    rtol: 3.5e-4
     atol: 1e-8
 
   - name: results_STAAR_B_1_25
     file: baselines/related_dense_binary_spa_filter_sentinels.json
     path: $.results_STAAR_B_1_25
     comparison: mapping_approx
-    rtol: 5e-4
+    rtol: 3.5e-4
     atol: 1e-8
 
   - name: results_STAAR_B_1_1
     file: baselines/related_dense_binary_spa_filter_sentinels.json
     path: $.results_STAAR_B_1_1
     comparison: mapping_approx
-    rtol: 5e-4
+    rtol: 3.5e-4
     atol: 1e-8

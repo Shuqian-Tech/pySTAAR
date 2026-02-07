@@ -330,9 +330,17 @@ def estimate_tau_reml(X: np.ndarray, y: np.ndarray, kins: sp.csc_matrix) -> np.n
         _reml_nll,
         init,
         args=(X, y, kins),
-        method="Nelder-Mead",
-        options={"maxiter": 200, "xatol": 1e-8, "fatol": 1e-8},
+        method="Powell",
+        options={"maxiter": 2000, "xtol": 1e-8, "ftol": 1e-8},
     )
+    if not result.success:
+        result = minimize(
+            _reml_nll,
+            init,
+            args=(X, y, kins),
+            method="Nelder-Mead",
+            options={"maxiter": 400, "xatol": 1e-8, "fatol": 1e-8},
+        )
     return np.exp(result.x)
 
 

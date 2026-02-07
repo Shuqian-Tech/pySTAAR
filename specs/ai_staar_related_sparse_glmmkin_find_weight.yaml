@@ -30,13 +30,13 @@ sentinels:
     file: baselines/ai_staar_related_sparse_glmmkin_find_weight_sentinels.json
     path: $.results_STAAR_O
     comparison: scalar_approx
-    rtol: 5e-4
+    rtol: 3.5e-4
     atol: 1e-8
   - name: results_ACAT_O
     file: baselines/ai_staar_related_sparse_glmmkin_find_weight_sentinels.json
     path: $.results_ACAT_O
     comparison: scalar_approx
-    rtol: 5e-4
+    rtol: 3.5e-4
     atol: 1e-8
   - name: weight_all_1
     file: baselines/ai_staar_related_sparse_glmmkin_find_weight_sentinels.json
@@ -54,35 +54,35 @@ sentinels:
     file: baselines/ai_staar_related_sparse_glmmkin_find_weight_sentinels.json
     path: $.results_weight_staar_o
     comparison: mapping_approx
-    rtol: 5e-4
+    rtol: 3.5e-4
     atol: 1e-8
   - name: results_weight1_staar_o
     file: baselines/ai_staar_related_sparse_glmmkin_find_weight_sentinels.json
     path: $.results_weight1_staar_o
     comparison: mapping_approx
-    rtol: 5e-4
+    rtol: 3.5e-4
     atol: 1e-8
   - name: results_weight2_staar_o
     file: baselines/ai_staar_related_sparse_glmmkin_find_weight_sentinels.json
     path: $.results_weight2_staar_o
     comparison: mapping_approx
-    rtol: 5e-4
+    rtol: 3.5e-4
     atol: 1e-8
   - name: results_weight_staar_s_1_25
     file: baselines/ai_staar_related_sparse_glmmkin_find_weight_sentinels.json
     path: $.results_weight_staar_s_1_25
     comparison: mapping_approx
-    rtol: 5e-4
+    rtol: 3.5e-4
     atol: 1e-8
   - name: results_weight1_staar_s_1_25
     file: baselines/ai_staar_related_sparse_glmmkin_find_weight_sentinels.json
     path: $.results_weight1_staar_s_1_25
     comparison: mapping_approx
-    rtol: 5e-4
+    rtol: 3.5e-4
     atol: 1e-8
   - name: results_weight2_staar_s_1_25
     file: baselines/ai_staar_related_sparse_glmmkin_find_weight_sentinels.json
     path: $.results_weight2_staar_s_1_25
     comparison: mapping_approx
-    rtol: 5e-4
+    rtol: 3.5e-4
     atol: 1e-8

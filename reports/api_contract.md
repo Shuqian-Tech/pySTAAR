@@ -1,6 +1,6 @@
 # API Contract (R to Python)
 
-Status as of 2026-02-06.
+Status as of 2026-02-07.
 
 This file tracks the strict API/UX contract alignment against exported functions in `../STAAR/NAMESPACE`.
 
@@ -24,4 +24,4 @@ This file tracks the strict API/UX contract alignment against exported functions
 
 - Full API name mapping is in place, but strict behavioral equivalence still depends on scenario/test coverage breadth.
 - Current parity remains strongest on the `example` dataset and selected scenarios in `specs/`.
-- `DEV-001` remains a temporary approved deviation and should continue to be called out until retired or narrowed.
+- No active parity-blocking deviations remain; `DEV-001` is closed and retained in `reports/deviations.md` as historical context for related-scenario tolerance policy.

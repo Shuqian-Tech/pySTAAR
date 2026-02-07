@@ -47,6 +47,7 @@ Status as of 2026-02-07:
   - Phase 3 R benchmark logs: `benchmarks/phase3_baseline_r_raw.csv`, `benchmarks/phase3_baseline_r_summary.csv`, `benchmarks/phase3_baseline_r_meta.json`
   - Phase 3 cross-language comparison: `benchmarks/phase3_cross_language_comparison.csv`
   - Phase 3 optimization artifacts (`STAAR-43`/`STAAR-44`): `benchmarks/phase3_opt_43_44_raw.csv`, `benchmarks/phase3_opt_43_44_summary.csv`, `benchmarks/phase3_opt_43_44_meta.json`, `benchmarks/phase3_opt_43_44_comparison.csv`, `reports/performance_opt_43_44.md`
+  - Post-`STAAR-42` optimization targeting probe: `benchmarks/phase3_post42_probe_raw.csv`, `benchmarks/phase3_post42_probe_summary.csv`, `benchmarks/phase3_post42_probe_meta.json`, `reports/performance_post42_probe.md`
 
 Open compliance notes:
 
@@ -88,6 +89,6 @@ PR-ready notes (copy into PR description):
 
 Next steps:
 
-- Expand performance and parity coverage beyond `example` with additional representative scenarios.
-- Add Phase 3 optimization candidates after profiling non-optimized related workflows.
+- Execute `STAAR-45`: expand performance/parity coverage beyond `example` with additional representative scenarios and exported R baselines.
+- Execute `STAAR-46`: optimize `staar_related_sparse_binary_spa` pure path (post-`STAAR-42` probe median: `2.343567s` in `benchmarks/phase3_post42_probe_summary.csv`).
 - Keep historical deviation context in sync with any future tolerance/backend adjustments.

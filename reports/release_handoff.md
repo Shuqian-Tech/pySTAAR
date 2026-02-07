@@ -38,5 +38,5 @@ Include the following points in release notes:
 
 ## Suggested Post-Release Follow-up
 
-- Continue profiling and optimizing high-cost related workflows while retaining current parity gates.
-- Expand parity/performance validation beyond `example` with additional representative datasets/scenarios.
+- `STAAR-45`: expand parity/performance validation beyond `example` with additional representative datasets/scenarios and exported R baselines.
+- `STAAR-46`: optimize high-cost pure-path related workflow `staar_related_sparse_binary_spa` while retaining parity gates.

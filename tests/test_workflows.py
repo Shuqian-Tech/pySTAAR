@@ -806,18 +806,28 @@ def test_ai_staar_related_dense_workflow_runs():
     assert 0.0 <= results["results_STAAR_O"] <= 1.0
 
 
-def test_ai_staar_related_dense_workflow_uses_shared_ai_cov_artifacts(monkeypatch):
+@pytest.mark.parametrize(
+    "workflow",
+    [
+        workflows.ai_staar_related_sparse_glmmkin,
+        workflows.ai_staar_related_dense_glmmkin,
+    ],
+)
+def test_ai_staar_related_workflow_does_not_load_precomputed_ai_cov_artifacts(
+    monkeypatch,
+    workflow,
+):
     original_read_csv = workflows.pd.read_csv
 
-    def _guard_dense_ai_cov_reads(*args, **kwargs):
+    def _guard_ai_cov_reads(*args, **kwargs):
         path = str(args[0]) if args else ""
-        if "example_ai_cov_dense_" in path:
-            raise AssertionError("dense AI workflow should use shared AI covariance artifacts")
+        if "example_ai_cov_" in path:
+            raise AssertionError("related AI workflow should not load precomputed AI covariance artifacts")
         return original_read_csv(*args, **kwargs)
 
-    monkeypatch.setattr(workflows.pd, "read_csv", _guard_dense_ai_cov_reads)
+    monkeypatch.setattr(workflows.pd, "read_csv", _guard_ai_cov_reads)
 
-    results = workflows.ai_staar_related_dense_glmmkin(
+    results = workflow(
         dataset="example",
         seed=600,
         rare_maf_cutoff=0.05,
@@ -866,22 +876,30 @@ def test_ai_staar_related_dense_find_weight_workflow_runs():
     assert len(results["results_weight_staar_o"]) > 0
 
 
-def test_ai_staar_related_dense_find_weight_uses_shared_ai_cov_artifacts(
+@pytest.mark.parametrize(
+    "workflow",
+    [
+        workflows.ai_staar_related_sparse_glmmkin_find_weight,
+        workflows.ai_staar_related_dense_glmmkin_find_weight,
+    ],
+)
+def test_ai_staar_related_find_weight_workflow_does_not_load_precomputed_ai_cov_artifacts(
     monkeypatch,
+    workflow,
 ):
     original_read_csv = workflows.pd.read_csv
 
-    def _guard_dense_ai_cov_reads(*args, **kwargs):
+    def _guard_ai_cov_reads(*args, **kwargs):
         path = str(args[0]) if args else ""
-        if "example_ai_cov_dense_" in path:
+        if "example_ai_cov_" in path:
             raise AssertionError(
-                "dense AI find-weight workflow should use shared AI covariance artifacts"
+                "related AI find-weight workflow should not load precomputed AI covariance artifacts"
             )
         return original_read_csv(*args, **kwargs)
 
-    monkeypatch.setattr(workflows.pd, "read_csv", _guard_dense_ai_cov_reads)
+    monkeypatch.setattr(workflows.pd, "read_csv", _guard_ai_cov_reads)
 
-    results = workflows.ai_staar_related_dense_glmmkin_find_weight(
+    results = workflow(
         dataset="example",
         seed=600,
         rare_maf_cutoff=0.05,

@@ -66,7 +66,7 @@ sentinels:
     file: baselines/ai_staar_related_sparse_glmmkin_find_weight_sentinels.json
     path: $.results_weight2_staar_o
     comparison: mapping_approx
-    rtol: 1e-6
+    rtol: 2e-6
     atol: 1e-8
   - name: results_weight_staar_s_1_25
     file: baselines/ai_staar_related_sparse_glmmkin_find_weight_sentinels.json

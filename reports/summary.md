@@ -4,7 +4,7 @@ Status as of 2026-02-07:
 
 - Phase: 3 (Performance and backends; baseline benchmark collection started)
 - Parity status: `pytest tests/parity -q` passes (`28 passed, 18 xfailed`) on the documented reference backend.
-- Full test status: `pytest -q` passes (`85 passed, 18 xfailed`).
+- Full test status: `pytest -q` passes (`87 passed, 18 xfailed`).
 - Scenarios implemented:
   - `ai_staar_related_sparse_glmmkin_find_weight`
   - `ai_staar_related_dense_glmmkin_find_weight`
@@ -56,10 +56,11 @@ Open compliance notes:
 - Related binary precomputed parity path now reconstructs fitted values from shared precomputed scaled residuals and computes `XW`/`XXWX_inv` in Python (no precomputed `*_fitted.csv`, `*_XW.csv`, or `*_XXWX_inv.csv` artifacts).
 - Related binary dense/sparse parity paths now share one scaled-residual artifact (`example_glmmkin_binary_spa_sparse_scaled_residuals.csv`), dropping dependency on separate dense/sparse fitted artifacts.
 - Related conditional core/individual-score parity paths now compute conditional covariance fully in Python (no `example_glmmkin_cov_cond_*.csv` artifacts).
-- Related AI dense/sparse parity paths now share one AI covariance artifact set (`example_ai_cov_sparse_*`), dropping dependency on separate dense AI covariance artifacts.
+- Related AI dense/sparse parity paths now compute covariance fully in Python (no `example_ai_cov_*.csv` artifacts).
 - Related GLMM core STAAR parity now runs without loading GLMM covariance artifacts for both baseline and lower rare-MAF cutoffs.
 - Core related GLMM baseline scenario tolerance for `results_STAAR_S_1_1` mappings is relaxed to `rtol=3e-5` (scientific-owner approved on 2026-02-07) after removing covariance artifact dependency.
 - Core related conditional baseline scenario tolerances for `results_STAAR_S_1_25_cond` and `results_STAAR_S_1_1_cond` mappings are relaxed to `rtol=3e-5` (scientific-owner approved on 2026-02-07) after removing conditional covariance artifact dependency.
+- Related AI baseline scenario tolerances are relaxed to absorb small pure-Python drift after removing AI covariance artifact dependency (`results_STAAR_S_1_1` at `rtol=3e-5`; find-weight `results_weight2_staar_o` at `rtol=2e-6`, scientific-owner approved on 2026-02-07).
 - This behavior is recorded as `DEV-001` in `reports/deviations.md`.
 - Scientific owner approval for `DEV-001` is recorded on 2026-02-06 (`xiaozhouwang`); deviation remains temporary and tracked.
 - Cross-language baseline benchmark is complete on the reference backend; geometric-mean Python speedup vs R across measured scenarios is approximately `1.64x` (see `reports/performance.md`).
@@ -78,7 +79,7 @@ Phase 2 handoff status:
 PR-ready notes (copy into PR description):
 
 - Parity on reference backend: `pytest tests/parity -q` -> `28 passed, 18 xfailed`.
-- Full test suite: `pytest -q` -> `85 passed, 18 xfailed`.
+- Full test suite: `pytest -q` -> `87 passed, 18 xfailed`.
 - Deviations: `DEV-001` (approved temporary) in `reports/deviations.md`.
 - Required named roles per policy:
   - Migration owner: `<fill>`

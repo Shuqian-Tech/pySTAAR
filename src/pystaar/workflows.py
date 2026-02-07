@@ -50,7 +50,6 @@ INDIV_SAMPLE_VARIANT_INDICES = (1, 2, 10, 50, 100, 160)
 AI_POP_GROUPS_FILE = "example_ai_pop_groups.csv"
 AI_POP_WEIGHTS_1_1_FILE = "example_ai_pop_weights_1_1.csv"
 AI_POP_WEIGHTS_1_25_FILE = "example_ai_pop_weights_1_25.csv"
-AI_COV_FILE_TEMPLATE = "example_ai_cov_{suffix}_s{scenario}_b{base}.csv"
 
 
 def _num_rare_variants(genotype: np.ndarray, rare_maf_cutoff: float) -> int:
@@ -185,50 +184,6 @@ def _resolve_ai_metadata(
         "AI metadata must be provided for non-example datasets "
         "(pop_groups, pop_weights_1_1, pop_weights_1_25)."
     )
-
-
-def _load_ai_precomputed_covariances(
-    sparse: bool,
-    num_base_tests: int,
-    expected_num_variants: int,
-):
-    suffix = "sparse" if sparse else "dense"
-    cov_s1: list[np.ndarray] = []
-    cov_s2: list[np.ndarray] = []
-
-    for b in range(1, num_base_tests + 1):
-        expected_shape = (expected_num_variants, expected_num_variants)
-
-        # Dense/sparse baselines are numerically equivalent at this precision.
-        candidate_suffixes = ["sparse"] if sparse else ["sparse", suffix]
-        loaded = False
-        for candidate_suffix in candidate_suffixes:
-            path_s1 = DATA_DIR / AI_COV_FILE_TEMPLATE.format(
-                suffix=candidate_suffix,
-                scenario=1,
-                base=b,
-            )
-            path_s2 = DATA_DIR / AI_COV_FILE_TEMPLATE.format(
-                suffix=candidate_suffix,
-                scenario=2,
-                base=b,
-            )
-            if not (path_s1.exists() and path_s2.exists()):
-                continue
-
-            candidate_s1 = pd.read_csv(path_s1).to_numpy()
-            candidate_s2 = pd.read_csv(path_s2).to_numpy()
-            if candidate_s1.shape != expected_shape or candidate_s2.shape != expected_shape:
-                continue
-            cov_s1.append(candidate_s1)
-            cov_s2.append(candidate_s2)
-            loaded = True
-            break
-
-        if not loaded:
-            return None, None
-
-    return cov_s1, cov_s2
 
 
 def _sample_variant_mapping(values: np.ndarray, indices: tuple[int, ...]) -> dict[str, float]:
@@ -924,19 +879,10 @@ def _related_ai_common(
         pop_levels=pop_levels,
     )
 
-    precomputed_ai_cov_s1 = None
-    precomputed_ai_cov_s2 = None
     precomputed_scaled = _load_related_precomputed_scaled_residuals(
         genotype=data.geno,
         use_precomputed_artifacts=use_precomputed_artifacts,
     )
-    expected_num_variants = _num_rare_variants(data.geno, rare_maf_cutoff)
-    if precomputed_scaled is not None and expected_num_variants > 0:
-        precomputed_ai_cov_s1, precomputed_ai_cov_s2 = _load_ai_precomputed_covariances(
-            sparse=sparse,
-            num_base_tests=pop_weights_1_1.shape[1],
-            expected_num_variants=expected_num_variants,
-        )
 
     obj_nullmodel = fit_null_glmmkin(
         data.pheno_related,
@@ -953,8 +899,6 @@ def _related_ai_common(
     obj_nullmodel.pop_levels = pop_levels
     obj_nullmodel.pop_weights_1_1 = pop_weights_1_1
     obj_nullmodel.pop_weights_1_25 = pop_weights_1_25
-    obj_nullmodel.precomputed_ai_cov_s1 = precomputed_ai_cov_s1
-    obj_nullmodel.precomputed_ai_cov_s2 = precomputed_ai_cov_s2
     results = ai_staar(
         genotype=data.geno,
         obj_nullmodel=obj_nullmodel,

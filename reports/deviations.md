@@ -36,10 +36,6 @@ The following precomputed artifacts are still used for baseline parity when `use
 
 - `data/example_glmmkin_scaled_residuals.csv`
 - `data/example_glmmkin_binary_spa_sparse_scaled_residuals.csv`
-- `data/example_ai_cov_sparse_s1_b1.csv`
-- `data/example_ai_cov_sparse_s1_b2.csv`
-- `data/example_ai_cov_sparse_s2_b1.csv`
-- `data/example_ai_cov_sparse_s2_b2.csv`
 
 These are passed into the Python null-model/STAAR pipeline to reduce backend-specific numeric drift and match baseline sentinels for the `example` scenario.
 Related precomputed parity paths also anchor GLMM null-model `theta` to baseline constants (sparse/dense) to reduce residual backend optimization drift.
@@ -49,7 +45,8 @@ Core related GLMM STAAR parity now computes covariance fully in Python for all c
 To keep baseline-cutoff strict parity (`rare_maf_cutoff=0.05`) after removing the covariance artifact dependency, the `results_STAAR_S_1_1` mapping tolerance in related sparse/dense core STAAR specs is relaxed from `rtol=1e-6` to `rtol=3e-5` with scientific-owner approval.
 Core related `staar_*_glmmkin_cond` and related individual conditional score-test parity now compute conditional covariance fully in Python (no `example_glmmkin_cov_cond_*.csv` artifact usage).
 To keep baseline-cutoff strict parity (`rare_maf_cutoff=0.05`) after removing conditional covariance artifacts, related sparse/dense conditional SKAT mapping tolerances (`results_STAAR_S_1_25_cond`, `results_STAAR_S_1_1_cond`) are relaxed from `rtol=1e-6` to `rtol=3e-5` with scientific-owner approval.
-Related AI sparse/dense parity now share a single set of AI covariance artifacts (`example_ai_cov_sparse_*`).
+Related AI sparse/dense parity now compute covariance fully in Python (no `example_ai_cov_*.csv` artifact usage).
+To keep baseline-cutoff strict parity (`rare_maf_cutoff=0.05`) after removing AI covariance artifacts, related AI `results_STAAR_S_1_1` mapping tolerances are relaxed from `rtol=1e-6` to `rtol=3e-5`, and related AI find-weight `results_weight2_staar_o` mapping tolerances are relaxed from `rtol=1e-6` to `rtol=2e-6`, with scientific-owner approval.
 
 ### Why
 
@@ -76,6 +73,10 @@ Observed on 2026-02-06 (reference backend):
 - After removing `example_glmmkin_cov.csv` from baseline-cutoff core related GLMM parity (`rare_maf_cutoff=0.05`), the largest remaining mapped drift is `results_STAAR_S_1_1["SKAT(1,1)-Z8"]` at approximately `1.12e-5` versus baseline; approved tolerance relaxation for this mapping (`rtol=3e-5`) restores parity compliance.
 - After removing `example_glmmkin_cov_cond_sparse.csv` from baseline-cutoff core related conditional parity (`rare_maf_cutoff=0.05`), the largest remaining mapped drifts are `results_STAAR_S_1_25_cond["SKAT(1,25)-Z2"]` at approximately `1.72e-6` (relative) and `results_STAAR_S_1_1_cond["SKAT(1,1)-Z8"]` at approximately `1.58e-5` (relative); approved tolerance relaxation for these mappings (`rtol=3e-5`) restores parity compliance.
 - Related GLMM/AI/individual-score precomputed parity paths now use baseline `theta` constants (sparse/dense) to reduce null-model fit drift while preserving strict parity.
+- After removing `example_ai_cov_*.csv` artifacts from baseline-cutoff related AI parity (`rare_maf_cutoff=0.05`), the largest remaining mapped drifts are:
+  - `results_STAAR_S_1_1["SKAT(1,1)-Z2"]`: approximately `1.83e-5` relative.
+  - `results_weight2_staar_o["B2"]`: approximately `1.01e-6` relative.
+  Approved tolerance relaxations for these mappings (`rtol=3e-5` and `rtol=2e-6`, respectively) restore parity compliance.
 - Current related binary pure-path deltas against baseline sentinels (`example`):
   - Sparse `results_STAAR_B`: `0.23360463525923016` vs baseline `0.2336049736705653` (delta `-3.3861133513779507e-07`)
   - Dense `results_STAAR_B`: `0.23360475727667856` vs baseline `0.233605092772099` (delta `-3.354954204448646e-07`)
@@ -98,7 +99,7 @@ Parity test status with current hybrid path:
 ### Acceptability Criteria
 
 - Temporary acceptance only for Phase 2 parity closure on the `example` scenarios.
-- Related binary SPA default path is already fully computed in Python; remaining work is to reduce/remove remaining parity-only precomputed artifact usage (notably related binary scaled-residual artifacts, baseline-cutoff core related-GLMM scaled/theta anchoring, and related AI covariance artifacts), or explicitly re-baseline/approve.
+- Related binary SPA default path is already fully computed in Python; remaining work is to reduce/remove remaining parity-only precomputed artifact usage (notably related binary scaled-residual artifacts and baseline-cutoff core related-GLMM scaled/theta anchoring), or explicitly re-baseline/approve.
 
 ### Approval Record
 
@@ -110,6 +111,7 @@ Parity test status with current hybrid path:
 - Merge/release gating note: approved as a temporary deviation; keep explicit mention in release notes until retired or narrowed.
 - Additional scientific-owner approval: 2026-02-07 (`xiaozhouwang`) to accept baseline-cutoff core related GLMM tolerance relaxation for `results_STAAR_S_1_1` mappings (`rtol=3e-5`) after removing covariance artifact dependency.
 - Additional scientific-owner approval: 2026-02-07 (`xiaozhouwang`) to accept baseline-cutoff core related conditional SKAT mapping tolerance relaxation (`results_STAAR_S_1_25_cond`, `results_STAAR_S_1_1_cond`, `rtol=3e-5`) after removing conditional covariance artifact dependency.
+- Additional scientific-owner approval: 2026-02-07 (`xiaozhouwang`) to accept baseline-cutoff related AI mapping tolerance relaxations (`results_STAAR_S_1_1`: `rtol=3e-5`; find-weight `results_weight2_staar_o`: `rtol=2e-6`) after removing AI covariance artifact dependency.
 
 ### PR Handoff Checklist
 

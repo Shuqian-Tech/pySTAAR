@@ -50,5 +50,5 @@ From `numpy.__config__.show()`:
 
 ## Test Execution Snapshot
 
-- `pytest tests/parity -q` -> `53 passed`
-- `pytest -q` -> `120 passed`
+- `pytest tests/parity -q` -> `54 passed`
+- `pytest -q` -> `121 passed`

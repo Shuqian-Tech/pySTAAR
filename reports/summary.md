@@ -4,7 +4,7 @@ Status as of 2026-02-07:
 
 - Phase: 3 (Performance and backends; baseline benchmark collection started)
 - Parity status: `pytest tests/parity -q` passes (`28 passed, 18 xfailed`) on the documented reference backend.
-- Full test status: `pytest -q` passes (`87 passed, 18 xfailed`).
+- Full test status: `pytest -q` passes (`91 passed, 18 xfailed`).
 - Scenarios implemented:
   - `ai_staar_related_sparse_glmmkin_find_weight`
   - `ai_staar_related_dense_glmmkin_find_weight`
@@ -71,13 +71,14 @@ Phase 2 handoff status:
 
 - Planned migration scope in `reports/issues.md` is complete (`STAAR-1` through `STAAR-29` resolved).
 - Full migration checklist in `reports/issues.md` is complete (`STAAR-1` through `STAAR-41` resolved).
+- Phase 3 follow-up work is tracked separately in `reports/issues.md` (`STAAR-42` through `STAAR-44`, open).
 - Current state has completed Phase 2 implementation and moved into Phase 3 baseline measurement.
 - Release-style sign-off should continue to call out approved temporary `DEV-001` until retired/narrowed.
 
 PR-ready notes (copy into PR description):
 
 - Parity on reference backend: `pytest tests/parity -q` -> `28 passed, 18 xfailed`.
-- Full test suite: `pytest -q` -> `87 passed, 18 xfailed`.
+- Full test suite: `pytest -q` -> `91 passed, 18 xfailed`.
 - Deviations: `DEV-001` (approved temporary) in `reports/deviations.md`.
 - Required named roles per policy:
   - Migration owner: `<fill>`

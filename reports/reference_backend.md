@@ -1,6 +1,6 @@
 # Reference Backend
 
-- Document date: 2026-02-06
+- Document date: 2026-02-07
 - Purpose: Reference backend for Phase 2 parity validation in this repository.
 
 ## Backend Identity
@@ -54,4 +54,7 @@ Detailed Python capture is recorded in `reports/python_environment.md`.
 - `pytest tests/parity -q`
 - `pytest -q`
 
-Latest run (2026-02-06): both commands passed with `3 passed`.
+Latest run (2026-02-07):
+
+- `pytest tests/parity -q` -> `28 passed, 18 xfailed`
+- `pytest -q` -> `91 passed, 18 xfailed`

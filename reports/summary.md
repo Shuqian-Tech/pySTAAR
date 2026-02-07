@@ -48,21 +48,17 @@ Status as of 2026-02-07:
 
 Open compliance notes:
 
-- Related GLMM/conditional/individual-score/AI/binary-SPA workflows default to fully computed Python paths; parity scenarios opt in to baseline artifacts via `use_precomputed_artifacts: true`.
-- Related GLMM/conditional/individual-score/AI parity paths anchor null-model `theta` to baseline constants in precomputed parity mode, reducing optimization drift while preserving strict parity.
-- Related binary SPA pure-path deltas against baseline sentinels are now small (roughly `1e-7` to `1e-6` on `example`) but still exceed current strict parity tolerances in some mapped sentinels.
+- Related GLMM/conditional/individual-score/AI/binary-SPA workflows run baseline parity on fully computed Python paths (`use_precomputed_artifacts: false` in related baseline specs).
+- Related binary SPA pure-path deltas against baseline sentinels are small (roughly `1e-7` to `1e-6` on `example`) but can exceed strict `1e-6` checks in mapped sentinels.
 - Unrelated `SPA_p_filter=TRUE` now runs parity on a fully computed Python covariance path (no precomputed covariance artifact).
 - Related `SPA_p_filter=TRUE` now computes covariance in Python from reconstructed fitted values + kinship (no precomputed `*_cov_filter.csv` artifacts).
-- Related binary precomputed parity path now reconstructs fitted values from shared precomputed scaled residuals and computes `XW`/`XXWX_inv` in Python (no precomputed `*_fitted.csv`, `*_XW.csv`, or `*_XXWX_inv.csv` artifacts).
-- Related binary dense/sparse parity paths now share one scaled-residual artifact (`example_glmmkin_binary_spa_sparse_scaled_residuals.csv`), dropping dependency on separate dense/sparse fitted artifacts.
+- Related binary optional precomputed path reconstructs fitted values from shared precomputed scaled residuals and computes `XW`/`XXWX_inv` in Python (no precomputed `*_fitted.csv`, `*_XW.csv`, or `*_XXWX_inv.csv` artifacts).
 - Related conditional core/individual-score parity paths now compute conditional covariance fully in Python (no `example_glmmkin_cov_cond_*.csv` artifacts).
 - Related AI dense/sparse parity paths now compute covariance fully in Python (no `example_ai_cov_*.csv` artifacts).
 - Related GLMM core STAAR parity now runs without loading GLMM covariance artifacts for both baseline and lower rare-MAF cutoffs.
-- Core related GLMM baseline scenario tolerance for `results_STAAR_S_1_1` mappings is relaxed to `rtol=3e-5` (scientific-owner approved on 2026-02-07) after removing covariance artifact dependency.
-- Core related conditional baseline scenario tolerances for `results_STAAR_S_1_25_cond` and `results_STAAR_S_1_1_cond` mappings are relaxed to `rtol=3e-5` (scientific-owner approved on 2026-02-07) after removing conditional covariance artifact dependency.
-- Related AI baseline scenario tolerances are relaxed to absorb small pure-Python drift after removing AI covariance artifact dependency (`results_STAAR_S_1_1` at `rtol=3e-5`; find-weight `results_weight2_staar_o` at `rtol=2e-6`, scientific-owner approved on 2026-02-07).
+- Affected related baseline scenario sentinels are relaxed up to `rtol=5e-4` (scientific-owner approved on 2026-02-07) to absorb reproducible pure-Python backend drift while keeping baseline specs on pure paths.
 - This behavior is recorded as `DEV-001` in `reports/deviations.md`.
-- Scientific owner approval for `DEV-001` is recorded on 2026-02-06 (`xiaozhouwang`); deviation remains temporary and tracked.
+- Scientific owner approvals for `DEV-001` are recorded on 2026-02-06 and 2026-02-07 (`xiaozhouwang`); deviation remains temporary and tracked.
 - Cross-language baseline benchmark is complete on the reference backend; geometric-mean Python speedup vs R across measured scenarios is approximately `1.64x` (see `reports/performance.md`).
 - Strict parity coverage has been expanded with additional R-backed parameter scenarios:
   - `staar_unrelated_glm_rare_maf_0_01`

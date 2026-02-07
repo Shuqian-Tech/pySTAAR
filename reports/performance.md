@@ -34,3 +34,18 @@
 - Geometric mean Python speedup vs R across scenarios: `1.64x`.
 - Speedup is computed as `R median / Python median` (values > 1 mean Python is faster).
 - This report is the Phase 3 baseline before Python optimizations.
+
+## Optimization Update (2026-02-07)
+
+Targeted Phase 3 optimization work for `STAAR-43` and `STAAR-44` is captured in:
+
+- `benchmarks/phase3_opt_43_44_raw.csv`
+- `benchmarks/phase3_opt_43_44_summary.csv`
+- `benchmarks/phase3_opt_43_44_meta.json`
+- `benchmarks/phase3_opt_43_44_comparison.csv`
+- `reports/performance_opt_43_44.md`
+
+Observed median improvements versus the Phase 3 baseline:
+
+- `staar_unrelated_binary_spa`: `0.288611s` -> `0.161430s` (`~1.79x`)
+- `ai_staar_unrelated_glm`: `0.928488s` -> `0.856711s` (`~1.08x`)

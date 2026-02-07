@@ -4,7 +4,7 @@ Status as of 2026-02-07:
 
 - Phase: 3 (Performance and backends; baseline benchmark collection started)
 - Parity status: `pytest tests/parity -q` passes (`28 passed, 18 xfailed`) on the documented reference backend.
-- Full test status: `pytest -q` passes (`91 passed, 18 xfailed`).
+- Full test status: `pytest -q` passes (`93 passed, 18 xfailed`).
 - Scenarios implemented:
   - `ai_staar_related_sparse_glmmkin_find_weight`
   - `ai_staar_related_dense_glmmkin_find_weight`
@@ -46,6 +46,7 @@ Status as of 2026-02-07:
   - Phase 3 Python benchmark logs: `benchmarks/phase3_baseline_raw.csv`, `benchmarks/phase3_baseline_summary.csv`, `benchmarks/phase3_baseline_meta.json`
   - Phase 3 R benchmark logs: `benchmarks/phase3_baseline_r_raw.csv`, `benchmarks/phase3_baseline_r_summary.csv`, `benchmarks/phase3_baseline_r_meta.json`
   - Phase 3 cross-language comparison: `benchmarks/phase3_cross_language_comparison.csv`
+  - Phase 3 optimization artifacts (`STAAR-43`/`STAAR-44`): `benchmarks/phase3_opt_43_44_raw.csv`, `benchmarks/phase3_opt_43_44_summary.csv`, `benchmarks/phase3_opt_43_44_meta.json`, `benchmarks/phase3_opt_43_44_comparison.csv`, `reports/performance_opt_43_44.md`
 
 Open compliance notes:
 
@@ -71,14 +72,14 @@ Phase 2 handoff status:
 
 - Planned migration scope in `reports/issues.md` is complete (`STAAR-1` through `STAAR-29` resolved).
 - Full migration checklist in `reports/issues.md` is complete (`STAAR-1` through `STAAR-41` resolved).
-- Phase 3 follow-up work is tracked separately in `reports/issues.md` (`STAAR-42` through `STAAR-44`, open).
+- Phase 3 follow-up work is tracked separately in `reports/issues.md` (`STAAR-42` remains open; `STAAR-43` and `STAAR-44` resolved with benchmark evidence).
 - Current state has completed Phase 2 implementation and moved into Phase 3 baseline measurement.
 - Release-style sign-off should continue to call out approved temporary `DEV-001` until retired/narrowed.
 
 PR-ready notes (copy into PR description):
 
 - Parity on reference backend: `pytest tests/parity -q` -> `28 passed, 18 xfailed`.
-- Full test suite: `pytest -q` -> `91 passed, 18 xfailed`.
+- Full test suite: `pytest -q` -> `93 passed, 18 xfailed`.
 - Deviations: `DEV-001` (approved temporary) in `reports/deviations.md`.
 - Required named roles per policy:
   - Migration owner: `<fill>`
@@ -88,7 +89,6 @@ PR-ready notes (copy into PR description):
 
 Next steps:
 
-- Add optimized variants for selected workflows and measure speedups against `benchmarks/phase3_baseline_summary.csv` and `benchmarks/phase3_cross_language_comparison.csv`.
-- Prioritize scenarios where Python is currently slower than R (notably `staar_unrelated_binary_spa`, `ai_staar_unrelated_glm`).
-- Re-run parity after each optimization change and retain `DEV-001` tracking until retired/narrowed.
+- Continue `DEV-001` retirement work (`STAAR-42`) by tightening related pure-shadow tolerances and reducing numeric drift.
+- Re-run parity after each numeric-alignment change and keep deviation tracking explicit until shadow xfails are removed.
 - Expand performance and parity coverage beyond `example` with additional representative scenarios.

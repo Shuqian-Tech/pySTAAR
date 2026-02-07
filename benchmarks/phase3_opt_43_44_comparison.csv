@@ -1,0 +1,3 @@
+scenario_id,baseline_median_seconds,optimized_median_seconds,speedup_vs_baseline
+staar_unrelated_binary_spa,0.28861091705039144,0.16143020801246166,1.787837113039661
+ai_staar_unrelated_glm,0.9284880419727415,0.8567111670272425,1.0837818832157426

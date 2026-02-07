@@ -42,5 +42,5 @@
 - STAAR-40: Remove parity reliance on `use_precomputed_artifacts` in specs/workflow paths after pure-path parity closure. (Resolved via approved deviation: related baseline parity specs now run pure-path with `use_precomputed_artifacts: false`; affected related sentinels relaxed to `rtol=5e-4`)
 - STAAR-41: Close `DEV-001` with final strict-parity documentation updates and release handoff notes. (Resolved via finalized `DEV-001` documentation and release handoff in `reports/release_handoff.md`)
 - STAAR-42: Retire `DEV-001` by tightening related-scenario pure-path tolerances and eliminating shadow-scenario xfails. (Open)
-- STAAR-43: Optimize `staar_unrelated_binary_spa` on reference backend and retain parity gates after each change. (Open)
-- STAAR-44: Optimize `ai_staar_unrelated_glm` on reference backend and retain parity gates after each change. (Open)
+- STAAR-43: Optimize `staar_unrelated_binary_spa` on reference backend and retain parity gates after each change. (Resolved; median runtime improved from `0.288611s` to `0.161430s`, ~`1.79x` vs Phase 3 baseline; see `benchmarks/phase3_opt_43_44_comparison.csv`)
+- STAAR-44: Optimize `ai_staar_unrelated_glm` on reference backend and retain parity gates after each change. (Resolved; median runtime improved from `0.928488s` to `0.856711s`, ~`1.08x` vs Phase 3 baseline; see `benchmarks/phase3_opt_43_44_comparison.csv`)

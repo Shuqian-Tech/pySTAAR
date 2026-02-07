@@ -64,3 +64,4 @@ Artifacts copied into this repo:
 - `baselines/nonexample601_sim_metadata.json`
 - `baselines/nonexample601_fingerprint.json`
 - `baselines/unrelated_glm_nonexample601_sentinels.json`
+- `baselines/related_sparse_glmmkin_nonexample601_sentinels.json`

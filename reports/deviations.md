@@ -30,8 +30,8 @@ Pure-Python GLMM(kinship) estimation and sparse linear algebra produce reproduci
 ### Evidence
 
 - Previous parity state (2026-02-07, before `STAAR-42` closure): `pytest tests/parity -q` -> `28 passed, 18 xfailed`.
-- Current parity state (2026-02-07, after `STAAR-45`/`STAAR-47`): `pytest tests/parity -q` -> `48 passed`.
-- Current full-suite state (2026-02-07): `pytest -q` -> `113 passed`.
+- Current parity state (2026-02-07, after `STAAR-45`/`STAAR-48`): `pytest tests/parity -q` -> `49 passed`.
+- Current full-suite state (2026-02-07): `pytest -q` -> `114 passed`.
 - Related pure-shadow scenarios now run as required parity checks (no `xfail`) under the tightened `rtol=3.5e-4` envelope.
 
 ### Scientific Impact

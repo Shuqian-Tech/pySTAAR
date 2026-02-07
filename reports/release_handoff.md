@@ -4,12 +4,12 @@ Status date: 2026-02-07
 
 ## Scope
 
-This handoff covers full functional migration of the planned STAAR workflows (`STAAR-1` through `STAAR-47`) with parity validation on the reference backend.
+This handoff covers full functional migration of the planned STAAR workflows (`STAAR-1` through `STAAR-48`) with parity validation on the reference backend.
 
 ## Current Validation Status
 
-- Parity suite: `pytest tests/parity -q` -> `48 passed`
-- Full suite: `pytest -q` -> `113 passed`
+- Parity suite: `pytest tests/parity -q` -> `49 passed`
+- Full suite: `pytest -q` -> `114 passed`
 - Related baseline parity scenarios run on pure-Python paths (`use_precomputed_artifacts: false` in baseline related specs).
 
 ## Deviation Summary
@@ -38,7 +38,8 @@ Include the following points in release notes:
 - `STAAR-46` optimization reduced `staar_related_sparse_binary_spa` pure-path median runtime from `2.343567s` to `0.909528s` (`~2.58x`) versus the post-`STAAR-42` probe.
 - `STAAR-45` adds non-`example` parity/performance coverage via runtime directory-dataset scenario `staar_unrelated_glm_nonexample_dir`.
 - `STAAR-47` adds distinct non-clone non-`example` R-baseline parity via `dataset=nonexample601` and scenario `staar_unrelated_glm_nonexample601`.
+- `STAAR-48` extends distinct non-`example` parity into related workflows via `staar_related_sparse_glmmkin_nonexample601`.
 
 ## Suggested Post-Release Follow-up
 
-- `STAAR-48`: expand distinct non-`example` R-baseline parity into related-workflow families (for example sparse GLMMkin or related binary SPA).
+- `STAAR-49`: add distinct non-`example` R-baseline parity for at least one additional related workflow family (for example related binary SPA or related conditional GLMMkin).

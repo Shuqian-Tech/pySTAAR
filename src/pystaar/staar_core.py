@@ -6,7 +6,7 @@ import math
 from typing import Dict, List, Tuple
 
 import numpy as np
-from scipy import stats
+from scipy import special, stats
 
 from .staar_stats import cct, cct_pval, saddle
 
@@ -17,30 +17,23 @@ def matrix_flip(G: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     Mirrors matrix_flip.cpp.
     """
     G = G.copy().astype(float)
-    n, p = G.shape
-    AF = np.zeros(p, dtype=float)
-    MAF = np.zeros(p, dtype=float)
+    observed = G > -1
+    num_observed = np.sum(observed, axis=0)
 
-    for i in range(p):
-        col = G[:, i]
-        mask = col > -1
-        num = np.sum(mask)
-        AF[i] = np.sum(col[mask]) / 2.0 / num
+    with np.errstate(invalid="ignore", divide="ignore"):
+        AF = np.sum(np.where(observed, G, 0.0), axis=0) / (2.0 * num_observed)
 
-    # Impute missing
-    for i in range(p):
-        if AF[i] <= 0.5:
-            G[G[:, i] <= -1, i] = 0.0
-        else:
-            G[G[:, i] <= -1, i] = 2.0
+    low_af = AF <= 0.5
+    missing_idx = np.where(~observed)
+    if missing_idx[0].size > 0:
+        impute_values = np.where(low_af, 0.0, 2.0)
+        G[missing_idx] = impute_values[missing_idx[1]]
 
-    # Flip
-    for i in range(p):
-        if AF[i] <= 0.5:
-            MAF[i] = AF[i]
-        else:
-            MAF[i] = 1.0 - AF[i]
-            G[:, i] = 2.0 - G[:, i]
+    flip_mask = ~low_af
+    if np.any(flip_mask):
+        G[:, flip_mask] = 2.0 - G[:, flip_mask]
+
+    MAF = np.where(low_af, AF, 1.0 - AF)
 
     return G, AF, MAF
 
@@ -82,15 +75,21 @@ def _compute_weights(maf: np.ndarray, annotation_phred: np.ndarray) -> Tuple[np.
 
 
 def _pchisq_upper(x: float, df: float) -> float:
-    return float(stats.chi2.sf(x, df))
+    x = float(x)
+    df = float(df)
+    if x <= 0.0:
+        return 1.0
+    if df == 1.0:
+        return float(special.erfc(math.sqrt(0.5 * x)))
+    return float(special.gammaincc(0.5 * df, 0.5 * x))
 
 
 def _pt_upper(x: float, df: float) -> float:
-    return float(stats.t.sf(x, df))
+    return float(special.stdtr(float(df), -float(x)))
 
 
 def _pnorm_upper(x: float) -> float:
-    return float(stats.norm.sf(x))
+    return float(special.ndtr(-float(x)))
 
 
 def _safe_chisq_pvalue(numerator: float, denominator: float, eps: float = 1e-12) -> float:
@@ -322,7 +321,7 @@ def _saddle_binary_spa(
         return 1.0
 
     z = w + math.log(ratio) / w
-    return float(stats.norm.cdf(z) if lower else stats.norm.sf(z))
+    return float(special.ndtr(z) if lower else special.ndtr(-z))
 
 
 def _saddle_binary_spa_bisection(
@@ -354,7 +353,7 @@ def _saddle_binary_spa_bisection(
         return 1.0
 
     z = w + math.log(ratio) / w
-    return float(stats.norm.cdf(z) if lower else stats.norm.sf(z))
+    return float(special.ndtr(z) if lower else special.ndtr(-z))
 
 
 def _staartest_burden_binary_spa(
@@ -862,7 +861,7 @@ def _score_test_from_covariance(score: np.ndarray, Cov: np.ndarray) -> Tuple[np.
 
     se = np.sqrt(np.where(var > 0.0, var, 0.0))
     stat = np.divide(score**2, var_safe, out=np.zeros_like(score), where=~np.isnan(var_safe))
-    pvalue = np.where(np.isnan(var_safe), 1.0, stats.chi2.sf(stat, df=1))
+    pvalue = np.where(np.isnan(var_safe), 1.0, special.erfc(np.sqrt(np.maximum(stat, 0.0) * 0.5)))
     return se, pvalue
 
 
@@ -1426,14 +1425,20 @@ def _variant_set_pvalues(
     fam = 0 if obj_nullmodel.family == "gaussian" else 1
     residuals = obj_nullmodel.y - obj_nullmodel.fitted
     df_resid = X.shape[0] - X.shape[1]
-    if fam == 0:
-        tX_G = X.T @ G
-        Cov = G.T @ G - tX_G.T @ np.linalg.inv(X.T @ X) @ tX_G
+    if precomputed_cov is not None:
+        Cov = np.asarray(precomputed_cov, dtype=float)
+        if Cov.shape != (G.shape[1], G.shape[1]):
+            raise ValueError("precomputed_cov shape does not match the rare-variant dimension.")
+        Cov = 0.5 * (Cov + Cov.T)
     else:
-        WX = X * working[:, None]
-        tX_G = X.T @ (working[:, None] * G)
-        Cov = (working[:, None] * G).T @ G - tX_G.T @ np.linalg.inv(X.T @ WX) @ tX_G
-    Cov = 0.5 * (Cov + Cov.T)
+        if fam == 0:
+            tX_G = X.T @ G
+            Cov = G.T @ G - tX_G.T @ np.linalg.inv(X.T @ X) @ tX_G
+        else:
+            WX = X * working[:, None]
+            tX_G = X.T @ (working[:, None] * G)
+            Cov = (working[:, None] * G).T @ G - tX_G.T @ np.linalg.inv(X.T @ WX) @ tX_G
+        Cov = 0.5 * (Cov + Cov.T)
     return _staartest_pvalues(
         G=G,
         residuals=residuals,
@@ -1446,6 +1451,19 @@ def _variant_set_pvalues(
         fam=fam,
         df_resid=df_resid,
     )
+
+
+def _ai_unrelated_gaussian_cov_from_group_stats(
+    pop_weights: np.ndarray,
+    group_gram: np.ndarray,
+    group_xtg: np.ndarray,
+    inv_xtx: np.ndarray,
+) -> np.ndarray:
+    pop_weights = np.asarray(pop_weights, dtype=float)
+    cov = np.tensordot(pop_weights * pop_weights, group_gram, axes=(0, 0))
+    xtg = np.tensordot(pop_weights, group_xtg, axes=(0, 0))
+    cov = cov - xtg.T @ inv_xtx @ xtg
+    return 0.5 * (cov + cov.T)
 
 
 def _assemble_ai_outputs_from_pvalues(
@@ -1574,6 +1592,21 @@ def ai_staar(
     precomputed_cov_s1 = getattr(obj_nullmodel, "precomputed_ai_cov_s1", None)
     precomputed_cov_s2 = getattr(obj_nullmodel, "precomputed_ai_cov_s2", None)
 
+    group_gram = None
+    group_xtg = None
+    inv_xtx = None
+    if (not obj_nullmodel.relatedness) and getattr(obj_nullmodel, "family", None) == "gaussian":
+        X = obj_nullmodel.X
+        inv_xtx = np.linalg.inv(X.T @ X)
+        group_gram = np.stack(
+            [G_base[idx, :].T @ G_base[idx, :] for idx in indices],
+            axis=0,
+        )
+        group_xtg = np.stack(
+            [X[idx, :].T @ G_base[idx, :] for idx in indices],
+            axis=0,
+        )
+
     pvalues_1_tot: list[np.ndarray] = []
     pvalues_2_tot: list[np.ndarray] = []
     weight_all_1: list[np.ndarray] = []
@@ -1599,6 +1632,20 @@ def ai_staar(
             candidate = np.asarray(precomputed_cov_s2[b], dtype=float)
             if candidate.shape == (maf.size, maf.size):
                 precomputed_cov_2 = candidate
+        if precomputed_cov_1 is None and group_gram is not None and group_xtg is not None and inv_xtx is not None:
+            precomputed_cov_1 = _ai_unrelated_gaussian_cov_from_group_stats(
+                pop_weights=w_b_1,
+                group_gram=group_gram,
+                group_xtg=group_xtg,
+                inv_xtx=inv_xtx,
+            )
+        if precomputed_cov_2 is None and group_gram is not None and group_xtg is not None and inv_xtx is not None:
+            precomputed_cov_2 = _ai_unrelated_gaussian_cov_from_group_stats(
+                pop_weights=w_b_2,
+                group_gram=group_gram,
+                group_xtg=group_xtg,
+                inv_xtx=inv_xtx,
+            )
 
         pvalues_1 = _variant_set_pvalues(
             G=G1,

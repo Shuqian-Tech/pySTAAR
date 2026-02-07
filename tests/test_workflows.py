@@ -4,6 +4,7 @@ import shutil
 import pytest
 
 from pystaar import workflows
+from pystaar import staar_core
 from pystaar.data import load_example_dataset
 
 
@@ -732,6 +733,26 @@ def test_ai_staar_unrelated_workflow_runs():
     )
     assert results["num_variant"] > 0
     assert results["cMAC"] > 0
+    assert 0.0 <= results["results_STAAR_O"] <= 1.0
+
+
+def test_ai_staar_unrelated_uses_group_stat_covariance_fast_path(monkeypatch):
+    original = staar_core._ai_unrelated_gaussian_cov_from_group_stats
+    called = {"count": 0}
+
+    def _wrapped(*args, **kwargs):
+        called["count"] += 1
+        return original(*args, **kwargs)
+
+    monkeypatch.setattr(staar_core, "_ai_unrelated_gaussian_cov_from_group_stats", _wrapped)
+
+    results = workflows.ai_staar_unrelated_glm(
+        dataset="example",
+        seed=600,
+        rare_maf_cutoff=0.05,
+    )
+
+    assert called["count"] > 0
     assert 0.0 <= results["results_STAAR_O"] <= 1.0
 
 

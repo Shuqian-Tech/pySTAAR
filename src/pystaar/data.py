@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from functools import lru_cache
 from pathlib import Path
 import numpy as np
 import pandas as pd
@@ -87,6 +88,11 @@ def _load_dataset_from_paths(
 
 
 def load_named_dataset(name: str) -> STAARDataset:
+    return _load_named_dataset_cached(name)
+
+
+@lru_cache(maxsize=16)
+def _load_named_dataset_cached(name: str) -> STAARDataset:
     base = DATA_DIR
     return _load_dataset_from_paths(
         dataset_label=name,
@@ -103,9 +109,14 @@ def load_dataset_from_directory(path: str | Path) -> STAARDataset:
     directory = Path(path).expanduser().resolve()
     if not directory.exists() or not directory.is_dir():
         raise ValueError(f"Dataset directory does not exist: {directory}")
+    return _load_dataset_from_directory_cached(str(directory))
 
+
+@lru_cache(maxsize=16)
+def _load_dataset_from_directory_cached(directory_str: str) -> STAARDataset:
+    directory = Path(directory_str)
     return _load_dataset_from_paths(
-        dataset_label=str(directory),
+        dataset_label=directory_str,
         geno_path=directory / "geno.mtx",
         phred_path=directory / "phred.csv",
         pheno_unrelated_path=directory / "pheno_unrelated.csv",

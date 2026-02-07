@@ -5,6 +5,7 @@ matching the scenario specs under `specs/`.
 """
 
 from __future__ import annotations
+from functools import lru_cache
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -89,6 +90,16 @@ def _load_related_precomputed_theta(
 
 
 def _load_ai_metadata_from_files(num_samples: int):
+    pop_groups, pop_levels, pop_weights_1_1, pop_weights_1_25 = (
+        _load_ai_metadata_from_files_cached()
+    )
+    if pop_groups.size != num_samples:
+        raise ValueError("AI pop groups length does not match sample size.")
+    return pop_groups, pop_levels, pop_weights_1_1, pop_weights_1_25
+
+
+@lru_cache(maxsize=1)
+def _load_ai_metadata_from_files_cached():
     groups_path = DATA_DIR / AI_POP_GROUPS_FILE
     w11_path = DATA_DIR / AI_POP_WEIGHTS_1_1_FILE
     w125_path = DATA_DIR / AI_POP_WEIGHTS_1_25_FILE
@@ -101,8 +112,6 @@ def _load_ai_metadata_from_files(num_samples: int):
     if "pop_group" not in groups_df.columns:
         raise ValueError("AI pop group file must include 'pop_group' column.")
     pop_groups = groups_df["pop_group"].astype(str).to_numpy()
-    if pop_groups.size != num_samples:
-        raise ValueError("AI pop groups length does not match sample size.")
 
     pop_levels = list(dict.fromkeys(pop_groups.tolist()))
 

@@ -6,7 +6,7 @@ import math
 from typing import Iterable
 
 import numpy as np
-from scipy import stats
+from scipy import special, stats
 
 
 def _normalize_weights(weights: np.ndarray, expected_size: int) -> np.ndarray:
@@ -137,4 +137,4 @@ def saddle(q: float, eigenvals: np.ndarray) -> float:
         return 2.0
 
     z = w + math.log(v / w) / w
-    return float(stats.norm.sf(z, loc=0.0, scale=1.0))
+    return float(special.ndtr(-z))

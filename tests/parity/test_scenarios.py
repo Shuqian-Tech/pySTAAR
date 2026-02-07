@@ -44,6 +44,7 @@ ISSUE_BY_SCENARIO = {
     "staar_unrelated_binary_spa_case_q90": "STAAR-27",
     "staar_unrelated_binary_spa_filter": "STAAR-11",
     "staar_related_sparse_binary_spa": "STAAR-8",
+    "staar_related_sparse_binary_spa_nonexample601": "STAAR-49",
     "staar_related_sparse_binary_spa_filter": "STAAR-12",
     "staar_related_dense_binary_spa": "STAAR-9",
     "staar_related_dense_binary_spa_filter": "STAAR-13",

@@ -56,5 +56,5 @@ Detailed Python capture is recorded in `reports/python_environment.md`.
 
 Latest run (2026-02-07):
 
-- `pytest tests/parity -q` -> `47 passed`
-- `pytest -q` -> `112 passed`
+- `pytest tests/parity -q` -> `48 passed`
+- `pytest -q` -> `113 passed`

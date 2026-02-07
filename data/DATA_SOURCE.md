@@ -1,6 +1,6 @@
 # Data Source and Fingerprints
 
-- Document date: 2026-02-06
+- Document date: 2026-02-07
 - Scope: files under `data/` used by Python parity workflows.
 
 ## Source
@@ -19,6 +19,7 @@
 | file | size_bytes | sha256 |
 |---|---:|---|
 | `baselines/example_sim_data.rds` | 1312814 | `89498efaa1140720d512e92b4fb80d5141dfbec174dca54df29d553ef7b92fe6` |
+| `baselines/nonexample601_sim_data.rds` | 1307967 | `3104c42d8fff5cd75f824bb10e282366b593c6f22ad924885263bdee63513241` |
 
 ## Exported Runtime Files
 
@@ -30,6 +31,12 @@
 | `data/example_phred.csv` | 27924 | `272e43cfe806a2a980de6293fb353ee4cbb5d66722d8ef765b59c4eecad6d0bb` |
 | `data/example_pheno_unrelated.csv` | 381409 | `e0f4caf7398060761040d4f709b546e6531a6808b713ea5681e8921b5becd8f3` |
 | `data/example_pheno_related.csv` | 429554 | `3f0a8ba32fe7bcf1c8eafc6666b64b3bbbf0b9a145f58b5a065442ff2f3c6396` |
+| `data/nonexample601_geno.mtx` | 77624 | `2b9de0a4d95f22a9b7d7912e3189ccfbc170efd80566aac34b53f09a6182ec5d` |
+| `data/nonexample601_kins_sparse.mtx` | 300091 | `5783413a57c288fac6964946e1c4bd5d9453ca3c87a24847fd4619da5e037243` |
+| `data/nonexample601_kins_dense.mtx` | 300091 | `5783413a57c288fac6964946e1c4bd5d9453ca3c87a24847fd4619da5e037243` |
+| `data/nonexample601_phred.csv` | 24686 | `576e4f60f5d42653c18eb157e2c3847710f97538cf81e5fa44320adbabb16741` |
+| `data/nonexample601_pheno_unrelated.csv` | 381071 | `c0fb8111ed7128fddc2b13e2ed6986d4566a4732e43960a82f925942d72f0358` |
+| `data/nonexample601_pheno_related.csv` | 429309 | `26a2cc47bfb5f902a37495bad541be760a81cf8972ed306f4c82f8c67b6665c4` |
 | `data/example_glmmkin_cov.csv` | 555749 | `f6893ba9f034143c0b8eab7fda2fe020e8e43ac0280fbd1bd3824fa20c3311e6` |
 | `data/example_glmmkin_cov_rare_maf_0_01.csv` | 495166 | `c08479c923d9207da12c4e4d8faa64cf80390291223700b423eb15a1cf649ebc` |
 | `data/example_glmmkin_scaled_residuals.csv` | 182493 | `55ebe906e9c63fb25e8bbc4bf4f4ac05966401af8a66bbba972cd48a4a3c29ca` |
@@ -66,6 +73,12 @@
 - `data/example_geno.mtx`: shape=`10000x163`, nnz=7486
 - `data/example_kins_sparse.mtx`: shape=`10000x10000`, nnz=35000
 - `data/example_kins_dense.mtx`: shape=`10000x10000`, nnz=35000
+- `data/nonexample601_pheno_unrelated.csv`: rows=10000, cols=3, columns=`Y,X1,X2`
+- `data/nonexample601_pheno_related.csv`: rows=10000, cols=4, columns=`Y,X1,X2,id`
+- `data/nonexample601_phred.csv`: rows=144, cols=10, columns=`Z1,Z2,Z3,Z4,Z5,Z6,Z7,Z8,Z9,Z10`
+- `data/nonexample601_geno.mtx`: shape=`10000x144`, nnz=7636
+- `data/nonexample601_kins_sparse.mtx`: shape=`10000x10000`, nnz=35000
+- `data/nonexample601_kins_dense.mtx`: shape=`10000x10000`, nnz=35000
 - `data/example_glmmkin_cov.csv`: shape=`163x163`
 - `data/example_glmmkin_cov_rare_maf_0_01.csv`: shape=`153x153`
 - `data/example_glmmkin_cov_cond_sparse.csv`: shape=`163x163`
@@ -108,7 +121,9 @@
 - `baselines/scripts/extract_ai_staar_unrelated.R` (AI-STAAR ancestry metadata export)
 - `baselines/scripts/extract_ai_staar_related_sparse.R` (AI-STAAR sparse related covariance export)
 - `baselines/scripts/extract_ai_staar_related_dense.R` (AI-STAAR dense related covariance export)
+- `../STAAR` one-shot extraction script (`/tmp/extract_nonexample601.R`) for non-clone `nonexample601` dataset + sentinels (`STAAR-47`)
 
 Command:
 
 - `Rscript scripts/export_example_data.R`
+- `Rscript /tmp/extract_nonexample601.R` (executed in `../STAAR`, then copied `nonexample601_*` outputs)

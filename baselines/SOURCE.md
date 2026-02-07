@@ -42,3 +42,25 @@ Rscript baselines/scripts/extract_indiv_score_related_dense.R
 - R version: 4.5.0 (2025-04-11)
 - Seed used: 600 for all stochastic operations
 - `R CMD check --no-manual` completed with 3 WARNINGs and 4 NOTEs (see `baselines/r_cmd_check.log`).
+
+## Additional Extraction (Non-Example Baseline)
+
+- **R repo**: `../STAAR` (local clone of upstream project)
+- **Commit**: `b06e478b03f00b7810ea8c75247a1b143f37bda4`
+- **Extraction date**: 2026-02-07
+- **Purpose**: add distinct non-clone baseline for `STAAR-47` (`nonexample601`, seed 601 simulation)
+
+### Commands used
+
+Executed in `../STAAR`:
+
+```bash
+Rscript /tmp/extract_nonexample601.R
+```
+
+Artifacts copied into this repo:
+
+- `baselines/nonexample601_sim_data.rds`
+- `baselines/nonexample601_sim_metadata.json`
+- `baselines/nonexample601_fingerprint.json`
+- `baselines/unrelated_glm_nonexample601_sentinels.json`

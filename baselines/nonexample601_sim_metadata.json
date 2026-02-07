@@ -1,0 +1,9 @@
+{
+  "seed": 601,
+  "N": 10000,
+  "startloc": 121267,
+  "endloc": 126266,
+  "numSNPs": 144,
+  "causal_variant_count": 20,
+  "snplist_length": 144
+}

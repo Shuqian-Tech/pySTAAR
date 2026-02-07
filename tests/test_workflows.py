@@ -109,7 +109,9 @@ def test_related_workflow_precomputed_mode_does_not_load_glmm_cov_artifacts(monk
     assert results["num_variant"] == 153.0
 
 
-def test_related_workflow_precomputed_mode_uses_cov_and_scaled_for_baseline_cutoff(monkeypatch):
+def test_related_workflow_precomputed_mode_uses_scaled_without_cov_for_baseline_cutoff(
+    monkeypatch,
+):
     original_fit_null_glmmkin = workflows.fit_null_glmmkin
     captured = {}
 
@@ -128,8 +130,7 @@ def test_related_workflow_precomputed_mode_uses_cov_and_scaled_for_baseline_cuto
     )
 
     assert results["num_variant"] == 163.0
-    assert captured["precomputed_cov"] is not None
-    assert captured["precomputed_cov"].shape == (163, 163)
+    assert captured["precomputed_cov"] is None
     assert captured["precomputed_scaled_residuals"] is not None
 
 
@@ -154,6 +155,27 @@ def test_related_workflow_precomputed_mode_omits_cov_for_nonbaseline_cutoff(monk
     assert results["num_variant"] == 153.0
     assert captured["precomputed_cov"] is None
     assert captured["precomputed_scaled_residuals"] is not None
+
+
+def test_related_workflow_precomputed_mode_does_not_load_cov_for_baseline_cutoff(monkeypatch):
+    original_read_csv = workflows.pd.read_csv
+
+    def _guard_cov_reads(*args, **kwargs):
+        path = str(args[0]) if args else ""
+        if path.endswith("example_glmmkin_cov.csv"):
+            raise AssertionError("baseline related GLMM precomputed mode should not load covariance artifacts")
+        return original_read_csv(*args, **kwargs)
+
+    monkeypatch.setattr(workflows.pd, "read_csv", _guard_cov_reads)
+
+    results = workflows.staar_related_sparse_glmmkin(
+        dataset="example",
+        seed=600,
+        rare_maf_cutoff=0.05,
+        use_precomputed_artifacts=True,
+    )
+
+    assert results["num_variant"] == 163.0
 
 
 def test_related_workflow_defaults_to_pure_path_for_baseline_cutoff(monkeypatch):

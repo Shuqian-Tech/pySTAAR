@@ -76,28 +76,6 @@ def _load_related_precomputed_scaled_residuals(
     return candidate_scaled
 
 
-def _load_related_precomputed_cov_baseline_only(
-    genotype: np.ndarray,
-    rare_maf_cutoff: float,
-    use_precomputed_artifacts: bool,
-) -> np.ndarray | None:
-    if not use_precomputed_artifacts:
-        return None
-    if not np.isclose(rare_maf_cutoff, BASELINE_PRECOMPUTED_RARE_MAF_CUTOFF):
-        return None
-
-    cov_path = DATA_DIR / "example_glmmkin_cov.csv"
-    if not cov_path.exists():
-        return None
-
-    candidate_cov = pd.read_csv(cov_path).to_numpy()
-    expected_num_variants = _num_rare_variants(genotype, rare_maf_cutoff)
-    expected_shape = (expected_num_variants, expected_num_variants)
-    if candidate_cov.shape != expected_shape:
-        return None
-    return candidate_cov
-
-
 def _load_related_precomputed_theta(
     sparse: bool,
     use_precomputed_artifacts: bool,
@@ -922,17 +900,11 @@ def _related_common(
         genotype=data.geno,
         use_precomputed_artifacts=use_precomputed_artifacts,
     )
-    precomputed_cov = _load_related_precomputed_cov_baseline_only(
-        genotype=data.geno,
-        rare_maf_cutoff=rare_maf_cutoff,
-        use_precomputed_artifacts=use_precomputed_artifacts,
-    )
 
     obj_nullmodel = fit_null_glmmkin(
         data.pheno_related,
         kins=kins,
         sparse_kins=sparse,
-        precomputed_cov=precomputed_cov,
         precomputed_scaled_residuals=precomputed_scaled,
         precomputed_theta=_load_related_precomputed_theta(
             sparse=sparse,

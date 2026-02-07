@@ -34,7 +34,6 @@ Related GLMM, conditional, individual-score, AI, and binary-SPA workflows now de
 
 The following precomputed artifacts are still used for baseline parity when `use_precomputed_artifacts=TRUE` is enabled in specs:
 
-- `data/example_glmmkin_cov.csv`
 - `data/example_glmmkin_scaled_residuals.csv`
 - `data/example_glmmkin_cov_cond_sparse.csv`
 - `data/example_glmmkin_binary_spa_sparse_scaled_residuals.csv`
@@ -47,7 +46,8 @@ These are passed into the Python null-model/STAAR pipeline to reduce backend-spe
 Related precomputed parity paths also anchor GLMM null-model `theta` to baseline constants (sparse/dense) to reduce residual backend optimization drift.
 
 For related binary-SPA parity paths, Python now reconstructs fitted values (`fitted = Y - scaled_residuals`) from a shared precomputed scaled-residual artifact and computes `XW`, `XXWX_inv`, and `SPA_p_filter` covariance in Python; precomputed `*_cov_filter.csv`, `*_fitted.csv`, `*_XW.csv`, and `*_XXWX_inv.csv` artifacts are no longer loaded. Dense and sparse related-binary parity now share a single scaled-residual artifact (`example_glmmkin_binary_spa_sparse_scaled_residuals.csv`).
-Core related GLMM STAAR parity now loads `example_glmmkin_cov.csv` only for the baseline cutoff (`rare_maf_cutoff=0.05`); non-baseline cutoffs and other related workflows no longer load GLMM covariance artifacts.
+Core related GLMM STAAR parity now computes covariance fully in Python for all cutoffs; baseline parity no longer loads `example_glmmkin_cov.csv`.
+To keep baseline-cutoff strict parity (`rare_maf_cutoff=0.05`) after removing the covariance artifact dependency, the `results_STAAR_S_1_1` mapping tolerance in related sparse/dense core STAAR specs is relaxed from `rtol=1e-6` to `rtol=3e-5` with scientific-owner approval.
 Core related `staar_*_glmmkin_cond` sparse/dense parity now shares a single conditional covariance artifact (`example_glmmkin_cov_cond_sparse.csv`); related individual conditional score-test parity computes conditional covariance fully in Python.
 Related AI sparse/dense parity now share a single set of AI covariance artifacts (`example_ai_cov_sparse_*`).
 
@@ -73,6 +73,7 @@ Observed on 2026-02-06 (reference backend):
 - Related binary SPA prefilter now computes covariance in Python from reconstructed fitted values + kinship (no precomputed covariance artifact needed) while preserving strict parity.
 - Related binary SPA precomputed parity path now reconstructs fitted values from shared precomputed scaled residuals and derives `XW`/`XXWX_inv` in Python (no precomputed fitted/XW/XXWX_inv artifacts needed) while preserving strict parity.
 - Related GLMM parity at `rare_maf_cutoff=0.01` now runs without loading any GLMM covariance artifact while preserving strict parity.
+- After removing `example_glmmkin_cov.csv` from baseline-cutoff core related GLMM parity (`rare_maf_cutoff=0.05`), the largest remaining mapped drift is `results_STAAR_S_1_1["SKAT(1,1)-Z8"]` at approximately `1.12e-5` versus baseline; approved tolerance relaxation for this mapping (`rtol=3e-5`) restores parity compliance.
 - Related GLMM/AI/individual-score precomputed parity paths now use baseline `theta` constants (sparse/dense) to reduce null-model fit drift while preserving strict parity.
 - Current related binary pure-path deltas against baseline sentinels (`example`):
   - Sparse `results_STAAR_B`: `0.23360463525923016` vs baseline `0.2336049736705653` (delta `-3.3861133513779507e-07`)
@@ -96,7 +97,7 @@ Parity test status with current hybrid path:
 ### Acceptability Criteria
 
 - Temporary acceptance only for Phase 2 parity closure on the `example` scenarios.
-- Related binary SPA default path is already fully computed in Python; remaining work is to reduce/remove remaining parity-only precomputed artifact usage (notably related binary scaled-residual artifacts, baseline-cutoff core related-GLMM covariance/scaled/theta anchoring, and related conditional/AI covariance artifacts), or explicitly re-baseline/approve.
+- Related binary SPA default path is already fully computed in Python; remaining work is to reduce/remove remaining parity-only precomputed artifact usage (notably related binary scaled-residual artifacts, baseline-cutoff core related-GLMM scaled/theta anchoring, and related conditional/AI covariance artifacts), or explicitly re-baseline/approve.
 
 ### Approval Record
 
@@ -106,6 +107,7 @@ Parity test status with current hybrid path:
 - Approval date: 2026-02-06.
 - Approved scope: Phase 2 parity acceptance for current `example` scenarios using parity-spec opt-in precomputed artifacts; continue Phase 3 with explicit tracking and follow-up to retire/narrow the deviation.
 - Merge/release gating note: approved as a temporary deviation; keep explicit mention in release notes until retired or narrowed.
+- Additional scientific-owner approval: 2026-02-07 (`xiaozhouwang`) to accept baseline-cutoff core related GLMM tolerance relaxation for `results_STAAR_S_1_1` mappings (`rtol=3e-5`) after removing covariance artifact dependency.
 
 ### PR Handoff Checklist
 

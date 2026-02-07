@@ -57,7 +57,8 @@ Open compliance notes:
 - Related binary dense/sparse parity paths now share one scaled-residual artifact (`example_glmmkin_binary_spa_sparse_scaled_residuals.csv`), dropping dependency on separate dense/sparse fitted artifacts.
 - Core related conditional STAAR dense/sparse parity paths now share one conditional covariance artifact (`example_glmmkin_cov_cond_sparse.csv`), while related individual conditional parity no longer loads conditional covariance artifacts.
 - Related AI dense/sparse parity paths now share one AI covariance artifact set (`example_ai_cov_sparse_*`), dropping dependency on separate dense AI covariance artifacts.
-- Related GLMM parity for lower rare-MAF cutoffs now runs without loading GLMM covariance artifacts; only baseline-cutoff core related-GLMM STAAR parity still loads `example_glmmkin_cov.csv`.
+- Related GLMM core STAAR parity now runs without loading GLMM covariance artifacts for both baseline and lower rare-MAF cutoffs.
+- Core related GLMM baseline scenario tolerance for `results_STAAR_S_1_1` mappings is relaxed to `rtol=3e-5` (scientific-owner approved on 2026-02-07) after removing covariance artifact dependency.
 - This behavior is recorded as `DEV-001` in `reports/deviations.md`.
 - Scientific owner approval for `DEV-001` is recorded on 2026-02-06 (`xiaozhouwang`); deviation remains temporary and tracked.
 - Cross-language baseline benchmark is complete on the reference backend; geometric-mean Python speedup vs R across measured scenarios is approximately `1.64x` (see `reports/performance.md`).
@@ -76,7 +77,7 @@ Phase 2 handoff status:
 PR-ready notes (copy into PR description):
 
 - Parity on reference backend: `pytest tests/parity -q` -> `28 passed, 18 xfailed`.
-- Full test suite: `pytest -q` -> `82 passed, 18 xfailed`.
+- Full test suite: `pytest -q` -> `83 passed, 18 xfailed`.
 - Deviations: `DEV-001` (approved temporary) in `reports/deviations.md`.
 - Required named roles per policy:
   - Migration owner: `<fill>`

@@ -26,6 +26,14 @@ print(res["results_STAAR_O"])
 - `staar_unrelated_binary_spa`, `staar_related_sparse_binary_spa`, `staar_related_dense_binary_spa`
 - `ai_staar_unrelated_glm`, `ai_staar_related_sparse_glmmkin`, `ai_staar_related_dense_glmmkin`
 
+## More docs
+
+- Installation: [`installation.md`](installation.md)
+- Tutorials: [`tutorials/`](tutorials/)
+- API output fields: [`api/output_fields.md`](api/output_fields.md)
+- R migration guide: [`migration_from_r.md`](migration_from_r.md)
+- Changelog: [`../CHANGELOG.md`](../CHANGELOG.md)
+
 ## Parity note
 
 Functional migration scope is complete. Related-workflow parity uses approved relaxed tolerances for affected sentinels (tracked in `reports/deviations.md`, `DEV-001`).

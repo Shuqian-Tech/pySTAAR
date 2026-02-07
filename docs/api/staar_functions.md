@@ -93,3 +93,7 @@ AI-STAAR 额外参数：
 ## 5. 输出结构建议
 
 不同 workflow 返回 dict，键名与 parity spec 保持一致。实践中建议只依赖你真正使用的字段，不要假设所有 workflow 返回同一组键。
+
+## 6. 输出字段参考表
+
+完整键名与含义对照见：[`output_fields.md`](output_fields.md)。

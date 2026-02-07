@@ -2,6 +2,17 @@
 
 本指南面向已经使用 R STAAR 的用户，帮助你快速切换到 Python。
 
+## 0. 版本对应关系
+
+- 当前 Python 迁移基线对齐的 R 包版本：`STAAR 0.9.8`
+- R 基线来源仓库：`https://github.com/xihaoli/STAAR`
+- 基线提取提交：`9db9dd504905b9f469146f670e5f6dbe3e08d01a`
+
+参考：
+
+- `baselines/SOURCE.md`
+- `reports/performance.md`
+
 ## 1. 核心函数对照
 
 | R 函数 | Python 对应 | 推荐入口 |

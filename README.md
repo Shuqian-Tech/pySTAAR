@@ -18,8 +18,10 @@ Primary audience: Chinese genomics/statistical genetics users migrating from R S
 - API references:
   - [`docs/api/null_models.md`](docs/api/null_models.md)
   - [`docs/api/staar_functions.md`](docs/api/staar_functions.md)
+  - [`docs/api/output_fields.md`](docs/api/output_fields.md)
   - [`docs/api/utilities.md`](docs/api/utilities.md)
 - R migration guide: [`docs/migration_from_r.md`](docs/migration_from_r.md)
+- Changelog: [`CHANGELOG.md`](CHANGELOG.md)
 
 ## Quick Install
 

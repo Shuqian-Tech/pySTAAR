@@ -97,4 +97,32 @@ print("STAAR-O:", res["results_STAAR_O"])
 - AI-STAAR：[`tutorials/05_ai_staar.md`](tutorials/05_ai_staar.md)
 - Null model API：[`api/null_models.md`](api/null_models.md)
 - STAAR API：[`api/staar_functions.md`](api/staar_functions.md)
+- 输出字段参考：[`api/output_fields.md`](api/output_fields.md)
 - 工具函数：[`api/utilities.md`](api/utilities.md)
+- 变更记录：[`../CHANGELOG.md`](../CHANGELOG.md)
+
+## 8. FAQ 与边界情况
+
+### Q1: 传入数据目录时报 “missing required files” 怎么办？
+
+A: 检查目录是否包含 `geno.mtx`, `phred.csv`, `pheno_unrelated.csv`, `pheno_related.csv`, `kins_sparse.mtx`, `kins_dense.mtx` 六个文件。
+
+### Q2: phenotype 报错缺少列（`Y`, `X1`, `X2`）怎么办？
+
+A: `pheno_unrelated.csv` 和 `pheno_related.csv` 至少要有这三列。列名区分大小写。
+
+### Q3: 条件分析报 `adj_variant_indices contains out-of-range indices`？
+
+A: 你的 `adj_variant_indices` 超过了 `geno` 的列范围，或者为空。请改成合法的 0-based 索引。
+
+### Q4: 报 `Number of rare variant in the set is less than rv_num_cutoff!`？
+
+A: 在当前 `rare_maf_cutoff` 下稀有位点太少（例如 MAF 接近 0 或全部被过滤）。可放宽 `rare_maf_cutoff`，或检查输入数据质量。
+
+### Q5: Binary SPA 报 `Y coded as 0/1` 相关错误？
+
+A: 这是底层 null model 的约束。使用 workflow API 时一般会自动二值化；若你直接调用底层函数，请确保 `Y` 已是 0/1。
+
+### Q6: 非 `example` 数据运行 AI-STAAR 报 metadata 错误？
+
+A: 需显式提供 `pop_groups`, `pop_weights_1_1`, `pop_weights_1_25`（可选 `pop_levels`），并保证维度与样本数/人群数一致。

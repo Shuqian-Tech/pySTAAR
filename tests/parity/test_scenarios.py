@@ -34,6 +34,7 @@ ISSUE_BY_SCENARIO = {
     "indiv_score_related_dense_glmmkin": "STAAR-16",
     "indiv_score_unrelated_glm_cond": "STAAR-17",
     "indiv_score_related_sparse_glmmkin_cond": "STAAR-18",
+    "indiv_score_related_sparse_glmmkin_cond_nonexample601": "STAAR-52",
     "indiv_score_related_dense_glmmkin_cond": "STAAR-19",
     "staar_unrelated_glm": "STAAR-1",
     "staar_unrelated_glm_nonexample_dir": "STAAR-45",
@@ -55,6 +56,7 @@ ISSUE_BY_SCENARIO = {
     "staar_related_dense_glmmkin": "STAAR-3",
     "staar_related_dense_glmmkin_rare_maf_0_01": "STAAR-29",
     "staar_related_sparse_glmmkin_cond": "STAAR-5",
+    "staar_related_dense_glmmkin_cond_nonexample601": "STAAR-51",
     "staar_related_dense_glmmkin_cond": "STAAR-6",
 }
 

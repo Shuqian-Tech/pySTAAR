@@ -4,12 +4,12 @@ Status date: 2026-02-07
 
 ## Scope
 
-This handoff covers full functional migration of the planned STAAR workflows (`STAAR-1` through `STAAR-50`) with parity validation on the reference backend.
+This handoff covers full functional migration of the planned STAAR workflows (`STAAR-1` through `STAAR-52`) with parity validation on the reference backend.
 
 ## Current Validation Status
 
-- Parity suite: `pytest tests/parity -q` -> `51 passed`
-- Full suite: `pytest -q` -> `118 passed`
+- Parity suite: `pytest tests/parity -q` -> `53 passed`
+- Full suite: `pytest -q` -> `120 passed`
 - Related baseline parity scenarios run on pure-Python paths (`use_precomputed_artifacts: false` in baseline related specs).
 
 ## Deviation Summary
@@ -42,7 +42,9 @@ Include the following points in release notes:
 - `STAAR-49` extends distinct non-`example` parity into related binary SPA via `staar_related_sparse_binary_spa_nonexample601`.
 - `STAAR-50` extends distinct non-`example` parity into related conditional workflows via `staar_related_sparse_glmmkin_cond_nonexample601`.
 - `STAAR-50` fixes weighted CCT exact-one handling in conditional ACAT aggregation (`cct_pval`) to avoid degenerate `p=1` entries forcing inflated combined p-values.
+- `STAAR-51` extends distinct non-`example` conditional parity into dense related STAAR via `staar_related_dense_glmmkin_cond_nonexample601`.
+- `STAAR-52` extends distinct non-`example` conditional parity into related individual-score workflows via `indiv_score_related_sparse_glmmkin_cond_nonexample601`.
 
 ## Suggested Post-Release Follow-up
 
-- `STAAR-51`: add an additional distinct non-`example` conditional-family parity scenario (for example `staar_related_dense_glmmkin_cond` and/or `indiv_score_related_*_glmmkin_cond`).
+- `STAAR-53`: add a distinct non-`example` dense related conditional individual-score scenario (for example `indiv_score_related_dense_glmmkin_cond_nonexample601`).

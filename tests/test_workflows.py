@@ -658,18 +658,30 @@ def test_indiv_score_related_cond_workflow_runs():
     assert len(results["pvalue_cond_samples"]) > 0
 
 
-def test_related_dense_cond_workflow_uses_shared_cond_cov_artifact(monkeypatch):
+@pytest.mark.parametrize(
+    "workflow",
+    [
+        workflows.staar_related_sparse_glmmkin_cond,
+        workflows.staar_related_dense_glmmkin_cond,
+    ],
+)
+def test_related_cond_workflow_does_not_load_precomputed_cond_cov(
+    monkeypatch,
+    workflow,
+):
     original_read_csv = workflows.pd.read_csv
 
-    def _guard_dense_cond_cov_reads(*args, **kwargs):
+    def _guard_cond_cov_reads(*args, **kwargs):
         path = str(args[0]) if args else ""
-        if path.endswith("example_glmmkin_cov_cond_dense.csv"):
-            raise AssertionError("dense conditional workflow should use shared cond covariance")
+        if path.endswith("example_glmmkin_cov_cond_sparse.csv") or path.endswith(
+            "example_glmmkin_cov_cond_dense.csv"
+        ):
+            raise AssertionError("related conditional workflow should not load cond covariance artifacts")
         return original_read_csv(*args, **kwargs)
 
-    monkeypatch.setattr(workflows.pd, "read_csv", _guard_dense_cond_cov_reads)
+    monkeypatch.setattr(workflows.pd, "read_csv", _guard_cond_cov_reads)
 
-    results = workflows.staar_related_dense_glmmkin_cond(
+    results = workflow(
         dataset="example",
         seed=600,
         rare_maf_cutoff=0.05,

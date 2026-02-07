@@ -48,14 +48,14 @@ sentinels:
     file: baselines/related_dense_glmmkin_cond_sentinels.json
     path: $.results_STAAR_S_1_25_cond
     comparison: mapping_approx
-    rtol: 1e-6
+    rtol: 3e-5
     atol: 1e-8
 
   - name: results_STAAR_S_1_1_cond
     file: baselines/related_dense_glmmkin_cond_sentinels.json
     path: $.results_STAAR_S_1_1_cond
     comparison: mapping_approx
-    rtol: 1e-6
+    rtol: 3e-5
     atol: 1e-8
 
   - name: results_STAAR_B_1_25_cond

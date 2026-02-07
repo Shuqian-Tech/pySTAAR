@@ -1,0 +1,150 @@
+{
+  "dataset_fingerprint_file": "baselines/example_fingerprint.json",
+  "generated_utc": "2026-02-07T07:57:20Z",
+  "measured_runs": 5,
+  "platform": {
+    "machine": "arm64",
+    "processor": "arm",
+    "python_version": "3.13.5",
+    "release": "24.6.0",
+    "system": "Darwin"
+  },
+  "python_environment_file": "reports/python_environment.md",
+  "reference_backend_file": "reports/reference_backend.md",
+  "scenarios": [
+    {
+      "function_name": "staar_unrelated_glm",
+      "kwargs": {
+        "dataset": "example",
+        "rare_maf_cutoff": 0.05,
+        "seed": 600
+      },
+      "scenario_id": "staar_unrelated_glm",
+      "sentinel_key": "results_STAAR_O"
+    },
+    {
+      "function_name": "staar_related_sparse_glmmkin",
+      "kwargs": {
+        "dataset": "example",
+        "rare_maf_cutoff": 0.05,
+        "seed": 600,
+        "use_precomputed_artifacts": false
+      },
+      "scenario_id": "staar_related_sparse_glmmkin_pure",
+      "sentinel_key": "results_STAAR_O"
+    },
+    {
+      "function_name": "staar_unrelated_binary_spa",
+      "kwargs": {
+        "dataset": "example",
+        "rare_maf_cutoff": 0.05,
+        "seed": 600
+      },
+      "scenario_id": "staar_unrelated_binary_spa",
+      "sentinel_key": "results_STAAR_B"
+    },
+    {
+      "function_name": "staar_related_sparse_binary_spa",
+      "kwargs": {
+        "dataset": "example",
+        "rare_maf_cutoff": 0.05,
+        "seed": 600,
+        "use_precomputed_artifacts": false
+      },
+      "scenario_id": "staar_related_sparse_binary_spa_pure",
+      "sentinel_key": "results_STAAR_B"
+    },
+    {
+      "function_name": "staar_unrelated_glm_cond",
+      "kwargs": {
+        "dataset": "example",
+        "rare_maf_cutoff": 0.05,
+        "seed": 600
+      },
+      "scenario_id": "staar_unrelated_glm_cond",
+      "sentinel_key": "results_STAAR_O_cond"
+    },
+    {
+      "function_name": "indiv_score_unrelated_glm",
+      "kwargs": {
+        "dataset": "example",
+        "rare_maf_cutoff": 0.05,
+        "seed": 600
+      },
+      "scenario_id": "indiv_score_unrelated_glm",
+      "sentinel_key": "pvalue_min"
+    },
+    {
+      "function_name": "ai_staar_unrelated_glm",
+      "kwargs": {
+        "dataset": "example",
+        "rare_maf_cutoff": 0.05,
+        "seed": 600
+      },
+      "scenario_id": "ai_staar_unrelated_glm",
+      "sentinel_key": "results_STAAR_O"
+    },
+    {
+      "function_name": "ai_staar_related_sparse_glmmkin_find_weight",
+      "kwargs": {
+        "dataset": "example",
+        "rare_maf_cutoff": 0.05,
+        "seed": 600,
+        "use_precomputed_artifacts": false
+      },
+      "scenario_id": "ai_staar_related_sparse_glmmkin_find_weight_pure",
+      "sentinel_key": "results_STAAR_O"
+    }
+  ],
+  "sentinel_checks": {
+    "ai_staar_related_sparse_glmmkin_find_weight_pure.run1": 0.14369423193755007,
+    "ai_staar_related_sparse_glmmkin_find_weight_pure.run2": 0.14369423193755007,
+    "ai_staar_related_sparse_glmmkin_find_weight_pure.run3": 0.14369423193755007,
+    "ai_staar_related_sparse_glmmkin_find_weight_pure.run4": 0.14369423193755007,
+    "ai_staar_related_sparse_glmmkin_find_weight_pure.run5": 0.14369423193755007,
+    "ai_staar_related_sparse_glmmkin_find_weight_pure.warmup": 0.14369423193755007,
+    "ai_staar_unrelated_glm.run1": 0.02075015131988984,
+    "ai_staar_unrelated_glm.run2": 0.02075015131988984,
+    "ai_staar_unrelated_glm.run3": 0.02075015131988984,
+    "ai_staar_unrelated_glm.run4": 0.02075015131988984,
+    "ai_staar_unrelated_glm.run5": 0.02075015131988984,
+    "ai_staar_unrelated_glm.warmup": 0.02075015131988984,
+    "indiv_score_unrelated_glm.run1": 0.00028090095477744173,
+    "indiv_score_unrelated_glm.run2": 0.00028090095477744173,
+    "indiv_score_unrelated_glm.run3": 0.00028090095477744173,
+    "indiv_score_unrelated_glm.run4": 0.00028090095477744173,
+    "indiv_score_unrelated_glm.run5": 0.00028090095477744173,
+    "indiv_score_unrelated_glm.warmup": 0.00028090095477744173,
+    "staar_related_sparse_binary_spa_pure.run1": 0.2336048073417211,
+    "staar_related_sparse_binary_spa_pure.run2": 0.2336048073417211,
+    "staar_related_sparse_binary_spa_pure.run3": 0.2336048073417211,
+    "staar_related_sparse_binary_spa_pure.run4": 0.2336048073417211,
+    "staar_related_sparse_binary_spa_pure.run5": 0.2336048073417211,
+    "staar_related_sparse_binary_spa_pure.warmup": 0.2336048073417211,
+    "staar_related_sparse_glmmkin_pure.run1": 0.13966348237717735,
+    "staar_related_sparse_glmmkin_pure.run2": 0.13966348237717735,
+    "staar_related_sparse_glmmkin_pure.run3": 0.13966348237717735,
+    "staar_related_sparse_glmmkin_pure.run4": 0.13966348237717735,
+    "staar_related_sparse_glmmkin_pure.run5": 0.13966348237717735,
+    "staar_related_sparse_glmmkin_pure.warmup": 0.13966348237717735,
+    "staar_unrelated_binary_spa.run1": 0.2047522366500004,
+    "staar_unrelated_binary_spa.run2": 0.2047522366500004,
+    "staar_unrelated_binary_spa.run3": 0.2047522366500004,
+    "staar_unrelated_binary_spa.run4": 0.2047522366500004,
+    "staar_unrelated_binary_spa.run5": 0.2047522366500004,
+    "staar_unrelated_binary_spa.warmup": 0.2047522366500004,
+    "staar_unrelated_glm.run1": 0.02326161035930591,
+    "staar_unrelated_glm.run2": 0.02326161035930591,
+    "staar_unrelated_glm.run3": 0.02326161035930591,
+    "staar_unrelated_glm.run4": 0.02326161035930591,
+    "staar_unrelated_glm.run5": 0.02326161035930591,
+    "staar_unrelated_glm.warmup": 0.02326161035930591,
+    "staar_unrelated_glm_cond.run1": 0.022907925285680406,
+    "staar_unrelated_glm_cond.run2": 0.022907925285680406,
+    "staar_unrelated_glm_cond.run3": 0.022907925285680406,
+    "staar_unrelated_glm_cond.run4": 0.022907925285680406,
+    "staar_unrelated_glm_cond.run5": 0.022907925285680406,
+    "staar_unrelated_glm_cond.warmup": 0.022907925285680406
+  },
+  "warmup_runs": 1
+}

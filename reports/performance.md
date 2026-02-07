@@ -49,3 +49,20 @@ Observed median improvements versus the Phase 3 baseline:
 
 - `staar_unrelated_binary_spa`: `0.288611s` -> `0.161430s` (`~1.79x`)
 - `ai_staar_unrelated_glm`: `0.928488s` -> `0.856711s` (`~1.08x`)
+
+## Optimization Update (2026-02-07, STAAR-46)
+
+Targeted Phase 3 optimization work for `STAAR-46` is captured in:
+
+- `benchmarks/phase3_post42_probe_raw.csv`
+- `benchmarks/phase3_post42_probe_summary.csv`
+- `benchmarks/phase3_post42_probe_meta.json`
+- `benchmarks/phase3_opt_46_raw.csv`
+- `benchmarks/phase3_opt_46_summary.csv`
+- `benchmarks/phase3_opt_46_meta.json`
+- `benchmarks/phase3_opt_46_comparison.csv`
+- `reports/performance_opt_46.md`
+
+Observed median improvement versus the post-`STAAR-42` probe baseline:
+
+- `staar_related_sparse_binary_spa_pure`: `2.343567s` -> `0.909528s` (`~2.58x`)

@@ -48,6 +48,7 @@ Status as of 2026-02-07:
   - Phase 3 cross-language comparison: `benchmarks/phase3_cross_language_comparison.csv`
   - Phase 3 optimization artifacts (`STAAR-43`/`STAAR-44`): `benchmarks/phase3_opt_43_44_raw.csv`, `benchmarks/phase3_opt_43_44_summary.csv`, `benchmarks/phase3_opt_43_44_meta.json`, `benchmarks/phase3_opt_43_44_comparison.csv`, `reports/performance_opt_43_44.md`
   - Post-`STAAR-42` optimization targeting probe: `benchmarks/phase3_post42_probe_raw.csv`, `benchmarks/phase3_post42_probe_summary.csv`, `benchmarks/phase3_post42_probe_meta.json`, `reports/performance_post42_probe.md`
+  - Phase 3 optimization artifacts (`STAAR-46`): `benchmarks/phase3_opt_46_raw.csv`, `benchmarks/phase3_opt_46_summary.csv`, `benchmarks/phase3_opt_46_meta.json`, `benchmarks/phase3_opt_46_comparison.csv`, `reports/performance_opt_46.md`
 
 Open compliance notes:
 
@@ -63,6 +64,7 @@ Open compliance notes:
 - `STAAR-42` removed all pure-shadow xfails; parity now passes for all 46 scenarios on the reference backend.
 - `DEV-001` is retained as a historical record in `reports/deviations.md` and is no longer active release gating.
 - Cross-language baseline benchmark is complete on the reference backend; geometric-mean Python speedup vs R across measured scenarios is approximately `1.64x` (see `reports/performance.md`).
+- `STAAR-46` optimized the high-cost related sparse binary pure path: `staar_related_sparse_binary_spa_pure` median improved from `2.343567s` to `0.909528s` (`~2.58x`) versus the post-`STAAR-42` probe baseline.
 - Strict parity coverage has been expanded with additional R-backed parameter scenarios:
   - `staar_unrelated_glm_rare_maf_0_01`
   - `staar_unrelated_binary_spa_case_q90`
@@ -72,7 +74,7 @@ Open compliance notes:
 Phase 2 handoff status:
 
 - Planned migration scope in `reports/issues.md` is complete (`STAAR-1` through `STAAR-29` resolved).
-- Full migration checklist in `reports/issues.md` is complete (`STAAR-1` through `STAAR-44` resolved).
+- Full migration checklist in `reports/issues.md` is complete through `STAAR-46` except `STAAR-45` (open).
 - Current state has completed Phase 2 implementation and moved into Phase 3 baseline measurement.
 - Release sign-off can reference `DEV-001` as closed historical context only.
 
@@ -90,5 +92,4 @@ PR-ready notes (copy into PR description):
 Next steps:
 
 - Execute `STAAR-45`: expand performance/parity coverage beyond `example` with additional representative scenarios and exported R baselines.
-- Execute `STAAR-46`: optimize `staar_related_sparse_binary_spa` pure path (post-`STAAR-42` probe median: `2.343567s` in `benchmarks/phase3_post42_probe_summary.csv`).
 - Keep historical deviation context in sync with any future tolerance/backend adjustments.

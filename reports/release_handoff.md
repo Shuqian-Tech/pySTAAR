@@ -35,8 +35,8 @@ Include the following points in release notes:
 - Full STAAR migration scope implemented (core, conditional, AI, individual score, binary SPA).
 - Reference-backend parity is validated on pure-Python related paths.
 - `DEV-001` is closed and retained as historical context; related parity runs are fully passing with tightened `rtol=3.5e-4` in affected related sentinels.
+- `STAAR-46` optimization reduced `staar_related_sparse_binary_spa` pure-path median runtime from `2.343567s` to `0.909528s` (`~2.58x`) versus the post-`STAAR-42` probe.
 
 ## Suggested Post-Release Follow-up
 
 - `STAAR-45`: expand parity/performance validation beyond `example` with additional representative datasets/scenarios and exported R baselines.
-- `STAAR-46`: optimize high-cost pure-path related workflow `staar_related_sparse_binary_spa` while retaining parity gates.

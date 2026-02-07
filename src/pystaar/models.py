@@ -441,19 +441,34 @@ def fit_null_glmmkin_binary_spa(
     eta = X @ beta
     tau = 1.0
 
-    for _ in range(max_iter):
+    log_tau_min = -10.0
+    log_tau_max = 5.0
+    local_window = 2.0
+
+    for it in range(max_iter):
         fitted = np.clip(expit(eta), eps, 1.0 - eps)
         weights = np.clip(fitted * (1.0 - fitted), eps, None)
         z = eta + (y - fitted) / weights
         d_inv = 1.0 / weights
 
+        log_tau_center = float(np.log(max(tau, eps)))
+        if it == 0:
+            bounds = (log_tau_min, log_tau_max)
+        else:
+            lo = max(log_tau_min, log_tau_center - local_window)
+            hi = min(log_tau_max, log_tau_center + local_window)
+            if hi <= lo:
+                bounds = (log_tau_min, log_tau_max)
+            else:
+                bounds = (lo, hi)
+
         try:
             opt = minimize_scalar(
                 _reml_nll_binomial_tau,
-                bounds=(-10.0, 5.0),
+                bounds=bounds,
                 method="bounded",
                 args=(X, z, d_inv, kins),
-                options={"xatol": 1e-6, "maxiter": 200},
+                options={"xatol": 1e-5, "maxiter": 120},
             )
             if opt.success:
                 tau_new = float(np.exp(opt.x))

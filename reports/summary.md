@@ -37,6 +37,7 @@ Status as of 2026-02-07:
 - Artifacts:
   - Issues: `reports/issues.md`
   - Deviations: `reports/deviations.md`
+  - Release handoff: `reports/release_handoff.md`
   - API contract map: `reports/api_contract.md`
   - Reference backend: `reports/reference_backend.md`
   - Python environment capture: `reports/python_environment.md`

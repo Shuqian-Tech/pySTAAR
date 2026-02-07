@@ -2,7 +2,7 @@
 
 ## DEV-001: Pure-Path Parity Requires Relaxed Tolerances
 
-- Status: Approved (temporary, narrowed)
+- Status: Approved (release-documented, active)
 - Date recorded: 2026-02-06
 - Affected scenarios:
   - `indiv_score_related_sparse_glmmkin`
@@ -103,6 +103,11 @@ Parity test status with current pure-path baseline specs:
 - Approved scope: Phase 2/3 parity acceptance for current `example` scenarios on pure-Python related paths with approved tolerance relaxations.
 - Merge/release gating note: approved as a temporary deviation; keep explicit mention in release notes until retired or narrowed.
 - Additional scientific-owner approval: 2026-02-07 (`xiaozhouwang`) to accept pure-path related-scenario tolerance relaxations up to `rtol=5e-4` for affected parity sentinels and proceed without parity-spec precomputed artifacts.
+
+### Handoff Record
+
+- Final strict-parity documentation + release handoff completed: 2026-02-07.
+- Handoff artifact: `reports/release_handoff.md`.
 
 ### PR Handoff Checklist
 

@@ -3,8 +3,8 @@
 Status as of 2026-02-07:
 
 - Phase: 3 (Performance and backends; baseline benchmark collection started)
-- Parity status: `pytest tests/parity -q` passes (`50 passed`) on the documented reference backend.
-- Full test status: `pytest -q` passes (`115 passed`).
+- Parity status: `pytest tests/parity -q` passes (`51 passed`) on the documented reference backend.
+- Full test status: `pytest -q` passes (`118 passed`).
 - Scenarios implemented:
   - `ai_staar_related_sparse_glmmkin_find_weight`
   - `ai_staar_related_dense_glmmkin_find_weight`
@@ -37,6 +37,7 @@ Status as of 2026-02-07:
   - `staar_related_dense_glmmkin`
   - `staar_related_dense_glmmkin_rare_maf_0_01`
   - `staar_related_sparse_glmmkin_cond`
+  - `staar_related_sparse_glmmkin_cond_nonexample601`
   - `staar_related_dense_glmmkin_cond`
 - Artifacts:
   - Issues: `reports/issues.md`
@@ -57,6 +58,7 @@ Status as of 2026-02-07:
   - Distinct non-example baseline artifacts (`STAAR-47`): `baselines/nonexample601_sim_data.rds`, `baselines/nonexample601_sim_metadata.json`, `baselines/nonexample601_fingerprint.json`, `baselines/unrelated_glm_nonexample601_sentinels.json`, and runtime dataset files `data/nonexample601_*`
   - Distinct non-example related baseline artifact (`STAAR-48`): `baselines/related_sparse_glmmkin_nonexample601_sentinels.json` with parity scenario `specs/staar_related_sparse_glmmkin_nonexample601.yaml`
   - Distinct non-example related binary baseline artifact (`STAAR-49`): `baselines/related_sparse_binary_spa_nonexample601_sentinels.json` with parity scenario `specs/staar_related_sparse_binary_spa_nonexample601.yaml`
+  - Distinct non-example related conditional baseline artifact (`STAAR-50`): `baselines/related_sparse_glmmkin_cond_nonexample601_sentinels.json` with parity scenario `specs/staar_related_sparse_glmmkin_cond_nonexample601.yaml`
 
 Open compliance notes:
 
@@ -77,6 +79,8 @@ Open compliance notes:
 - `STAAR-47` adds distinct non-clone non-`example` R-baseline parity coverage via `staar_unrelated_glm_nonexample601` (`dataset=nonexample601`, sentinels in `baselines/unrelated_glm_nonexample601_sentinels.json`).
 - `STAAR-48` expands distinct non-`example` parity into a related workflow family via `staar_related_sparse_glmmkin_nonexample601`.
 - `STAAR-49` expands distinct non-`example` parity into related binary SPA via `staar_related_sparse_binary_spa_nonexample601`.
+- `STAAR-50` expands distinct non-`example` parity into related conditional workflows via `staar_related_sparse_glmmkin_cond_nonexample601`.
+- `STAAR-50` also fixed weighted CCT exact-one handling in conditional ACAT-V paths (`cct_pval`), preventing degenerate `p=1` entries from overwhelming combined conditional ACAT statistics.
 - Strict parity coverage has been expanded with additional R-backed parameter scenarios:
   - `staar_unrelated_glm_rare_maf_0_01`
   - `staar_unrelated_binary_spa_case_q90`
@@ -86,14 +90,14 @@ Open compliance notes:
 Phase 2 handoff status:
 
 - Planned migration scope in `reports/issues.md` is complete (`STAAR-1` through `STAAR-29` resolved).
-- Full migration checklist in `reports/issues.md` is complete through `STAAR-49`; follow-up `STAAR-50` is open for related conditional non-`example` baseline expansion.
+- Full migration checklist in `reports/issues.md` is complete through `STAAR-50`; follow-up `STAAR-51` is open for additional non-`example` conditional-family expansion.
 - Current state has completed Phase 2 implementation and moved into Phase 3 baseline measurement.
 - Release sign-off can reference `DEV-001` as closed historical context only.
 
 PR-ready notes (copy into PR description):
 
-- Parity on reference backend: `pytest tests/parity -q` -> `50 passed`.
-- Full test suite: `pytest -q` -> `115 passed`.
+- Parity on reference backend: `pytest tests/parity -q` -> `51 passed`.
+- Full test suite: `pytest -q` -> `118 passed`.
 - Deviations: no active deviations; `DEV-001` is closed and retained historically in `reports/deviations.md`.
 - Required named roles per policy:
   - Migration owner: `<fill>`
@@ -103,5 +107,5 @@ PR-ready notes (copy into PR description):
 
 Next steps:
 
-- Execute `STAAR-50`: add distinct non-`example` R-baseline parity for a related conditional workflow family.
+- Execute `STAAR-51`: add at least one additional distinct non-`example` conditional-family parity scenario (for example dense related or conditional individual-score family).
 - Keep historical deviation context in sync with any future tolerance/backend adjustments.

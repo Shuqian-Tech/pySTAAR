@@ -35,6 +35,13 @@ def cct_pval(pvals: np.ndarray, weights: np.ndarray) -> float:
         raise ValueError("All p-values must be between 0 and 1!")
 
     weights = _normalize_weights(weights, expected_size=pvals.size)
+    valid = pvals < 1.0
+    if not np.any(valid):
+        return 1.0
+    if not np.all(valid):
+        pvals = pvals[valid]
+        weights = weights[valid]
+        weights = weights / np.sum(weights)
 
     cct_stat = 0.0
     for p, w in zip(pvals, weights):

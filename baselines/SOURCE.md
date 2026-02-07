@@ -48,7 +48,7 @@ Rscript baselines/scripts/extract_indiv_score_related_dense.R
 - **R repo**: `../STAAR` (local clone of upstream project)
 - **Commit**: `b06e478b03f00b7810ea8c75247a1b143f37bda4`
 - **Extraction date**: 2026-02-07
-- **Purpose**: add distinct non-clone baseline for `STAAR-47` (`nonexample601`, seed 601 simulation)
+- **Purpose**: add distinct non-clone `nonexample601` baseline expansions for `STAAR-47` through `STAAR-50`
 
 ### Commands used
 
@@ -56,6 +56,7 @@ Executed in `../STAAR`:
 
 ```bash
 Rscript /tmp/extract_nonexample601.R
+Rscript -e "<inline extraction for related_sparse_binary_spa_nonexample601 and related_sparse_glmmkin_cond_nonexample601 sentinels>"
 ```
 
 Artifacts copied into this repo:
@@ -65,3 +66,5 @@ Artifacts copied into this repo:
 - `baselines/nonexample601_fingerprint.json`
 - `baselines/unrelated_glm_nonexample601_sentinels.json`
 - `baselines/related_sparse_glmmkin_nonexample601_sentinels.json`
+- `baselines/related_sparse_binary_spa_nonexample601_sentinels.json`
+- `baselines/related_sparse_glmmkin_cond_nonexample601_sentinels.json`

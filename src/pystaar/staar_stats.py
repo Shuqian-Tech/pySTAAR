@@ -9,11 +9,32 @@ import numpy as np
 from scipy import stats
 
 
+def _normalize_weights(weights: np.ndarray, expected_size: int) -> np.ndarray:
+    weights = np.asarray(weights, dtype=float).reshape(-1)
+    if weights.size != expected_size:
+        raise ValueError("The length of weights should be the same as that of the p-values!")
+    if np.any(np.isnan(weights)):
+        raise ValueError("Cannot have NAs in the weights!")
+    if np.any(weights < 0):
+        raise ValueError("All the weights must be non-negative!")
+
+    weight_sum = float(np.sum(weights))
+    if (not np.isfinite(weight_sum)) or weight_sum <= 0.0:
+        raise ValueError("Sum of weights must be positive!")
+    return weights / weight_sum
+
+
 def cct_pval(pvals: np.ndarray, weights: np.ndarray) -> float:
     """Cauchy combination test with weights (matches CCT_pval.cpp)."""
-    pvals = np.asarray(pvals, dtype=float)
-    weights = np.asarray(weights, dtype=float)
-    weights = weights / np.sum(weights)
+    pvals = np.asarray(pvals, dtype=float).reshape(-1)
+    if pvals.size == 0:
+        raise ValueError("At least one p-value is required.")
+    if np.any(np.isnan(pvals)):
+        raise ValueError("Cannot have NAs in the p-values!")
+    if np.any(pvals < 0) or np.any(pvals > 1):
+        raise ValueError("All p-values must be between 0 and 1!")
+
+    weights = _normalize_weights(weights, expected_size=pvals.size)
 
     cct_stat = 0.0
     for p, w in zip(pvals, weights):
@@ -29,7 +50,9 @@ def cct_pval(pvals: np.ndarray, weights: np.ndarray) -> float:
 
 def cct(pvals: Iterable[float], weights: Iterable[float] | None = None) -> float:
     """Cauchy combination test (matches CCT.R)."""
-    pvals = np.asarray(list(pvals), dtype=float)
+    pvals = np.asarray(list(pvals), dtype=float).reshape(-1)
+    if pvals.size == 0:
+        raise ValueError("At least one p-value is required.")
 
     if np.any(np.isnan(pvals)):
         raise ValueError("Cannot have NAs in the p-values!")
@@ -46,14 +69,9 @@ def cct(pvals: Iterable[float], weights: Iterable[float] | None = None) -> float
         return 1.0
 
     if weights is None:
-        weights = np.full_like(pvals, 1.0 / len(pvals))
+        weights = np.full_like(pvals, 1.0 / pvals.size)
     else:
-        weights = np.asarray(list(weights), dtype=float)
-        if len(weights) != len(pvals):
-            raise ValueError("The length of weights should be the same as that of the p-values!")
-        if np.any(weights < 0):
-            raise ValueError("All the weights must be positive!")
-        weights = weights / np.sum(weights)
+        weights = _normalize_weights(list(weights), expected_size=pvals.size)
 
     is_small = pvals < 1e-16
     if not np.any(is_small):

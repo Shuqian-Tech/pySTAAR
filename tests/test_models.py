@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import pytest
 
 from pystaar.data import load_example_dataset
@@ -86,3 +87,16 @@ def test_design_matrix_validation_errors():
 
     with pytest.raises(ValueError, match="Design matrix must include at least one column"):
         fit_null_glm(df, covariate_cols=(), add_intercept=False)
+
+
+def test_fit_null_glm_requires_positive_residual_df():
+    df = pd.DataFrame(
+        {
+            "Y": [1.0, 2.0, 3.0],
+            "X1": [0.1, 0.2, 0.3],
+            "X2": [0.5, 0.6, 0.7],
+        }
+    )
+
+    with pytest.raises(ValueError, match="Residual degrees of freedom must be positive"):
+        fit_null_glm(df)

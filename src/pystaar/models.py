@@ -200,6 +200,10 @@ def fit_null_glm(
     fitted = X @ beta
     residuals = y - fitted
     df_resid = X.shape[0] - X.shape[1]
+    if df_resid <= 0:
+        raise ValueError(
+            "Residual degrees of freedom must be positive (n_samples must exceed model parameters)."
+        )
     dispersion = float(np.sum(residuals**2) / df_resid)
     weights = np.ones_like(y)
     return NullModelGLM(

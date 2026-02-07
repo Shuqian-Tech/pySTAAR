@@ -70,6 +70,7 @@ Open compliance notes:
 Phase 2 handoff status:
 
 - Planned migration scope in `reports/issues.md` is complete (`STAAR-1` through `STAAR-29` resolved).
+- Full migration checklist in `reports/issues.md` is complete (`STAAR-1` through `STAAR-41` resolved).
 - Current state has completed Phase 2 implementation and moved into Phase 3 baseline measurement.
 - Release-style sign-off should continue to call out approved temporary `DEV-001` until retired/narrowed.
 

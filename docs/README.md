@@ -1,0 +1,31 @@
+# pySTAAR Quickstart (English)
+
+`pySTAAR` is the Python migration of the STAAR R package.
+
+For Chinese users, start here first: [`README_CN.md`](README_CN.md).
+
+## Install
+
+```bash
+pip install -e .
+```
+
+## Minimal example
+
+```python
+from pystaar import staar_unrelated_glm
+
+res = staar_unrelated_glm(dataset="example", seed=600, rare_maf_cutoff=0.05)
+print(res["results_STAAR_O"])
+```
+
+## Main workflow APIs
+
+- `staar_unrelated_glm`, `staar_related_sparse_glmmkin`, `staar_related_dense_glmmkin`
+- `staar_unrelated_glm_cond`, `staar_related_sparse_glmmkin_cond`, `staar_related_dense_glmmkin_cond`
+- `staar_unrelated_binary_spa`, `staar_related_sparse_binary_spa`, `staar_related_dense_binary_spa`
+- `ai_staar_unrelated_glm`, `ai_staar_related_sparse_glmmkin`, `ai_staar_related_dense_glmmkin`
+
+## Parity note
+
+Functional migration scope is complete. Related-workflow parity uses approved relaxed tolerances for affected sentinels (tracked in `reports/deviations.md`, `DEV-001`).

@@ -66,3 +66,14 @@ Targeted Phase 3 optimization work for `STAAR-46` is captured in:
 Observed median improvement versus the post-`STAAR-42` probe baseline:
 
 - `staar_related_sparse_binary_spa_pure`: `2.343567s` -> `0.909528s` (`~2.58x`)
+
+## Non-Example Coverage Update (2026-02-07, STAAR-45)
+
+Non-`example` runtime-directory performance coverage is captured in:
+
+- `benchmarks/phase3_nonexample_raw.csv`
+- `benchmarks/phase3_nonexample_summary.csv`
+- `benchmarks/phase3_nonexample_meta.json`
+- `reports/performance_nonexample.md`
+
+Observed median runtime for `staar_unrelated_glm_nonexample_dir`: `0.165067s`.

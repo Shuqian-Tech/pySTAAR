@@ -1,6 +1,7 @@
 import json
 import math
 from pathlib import Path
+import shutil
 
 import pytest
 import yaml
@@ -10,6 +11,16 @@ from pystaar import workflows
 ROOT = Path(__file__).resolve().parents[2]
 SPECS_DIR = ROOT / "specs"
 BASELINES_DIR = ROOT / "baselines"
+DATA_DIR = ROOT / "data"
+
+EXAMPLE_DIRECTORY_FILE_MAP = {
+    "example_geno.mtx": "geno.mtx",
+    "example_phred.csv": "phred.csv",
+    "example_pheno_unrelated.csv": "pheno_unrelated.csv",
+    "example_pheno_related.csv": "pheno_related.csv",
+    "example_kins_sparse.mtx": "kins_sparse.mtx",
+    "example_kins_dense.mtx": "kins_dense.mtx",
+}
 
 ISSUE_BY_SCENARIO = {
     "ai_staar_related_dense_glmmkin_find_weight": "STAAR-25",
@@ -25,6 +36,7 @@ ISSUE_BY_SCENARIO = {
     "indiv_score_related_sparse_glmmkin_cond": "STAAR-18",
     "indiv_score_related_dense_glmmkin_cond": "STAAR-19",
     "staar_unrelated_glm": "STAAR-1",
+    "staar_unrelated_glm_nonexample_dir": "STAAR-45",
     "staar_unrelated_glm_rare_maf_0_01": "STAAR-26",
     "staar_unrelated_glm_cond": "STAAR-4",
     "staar_unrelated_binary_spa": "STAAR-7",
@@ -96,8 +108,26 @@ def _assert_mapping_close(label: str, actual, expected, rtol: float, atol: float
         _assert_scalar_close(f"{label}.{key}", actual[key], expected[key], rtol, atol)
 
 
+def _materialize_example_directory_copy(target_dir: Path) -> str:
+    target_dir.mkdir(parents=True, exist_ok=True)
+    for src_name, dst_name in EXAMPLE_DIRECTORY_FILE_MAP.items():
+        src = DATA_DIR / src_name
+        dst = target_dir / dst_name
+        shutil.copy2(src, dst)
+    return str(target_dir)
+
+
+def _resolve_runtime_dataset(inputs: dict, scenario_id: str, tmp_path: Path):
+    mode = inputs.get("dataset_mode", "direct")
+    if mode == "direct":
+        return inputs["dataset"]
+    if mode == "example_directory_copy":
+        return _materialize_example_directory_copy(tmp_path / f"{scenario_id}_dataset")
+    raise ValueError(f"Unsupported dataset_mode '{mode}' in scenario '{scenario_id}'.")
+
+
 @pytest.mark.parametrize("spec_path", _load_specs())
-def test_scenario_parity(spec_path: Path):
+def test_scenario_parity(spec_path: Path, tmp_path: Path):
     spec = yaml.safe_load(spec_path.read_text())
     scenario_id = spec["scenario_id"]
     issue = ISSUE_BY_SCENARIO.get(scenario_id, "STAAR-UNKNOWN")
@@ -111,7 +141,7 @@ def test_scenario_parity(spec_path: Path):
     func_name = _parse_entry_point(spec["python_entry_point"])
     func = getattr(workflows, func_name)
 
-    dataset = spec["inputs"]["dataset"]
+    dataset = _resolve_runtime_dataset(spec["inputs"], scenario_id, tmp_path)
     params = spec.get("parameters", {})
 
     try:

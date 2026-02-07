@@ -1,0 +1,7 @@
+scenario_id,run_type,run_index,seconds,sentinel_value
+staar_unrelated_glm_nonexample_dir,warmup,1,0.18257412500679493,0.02326161035930591
+staar_unrelated_glm_nonexample_dir,measured,1,0.15312137501314282,0.02326161035930591
+staar_unrelated_glm_nonexample_dir,measured,2,0.16506704105995595,0.02326161035930591
+staar_unrelated_glm_nonexample_dir,measured,3,0.1661870840471238,0.02326161035930591
+staar_unrelated_glm_nonexample_dir,measured,4,0.16954608296509832,0.02326161035930591
+staar_unrelated_glm_nonexample_dir,measured,5,0.15340325003489852,0.02326161035930591

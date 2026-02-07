@@ -1,0 +1,23 @@
+{
+  "dataset_fingerprint_file": "baselines/example_fingerprint.json",
+  "dataset_mode": "runtime_directory_copy_of_example",
+  "generated_utc": "2026-02-07T08:33:44Z",
+  "measured_runs": 5,
+  "platform": {
+    "machine": "arm64",
+    "processor": "arm",
+    "python_version": "3.13.5",
+    "release": "24.6.0",
+    "system": "Darwin"
+  },
+  "scenario_id": "staar_unrelated_glm_nonexample_dir",
+  "sentinel_checks": {
+    "run1": 0.02326161035930591,
+    "run2": 0.02326161035930591,
+    "run3": 0.02326161035930591,
+    "run4": 0.02326161035930591,
+    "run5": 0.02326161035930591,
+    "warmup1": 0.02326161035930591
+  },
+  "warmup_runs": 1
+}

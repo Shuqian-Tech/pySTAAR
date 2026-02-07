@@ -23,5 +23,5 @@ This file tracks the strict API/UX contract alignment against exported functions
 ## Current Caveats for Strict Equivalence
 
 - Full API name mapping is in place, but strict behavioral equivalence still depends on scenario/test coverage breadth.
-- Current parity remains strongest on the `example` dataset and selected scenarios in `specs/`.
+- Current parity remains strongest on `example` baselines, with additional non-`example` runtime-directory coverage via `staar_unrelated_glm_nonexample_dir` in `specs/`.
 - No active parity-blocking deviations remain; `DEV-001` is closed and retained in `reports/deviations.md` as historical context for related-scenario tolerance policy.

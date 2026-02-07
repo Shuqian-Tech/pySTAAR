@@ -1,0 +1,2 @@
+scenario_id,warmup_runs,measured_runs,median_seconds,mean_seconds,min_seconds,max_seconds,std_seconds
+staar_unrelated_glm_nonexample_dir,1,5,0.16506704105995595,0.1614649666240439,0.15312137501314282,0.16954608296509832,0.007667864269959127

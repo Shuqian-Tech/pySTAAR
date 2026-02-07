@@ -1,0 +1,20 @@
+{
+  "name": "nonexample602",
+  "source": "STAAR::example with new simulation seed 602",
+  "genotype": {
+    "class": "dgCMatrix",
+    "dim": [10000, 147]
+  },
+  "phred": {
+    "dim": [147, 10]
+  },
+  "pheno_unrelated": {
+    "dim": [10000, 3],
+    "colnames": ["Y", "X1", "X2"]
+  },
+  "pheno_related": {
+    "dim": [10000, 4],
+    "colnames": ["Y", "X1", "X2", "id"]
+  },
+  "checksum": "7684d01c445d786649fdb54cdd0c94498a4b10dffaa8e95ed4cf0059a9a27054"
+}

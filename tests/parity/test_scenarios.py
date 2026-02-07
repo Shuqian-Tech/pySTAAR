@@ -53,6 +53,7 @@ ISSUE_BY_SCENARIO = {
     "staar_related_sparse_glmmkin": "STAAR-2",
     "staar_related_sparse_glmmkin_nonexample601": "STAAR-48",
     "staar_related_sparse_glmmkin_cond_nonexample601": "STAAR-50",
+    "staar_related_sparse_glmmkin_cond_nonexample602": "STAAR-54",
     "staar_related_sparse_glmmkin_rare_maf_0_01": "STAAR-28",
     "staar_related_dense_glmmkin": "STAAR-3",
     "staar_related_dense_glmmkin_rare_maf_0_01": "STAAR-29",

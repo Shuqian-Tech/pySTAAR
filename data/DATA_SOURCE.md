@@ -20,6 +20,7 @@
 |---|---:|---|
 | `baselines/example_sim_data.rds` | 1312814 | `89498efaa1140720d512e92b4fb80d5141dfbec174dca54df29d553ef7b92fe6` |
 | `baselines/nonexample601_sim_data.rds` | 1307967 | `3104c42d8fff5cd75f824bb10e282366b593c6f22ad924885263bdee63513241` |
+| `baselines/nonexample602_sim_data.rds` | 1304535 | `97f2757233fd25d4fcdb3171cdcb8f341aa330f65078ad4753137bf1de2d77fb` |
 
 ## Exported Runtime Files
 
@@ -37,6 +38,12 @@
 | `data/nonexample601_phred.csv` | 24686 | `576e4f60f5d42653c18eb157e2c3847710f97538cf81e5fa44320adbabb16741` |
 | `data/nonexample601_pheno_unrelated.csv` | 381071 | `c0fb8111ed7128fddc2b13e2ed6986d4566a4732e43960a82f925942d72f0358` |
 | `data/nonexample601_pheno_related.csv` | 429309 | `26a2cc47bfb5f902a37495bad541be760a81cf8972ed306f4c82f8c67b6665c4` |
+| `data/nonexample602_geno.mtx` | 62711 | `1ca6579addfa90c0cca6cbd77b4d272f2bf1b9ed36a4c881111e191783f3af15` |
+| `data/nonexample602_kins_sparse.mtx` | 300091 | `5783413a57c288fac6964946e1c4bd5d9453ca3c87a24847fd4619da5e037243` |
+| `data/nonexample602_kins_dense.mtx` | 300091 | `5783413a57c288fac6964946e1c4bd5d9453ca3c87a24847fd4619da5e037243` |
+| `data/nonexample602_phred.csv` | 25214 | `808a8ddd4780b409ed32cd62f5a1dafb6452db83494e96e3358d8953fc6675a1` |
+| `data/nonexample602_pheno_unrelated.csv` | 381102 | `4a6a588cabee87e60064354b9811cdf9181a0f5c47e27418edb49b284091c965` |
+| `data/nonexample602_pheno_related.csv` | 429283 | `8692f9b8051d11dbc4d6b7173fe890c395705c2e637fc22b0fb549ff0edad750` |
 | `data/example_glmmkin_cov.csv` | 555749 | `f6893ba9f034143c0b8eab7fda2fe020e8e43ac0280fbd1bd3824fa20c3311e6` |
 | `data/example_glmmkin_cov_rare_maf_0_01.csv` | 495166 | `c08479c923d9207da12c4e4d8faa64cf80390291223700b423eb15a1cf649ebc` |
 | `data/example_glmmkin_scaled_residuals.csv` | 182493 | `55ebe906e9c63fb25e8bbc4bf4f4ac05966401af8a66bbba972cd48a4a3c29ca` |
@@ -79,6 +86,12 @@
 - `data/nonexample601_geno.mtx`: shape=`10000x144`, nnz=7636
 - `data/nonexample601_kins_sparse.mtx`: shape=`10000x10000`, nnz=35000
 - `data/nonexample601_kins_dense.mtx`: shape=`10000x10000`, nnz=35000
+- `data/nonexample602_pheno_unrelated.csv`: rows=10000, cols=3, columns=`Y,X1,X2`
+- `data/nonexample602_pheno_related.csv`: rows=10000, cols=4, columns=`Y,X1,X2,id`
+- `data/nonexample602_phred.csv`: rows=147, cols=10, columns=`Z1,Z2,Z3,Z4,Z5,Z6,Z7,Z8,Z9,Z10`
+- `data/nonexample602_geno.mtx`: shape=`10000x147`, nnz=6174
+- `data/nonexample602_kins_sparse.mtx`: shape=`10000x10000`, nnz=35000
+- `data/nonexample602_kins_dense.mtx`: shape=`10000x10000`, nnz=35000
 - `data/example_glmmkin_cov.csv`: shape=`163x163`
 - `data/example_glmmkin_cov_rare_maf_0_01.csv`: shape=`153x153`
 - `data/example_glmmkin_cov_cond_sparse.csv`: shape=`163x163`
@@ -122,8 +135,10 @@
 - `baselines/scripts/extract_ai_staar_related_sparse.R` (AI-STAAR sparse related covariance export)
 - `baselines/scripts/extract_ai_staar_related_dense.R` (AI-STAAR dense related covariance export)
 - `../STAAR` one-shot extraction script (`/tmp/extract_nonexample601.R`) for non-clone `nonexample601` dataset + sentinels (`STAAR-47`)
+- `../STAAR` one-shot extraction script (`/tmp/extract_nonexample602.R`) for second-seed `nonexample602` dataset (`STAAR-54`)
 
 Command:
 
 - `Rscript scripts/export_example_data.R`
 - `Rscript /tmp/extract_nonexample601.R` (executed in `../STAAR`, then copied `nonexample601_*` outputs)
+- `Rscript /tmp/extract_nonexample602.R` (executed in `../STAAR`, then copied `nonexample602_*` outputs)

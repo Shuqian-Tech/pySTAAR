@@ -44,7 +44,7 @@ print(res["pvalue_min"], res["top_variant_index"])
 ## 5. 注意事项
 
 - 亲属样本结果与 R 结果通常高度一致，但会存在小幅数值漂移。
-- 当前项目已批准受影响哨兵指标容差上限 `rtol=5e-4`（见 `reports/deviations.md`）。
+- 当前 release 口径下，受影响 related parity 哨兵指标使用收紧后的容差上限 `rtol=3.5e-4`（见 `reports/summary.md` 与 `reports/deviations.md`）。
 
 ## 6. 性能建议（sparse vs dense）
 

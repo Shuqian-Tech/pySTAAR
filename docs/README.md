@@ -33,6 +33,8 @@ print(res["results_STAAR_O"])
 - API output fields: [`api/output_fields.md`](api/output_fields.md)
 - API stability policy: [`api/stability.md`](api/stability.md)
 - R migration guide: [`migration_from_r.md`](migration_from_r.md)
+- R quick migration checklist (CN): [`migration_r_quickstart_cn.md`](migration_r_quickstart_cn.md)
+- Dataset directory template (CN): [`data_directory_template_cn.md`](data_directory_template_cn.md)
 - Changelog: [`../CHANGELOG.md`](../CHANGELOG.md)
 
 ## Parity note

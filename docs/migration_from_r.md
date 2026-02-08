@@ -2,6 +2,8 @@
 
 本指南面向已经使用 R STAAR 的用户，帮助你快速切换到 Python。
 
+如果你只想先把流程跑通，先看 15 分钟版本：[`migration_r_quickstart_cn.md`](migration_r_quickstart_cn.md)。
+
 ## 0. 版本对应关系
 
 - 当前 Python 迁移基线对齐的 R 包版本：`STAAR 0.9.8`
@@ -76,8 +78,8 @@ print(res["results_STAAR_O_cond"])
 
 - 当前功能迁移已完成，核心工作流都可用。
 - 相关样本路径在纯 Python 计算下存在可重复的小数值漂移。
-- 项目已通过科学负责人批准：对受影响 parity 哨兵指标允许 `rtol<=5e-4`。
-- 详情见 `reports/deviations.md`（`DEV-001`）。
+- 当前 release 口径下，受影响 related parity 哨兵指标已收紧到 `rtol<=3.5e-4`（保留既有 per-sentinel `atol`）。
+- `DEV-001` 已关闭，仅作为历史记录保留；当前状态以 `reports/summary.md` 和 `reports/deviations.md` 为准。
 
 ## 6. FAQ
 
@@ -87,8 +89,12 @@ A: 常见原因是底层数值后端差异（线性代数实现、优化路径�
 
 ### Q2: 我必须使用 `use_precomputed_artifacts=True` 吗？
 
-A: 不需要。当前 baseline parity 已在 pure-path（`False`）上运行。该参数仅保留兼容模式。
+A: 不需要。当前 baseline parity 已在 pure-path（`False`）上运行。该参数仅保留兼容模式，不建议新分析默认开启。
 
 ### Q3: 如何判断迁移是否成功？
 
 A: 建议先在同一 `seed`、相同参数下比较关键输出（例如 `results_STAAR_O`、`results_STAAR_B`），再看下游解释是否一致。
+
+### Q4: 为什么条件分析结果和 R 对不上？
+
+A: 最常见原因是条件位点索引。`pySTAAR` 的 `adj_variant_indices` 是 **0-based**，而不少 R 用户习惯按 1-based 思维记录位点顺序。迁移时请先确认索引基准。

@@ -79,17 +79,20 @@ print("STAAR-O:", res["results_STAAR_O"])
 - 迁移时先固定 `seed`、`rare_maf_cutoff`、`adj_variant_indices` 等参数，再逐步扩展。
 - 先用 `example` 验证流程跑通，再切换到自有数据目录。
 
-详细对照见：[`docs/migration_from_r.md`](migration_from_r.md)
+详细对照见：[`migration_from_r.md`](migration_from_r.md)
+快速迁移清单见：[`migration_r_quickstart_cn.md`](migration_r_quickstart_cn.md)
 
 ## 6. 与 R 结果的一致性说明
 
 - 当前功能迁移已完成（到 `STAAR-56`），可用于实际分析。
 - 相关样本 parity 当前以纯 Python 路径为基线运行。
-- 历史偏差记录（含 `DEV-001`）见 `reports/deviations.md`，当前总体状态见 `reports/summary.md`。
+- `DEV-001` 已关闭并保留为历史记录；当前总体状态见 `reports/summary.md`，历史记录见 `reports/deviations.md`。
 
 ## 7. 文档导航
 
 - 安装与环境：[`installation.md`](installation.md)
+- R 用户 15 分钟迁移清单：[`migration_r_quickstart_cn.md`](migration_r_quickstart_cn.md)
+- 数据目录模板：[`data_directory_template_cn.md`](data_directory_template_cn.md)
 - 基础教程：[`tutorials/01_basic_staar.md`](tutorials/01_basic_staar.md)
 - Binary SPA：[`tutorials/02_binary_spa.md`](tutorials/02_binary_spa.md)
 - 亲属样本：[`tutorials/03_related_samples.md`](tutorials/03_related_samples.md)

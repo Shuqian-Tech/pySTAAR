@@ -22,7 +22,21 @@ pip install -e .
 pip install -e .[dev]
 ```
 
-## 3. 依赖版本
+## 3. 发布版用户安装（非开发模式）
+
+如果你是普通使用者（不是本仓库开发者），推荐：
+
+```bash
+pip install pystaar
+```
+
+或安装指定版本：
+
+```bash
+pip install pystaar==1.0.0
+```
+
+## 4. 依赖版本
 
 项目依赖在 `pyproject.toml` 中定义，核心依赖包括：
 
@@ -31,7 +45,7 @@ pip install -e .[dev]
 - `pandas>=2.0`
 - `pyyaml>=6.0`
 
-## 4. 数据组织规范
+## 5. 数据组织规范
 
 `dataset` 支持目录路径。目录内需要以下文件：
 
@@ -44,7 +58,7 @@ pip install -e .[dev]
 
 其中 phenotype 文件至少包含列：`Y`, `X1`, `X2`。
 
-## 5. 验证安装
+## 6. 验证安装
 
 ```bash
 pytest -q
@@ -56,16 +70,32 @@ pytest -q
 pytest tests/parity -q
 ```
 
-## 6. 常见安装问题
+发布版（wheel/pip）用户可先做最小 smoke check：
 
-### 6.1 `ModuleNotFoundError: pystaar`
+```bash
+python - <<'PY'
+import pystaar
+res = pystaar.staar_unrelated_glm(dataset="example", seed=600, rare_maf_cutoff=0.05)
+print("SMOKE_OK", float(res["results_STAAR_O"]))
+PY
+```
+
+如果你在仓库内做发布前验收，还可以运行：
+
+```bash
+python scripts/run_release_smoke_checks.py
+```
+
+## 7. 常见安装问题
+
+### 7.1 `ModuleNotFoundError: pystaar`
 
 通常是未执行 `pip install -e .`，或当前环境不是安装时的虚拟环境。
 
-### 6.2 稀疏矩阵读取失败
+### 7.2 稀疏矩阵读取失败
 
 请确认 `.mtx` 文件格式正确，且文件路径没有拼写错误。
 
-### 6.3 版本冲突
+### 7.3 版本冲突
 
 优先新建干净虚拟环境，再重新安装。

@@ -268,6 +268,39 @@ def test_related_ai_cache_reuses_ai_staar_for_string_dataset(monkeypatch):
     assert second["results_STAAR_O"] == pytest.approx(0.12)
 
 
+def test_clear_runtime_caches_resets_workflow_and_data_caches():
+    workflows.clear_runtime_caches(include_dataset_cache=True)
+    initial = workflows.get_runtime_cache_info()
+
+    assert initial["workflows"]["related_nullmodel"]["currsize"] == 0
+    assert initial["workflows"]["related_ai_results"]["currsize"] == 0
+    assert initial["data"]["named_dataset"]["currsize"] == 0
+
+    workflows.staar_related_sparse_glmmkin(
+        dataset="example",
+        seed=600,
+        rare_maf_cutoff=0.05,
+        use_precomputed_artifacts=False,
+    )
+    workflows.ai_staar_related_sparse_glmmkin(
+        dataset="example",
+        seed=600,
+        rare_maf_cutoff=0.05,
+        use_precomputed_artifacts=False,
+    )
+
+    populated = workflows.get_runtime_cache_info()
+    assert populated["workflows"]["related_nullmodel"]["currsize"] > 0
+    assert populated["workflows"]["related_ai_results"]["currsize"] > 0
+    assert populated["data"]["named_dataset"]["currsize"] > 0
+
+    cleared = workflows.clear_runtime_caches(include_dataset_cache=True)
+    assert cleared["before"]["workflows"]["related_nullmodel"]["currsize"] > 0
+    assert cleared["after"]["workflows"]["related_nullmodel"]["currsize"] == 0
+    assert cleared["after"]["workflows"]["related_ai_results"]["currsize"] == 0
+    assert cleared["after"]["data"]["named_dataset"]["currsize"] == 0
+
+
 def test_related_workflow_precomputed_mode_uses_scaled_without_cov_for_baseline_cutoff(
     monkeypatch,
 ):

@@ -4,7 +4,7 @@ Status as of 2026-02-08:
 
 - Phase: 3 (Performance and backends; baseline benchmark collection started)
 - Parity status: `pytest tests/parity -q` passes (`55 passed`) on the documented reference backend.
-- Full test status: `pytest -q` passes (`124 passed`).
+- Full test status: `pytest -q` passes (`126 passed`).
 - Scenarios implemented:
   - `ai_staar_related_sparse_glmmkin_find_weight`
   - `ai_staar_related_dense_glmmkin_find_weight`
@@ -113,7 +113,7 @@ Phase 2 handoff status:
 PR-ready notes (copy into PR description):
 
 - Parity on reference backend: `pytest tests/parity -q` -> `55 passed`.
-- Full test suite: `pytest -q` -> `124 passed`.
+- Full test suite: `pytest -q` -> `126 passed`.
 - Deviations: no active deviations; `DEV-001` is closed and retained historically in `reports/deviations.md`.
 - Required named roles per policy:
   - Migration owner: `<fill>`

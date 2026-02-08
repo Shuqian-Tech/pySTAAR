@@ -1,5 +1,5 @@
 import pystaar
-from pystaar import models, staar_core, staar_stats
+from pystaar import models, staar_core, staar_stats, workflows
 
 
 def test_r_namespace_aliases_are_exposed():
@@ -36,3 +36,10 @@ def test_r_namespace_aliases_are_listed_in_all():
 def test_cct_alias_smoke():
     pvalue = pystaar.CCT([0.1, 0.2, 0.8])
     assert 0.0 <= pvalue <= 1.0
+
+
+def test_cache_management_api_is_exposed():
+    assert pystaar.get_runtime_cache_info is workflows.get_runtime_cache_info
+    assert pystaar.clear_runtime_caches is workflows.clear_runtime_caches
+    assert "get_runtime_cache_info" in pystaar.__all__
+    assert "clear_runtime_caches" in pystaar.__all__

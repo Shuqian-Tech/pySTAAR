@@ -83,9 +83,9 @@ print("STAAR-O:", res["results_STAAR_O"])
 
 ## 6. 与 R 结果的一致性说明
 
-- 当前功能迁移已完成，可用于实际分析。
-- 相关样本部分采用已批准的一致性策略：对受影响哨兵指标允许放宽到 `rtol<=5e-4`。
-- 该策略记录在 `reports/deviations.md`（`DEV-001`）。
+- 当前功能迁移已完成（到 `STAAR-56`），可用于实际分析。
+- 相关样本 parity 当前以纯 Python 路径为基线运行。
+- 历史偏差记录（含 `DEV-001`）见 `reports/deviations.md`，当前总体状态见 `reports/summary.md`。
 
 ## 7. 文档导航
 

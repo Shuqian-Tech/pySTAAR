@@ -9,7 +9,7 @@ This handoff covers full functional migration of the planned STAAR workflows (`S
 ## Current Validation Status
 
 - Parity suite: `pytest tests/parity -q` -> `55 passed`
-- Full suite: `pytest -q` -> `124 passed`
+- Full suite: `pytest -q` -> `126 passed`
 - Related baseline parity scenarios run on pure-Python paths (`use_precomputed_artifacts: false` in baseline related specs).
 
 ## Deviation Summary

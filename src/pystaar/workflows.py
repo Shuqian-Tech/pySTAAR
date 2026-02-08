@@ -18,7 +18,7 @@ from scipy.optimize import minimize_scalar
 from scipy.special import logit
 from scipy.sparse.linalg import splu
 
-from .data import load_dataset
+from .data import clear_dataset_cache, get_dataset_cache_info, load_dataset
 from .models import (
     _reml_nll_binomial_tau,
     fit_null_glm,
@@ -55,6 +55,37 @@ AI_POP_WEIGHTS_1_1_FILE = "example_ai_pop_weights_1_1.csv"
 AI_POP_WEIGHTS_1_25_FILE = "example_ai_pop_weights_1_25.csv"
 _ORIGINAL_FIT_NULL_GLMMKIN = fit_null_glmmkin
 _ORIGINAL_AI_STAAR = ai_staar
+
+
+def _cache_info_to_dict(cache_info) -> dict[str, int]:
+    return {
+        "hits": int(cache_info.hits),
+        "misses": int(cache_info.misses),
+        "maxsize": int(cache_info.maxsize),
+        "currsize": int(cache_info.currsize),
+    }
+
+
+def get_runtime_cache_info() -> dict[str, dict[str, dict[str, int]]]:
+    return {
+        "workflows": {
+            "related_nullmodel": _cache_info_to_dict(_fit_related_nullmodel_cached.cache_info()),
+            "related_ai_results": _cache_info_to_dict(_related_ai_common_cached.cache_info()),
+            "ai_file_metadata": _cache_info_to_dict(_load_ai_metadata_from_files_cached.cache_info()),
+        },
+        "data": get_dataset_cache_info(),
+    }
+
+
+def clear_runtime_caches(include_dataset_cache: bool = True) -> dict[str, dict[str, dict[str, int]]]:
+    before = get_runtime_cache_info()
+    _fit_related_nullmodel_cached.cache_clear()
+    _related_ai_common_cached.cache_clear()
+    _load_ai_metadata_from_files_cached.cache_clear()
+    if include_dataset_cache:
+        clear_dataset_cache()
+    after = get_runtime_cache_info()
+    return {"before": before, "after": after}
 
 
 def _num_rare_variants(genotype: np.ndarray, rare_maf_cutoff: float) -> int:

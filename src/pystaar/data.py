@@ -130,6 +130,30 @@ def load_example_dataset() -> ExampleDataset:
     return load_named_dataset("example")
 
 
+def _cache_info_to_dict(cache_info) -> dict[str, int]:
+    return {
+        "hits": int(cache_info.hits),
+        "misses": int(cache_info.misses),
+        "maxsize": int(cache_info.maxsize),
+        "currsize": int(cache_info.currsize),
+    }
+
+
+def get_dataset_cache_info() -> dict[str, dict[str, int]]:
+    return {
+        "named_dataset": _cache_info_to_dict(_load_named_dataset_cached.cache_info()),
+        "directory_dataset": _cache_info_to_dict(_load_dataset_from_directory_cached.cache_info()),
+    }
+
+
+def clear_dataset_cache() -> dict[str, dict[str, dict[str, int]]]:
+    before = get_dataset_cache_info()
+    _load_named_dataset_cached.cache_clear()
+    _load_dataset_from_directory_cached.cache_clear()
+    after = get_dataset_cache_info()
+    return {"before": before, "after": after}
+
+
 def load_dataset(dataset: str | STAARDataset) -> STAARDataset:
     if isinstance(dataset, STAARDataset):
         return dataset

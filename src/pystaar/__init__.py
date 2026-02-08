@@ -28,6 +28,8 @@ from .workflows import (
     ai_staar_related_sparse_glmmkin_find_weight,
     ai_staar_unrelated_glm,
     ai_staar_unrelated_glm_find_weight,
+    clear_runtime_caches,
+    get_runtime_cache_info,
     indiv_score_related_dense_glmmkin,
     indiv_score_related_dense_glmmkin_cond,
     indiv_score_related_sparse_glmmkin,
@@ -90,4 +92,6 @@ __all__ = [
     "ai_staar_unrelated_glm_find_weight",
     "ai_staar_related_sparse_glmmkin_find_weight",
     "ai_staar_related_dense_glmmkin_find_weight",
+    "get_runtime_cache_info",
+    "clear_runtime_caches",
 ]

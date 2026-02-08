@@ -40,6 +40,6 @@ print(res["results_STAAR_O"])
 
 ## Current Parity Policy
 
-- Functional migration scope is complete (`STAAR-1` through `STAAR-41`).
+- Functional migration scope is complete through `STAAR-56`.
 - Related-workflow parity runs on pure Python paths.
-- Approved parity tolerance relaxation exists for affected related sentinels (up to `rtol=5e-4`), tracked in `reports/deviations.md` (`DEV-001`).
+- Historical tolerance deviation (`DEV-001`) is closed; current parity status and artifact references live in `reports/summary.md` and `reports/deviations.md`.

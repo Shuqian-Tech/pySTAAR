@@ -55,3 +55,22 @@ p = CCT([0.01, 0.2, 0.5])
 
 - 先用 `load_example_dataset()` 检查流程。
 - 如遇 shape 错误，优先检查 `geno/phred/pheno` 行列是否匹配。
+
+## 5. 运行时缓存管理
+
+`pySTAAR` 在重复调用 workflow 时会使用缓存来减少重复计算。可通过以下 API 查看/清理：
+
+```python
+from pystaar import get_runtime_cache_info, clear_runtime_caches
+
+info = get_runtime_cache_info()
+print(info["workflows"]["related_nullmodel"]["currsize"])
+
+clear_runtime_caches(include_dataset_cache=True)
+```
+
+说明：
+
+- `get_runtime_cache_info()` 返回 workflow 层和数据加载层的缓存命中/容量信息。
+- `clear_runtime_caches()` 默认同时清理 workflow 缓存和数据集缓存。
+- 若希望保留数据集缓存，仅清理 workflow 缓存，可设置 `include_dataset_cache=False`。

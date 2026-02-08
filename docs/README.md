@@ -36,4 +36,4 @@ print(res["results_STAAR_O"])
 
 ## Parity note
 
-Functional migration scope is complete. Related-workflow parity uses approved relaxed tolerances for affected sentinels (tracked in `reports/deviations.md`, `DEV-001`).
+Functional migration scope is complete through `STAAR-56`. Related-workflow parity runs on pure Python paths; current parity and deviation history are tracked in `reports/summary.md` and `reports/deviations.md`.

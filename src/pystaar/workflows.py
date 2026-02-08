@@ -5,6 +5,7 @@ matching the scenario specs under `specs/`.
 """
 
 from __future__ import annotations
+from dataclasses import replace
 from functools import lru_cache
 from pathlib import Path
 from types import SimpleNamespace
@@ -51,6 +52,7 @@ INDIV_SAMPLE_VARIANT_INDICES = (1, 2, 10, 50, 100, 160)
 AI_POP_GROUPS_FILE = "example_ai_pop_groups.csv"
 AI_POP_WEIGHTS_1_1_FILE = "example_ai_pop_weights_1_1.csv"
 AI_POP_WEIGHTS_1_25_FILE = "example_ai_pop_weights_1_25.csv"
+_ORIGINAL_FIT_NULL_GLMMKIN = fit_null_glmmkin
 
 
 def _num_rare_variants(genotype: np.ndarray, rare_maf_cutoff: float) -> int:
@@ -86,6 +88,71 @@ def _load_related_precomputed_theta(
         BASELINE_GLMMKIN_THETA_SPARSE.copy()
         if sparse
         else BASELINE_GLMMKIN_THETA_DENSE.copy()
+    )
+
+
+def _normalize_dataset_cache_key(dataset: str) -> str:
+    dataset_path = Path(dataset).expanduser()
+    if dataset_path.exists() and dataset_path.is_dir():
+        return str(dataset_path.resolve())
+    return dataset
+
+
+@lru_cache(maxsize=32)
+def _fit_related_nullmodel_cached(
+    dataset_key: str,
+    sparse: bool,
+    use_precomputed_artifacts: bool,
+):
+    data = load_dataset(dataset_key)
+    kins = data.kins_sparse if sparse else data.kins_dense
+
+    precomputed_scaled = _load_related_precomputed_scaled_residuals(
+        genotype=data.geno,
+        use_precomputed_artifacts=use_precomputed_artifacts,
+    )
+    return fit_null_glmmkin(
+        data.pheno_related,
+        kins=kins,
+        sparse_kins=sparse,
+        precomputed_scaled_residuals=precomputed_scaled,
+        precomputed_theta=_load_related_precomputed_theta(
+            sparse=sparse,
+            use_precomputed_artifacts=use_precomputed_artifacts,
+        ),
+    )
+
+
+def _fit_related_nullmodel(
+    dataset: str,
+    data,
+    sparse: bool,
+    use_precomputed_artifacts: bool,
+):
+    if isinstance(dataset, str) and fit_null_glmmkin is _ORIGINAL_FIT_NULL_GLMMKIN:
+        dataset_key = _normalize_dataset_cache_key(dataset)
+        return replace(
+            _fit_related_nullmodel_cached(
+                dataset_key=dataset_key,
+                sparse=sparse,
+                use_precomputed_artifacts=use_precomputed_artifacts,
+            )
+        )
+
+    kins = data.kins_sparse if sparse else data.kins_dense
+    precomputed_scaled = _load_related_precomputed_scaled_residuals(
+        genotype=data.geno,
+        use_precomputed_artifacts=use_precomputed_artifacts,
+    )
+    return fit_null_glmmkin(
+        data.pheno_related,
+        kins=kins,
+        sparse_kins=sparse,
+        precomputed_scaled_residuals=precomputed_scaled,
+        precomputed_theta=_load_related_precomputed_theta(
+            sparse=sparse,
+            use_precomputed_artifacts=use_precomputed_artifacts,
+        ),
     )
 
 
@@ -820,22 +887,11 @@ def _related_common(
     np.random.seed(seed)
 
     data = load_dataset(dataset)
-    kins = data.kins_sparse if sparse else data.kins_dense
-
-    precomputed_scaled = _load_related_precomputed_scaled_residuals(
-        genotype=data.geno,
+    obj_nullmodel = _fit_related_nullmodel(
+        dataset=dataset,
+        data=data,
+        sparse=sparse,
         use_precomputed_artifacts=use_precomputed_artifacts,
-    )
-
-    obj_nullmodel = fit_null_glmmkin(
-        data.pheno_related,
-        kins=kins,
-        sparse_kins=sparse,
-        precomputed_scaled_residuals=precomputed_scaled,
-        precomputed_theta=_load_related_precomputed_theta(
-            sparse=sparse,
-            use_precomputed_artifacts=use_precomputed_artifacts,
-        ),
     )
 
     results = staar(
@@ -878,7 +934,6 @@ def _related_ai_common(
     np.random.seed(seed)
 
     data = load_dataset(dataset)
-    kins = data.kins_sparse if sparse else data.kins_dense
     pop_groups, pop_levels, pop_weights_1_1, pop_weights_1_25 = _resolve_ai_metadata(
         dataset=dataset,
         num_samples=data.geno.shape[0],
@@ -888,20 +943,11 @@ def _related_ai_common(
         pop_levels=pop_levels,
     )
 
-    precomputed_scaled = _load_related_precomputed_scaled_residuals(
-        genotype=data.geno,
+    obj_nullmodel = _fit_related_nullmodel(
+        dataset=dataset,
+        data=data,
+        sparse=sparse,
         use_precomputed_artifacts=use_precomputed_artifacts,
-    )
-
-    obj_nullmodel = fit_null_glmmkin(
-        data.pheno_related,
-        kins=kins,
-        sparse_kins=sparse,
-        precomputed_scaled_residuals=precomputed_scaled,
-        precomputed_theta=_load_related_precomputed_theta(
-            sparse=sparse,
-            use_precomputed_artifacts=use_precomputed_artifacts,
-        ),
     )
 
     obj_nullmodel.pop_groups = pop_groups
@@ -943,22 +989,11 @@ def _related_indiv_common(
     np.random.seed(seed)
 
     data = load_dataset(dataset)
-    kins = data.kins_sparse if sparse else data.kins_dense
-
-    precomputed_scaled = _load_related_precomputed_scaled_residuals(
-        genotype=data.geno,
+    obj_nullmodel = _fit_related_nullmodel(
+        dataset=dataset,
+        data=data,
+        sparse=sparse,
         use_precomputed_artifacts=use_precomputed_artifacts,
-    )
-
-    obj_nullmodel = fit_null_glmmkin(
-        data.pheno_related,
-        kins=kins,
-        sparse_kins=sparse,
-        precomputed_scaled_residuals=precomputed_scaled,
-        precomputed_theta=_load_related_precomputed_theta(
-            sparse=sparse,
-            use_precomputed_artifacts=use_precomputed_artifacts,
-        ),
     )
 
     results = indiv_score_test_region(
@@ -1018,21 +1053,11 @@ def _related_common_cond(
     np.random.seed(seed)
 
     data = load_dataset(dataset)
-    kins = data.kins_sparse if sparse else data.kins_dense
-
-    precomputed_scaled = _load_related_precomputed_scaled_residuals(
-        genotype=data.geno,
+    obj_nullmodel = _fit_related_nullmodel(
+        dataset=dataset,
+        data=data,
+        sparse=sparse,
         use_precomputed_artifacts=use_precomputed_artifacts,
-    )
-    obj_nullmodel = fit_null_glmmkin(
-        data.pheno_related,
-        kins=kins,
-        sparse_kins=sparse,
-        precomputed_scaled_residuals=precomputed_scaled,
-        precomputed_theta=_load_related_precomputed_theta(
-            sparse=sparse,
-            use_precomputed_artifacts=use_precomputed_artifacts,
-        ),
     )
 
     adj_variant_indices = tuple(int(idx) for idx in adj_variant_indices)
@@ -1079,21 +1104,11 @@ def _related_indiv_common_cond(
     np.random.seed(seed)
 
     data = load_dataset(dataset)
-    kins = data.kins_sparse if sparse else data.kins_dense
-
-    precomputed_scaled = _load_related_precomputed_scaled_residuals(
-        genotype=data.geno,
+    obj_nullmodel = _fit_related_nullmodel(
+        dataset=dataset,
+        data=data,
+        sparse=sparse,
         use_precomputed_artifacts=use_precomputed_artifacts,
-    )
-    obj_nullmodel = fit_null_glmmkin(
-        data.pheno_related,
-        kins=kins,
-        sparse_kins=sparse,
-        precomputed_scaled_residuals=precomputed_scaled,
-        precomputed_theta=_load_related_precomputed_theta(
-            sparse=sparse,
-            use_precomputed_artifacts=use_precomputed_artifacts,
-        ),
     )
 
     adj_variant_indices = tuple(int(idx) for idx in adj_variant_indices)

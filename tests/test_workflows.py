@@ -1,11 +1,13 @@
 import math
 import shutil
+from types import SimpleNamespace
 
 import pytest
 
 from pystaar import workflows
 from pystaar import staar_core
 from pystaar.data import load_example_dataset
+from pystaar.models import NullModelGLMMKin
 
 
 def _load_runtime_ai_metadata_from_example_files():
@@ -108,6 +110,75 @@ def test_related_workflow_precomputed_mode_does_not_load_glmm_cov_artifacts(monk
     )
 
     assert results["num_variant"] == 153.0
+
+
+def test_related_nullmodel_cache_reuses_fit_for_string_dataset(monkeypatch):
+    dummy_data = SimpleNamespace(
+        geno=workflows.np.array([[0.0, 1.0, 2.0], [1.0, 0.0, 1.0]], dtype=float),
+        phred=workflows.np.zeros((3, 1), dtype=float),
+        pheno_related=workflows.pd.DataFrame(
+            {
+                "Y": [0.0, 1.0],
+                "X1": [0.0, 1.0],
+                "X2": [1.0, 0.0],
+            }
+        ),
+        kins_sparse=workflows.sp.identity(2, format="csc"),
+        kins_dense=workflows.sp.identity(2, format="csc"),
+    )
+
+    fit_calls = {"count": 0}
+
+    def _fake_fit_null_glmmkin(*args, **kwargs):
+        fit_calls["count"] += 1
+        zeros = workflows.np.zeros(2, dtype=float)
+        return NullModelGLMMKin(
+            X=workflows.np.zeros((2, 3), dtype=float),
+            y=zeros,
+            fitted=zeros,
+            residuals=zeros,
+            scaled_residuals=zeros,
+            beta=workflows.np.zeros(3, dtype=float),
+            theta=workflows.np.array([1.0, 1.0], dtype=float),
+            cov=workflows.np.eye(3, dtype=float),
+            sigma_solver=None,
+            Sigma_iX=workflows.np.zeros((2, 3), dtype=float),
+            sparse_kins=True,
+        )
+
+    def _fake_staar(*args, **kwargs):
+        return {
+            "num_variant": 2.0,
+            "results_STAAR_O": 0.11,
+            "results_STAAR_S_1_25": {"STAAR-S(1,25)": 0.21},
+            "results_STAAR_S_1_1": {"STAAR-S(1,1)": 0.22},
+            "results_STAAR_B_1_25": {"STAAR-B(1,25)": 0.31},
+            "results_STAAR_B_1_1": {"STAAR-B(1,1)": 0.32},
+            "results_STAAR_A_1_25": {"STAAR-A(1,25)": 0.41},
+            "results_STAAR_A_1_1": {"STAAR-A(1,1)": 0.42},
+        }
+
+    monkeypatch.setattr(workflows, "load_dataset", lambda dataset: dummy_data)
+    monkeypatch.setattr(workflows, "fit_null_glmmkin", _fake_fit_null_glmmkin)
+    monkeypatch.setattr(workflows, "_ORIGINAL_FIT_NULL_GLMMKIN", _fake_fit_null_glmmkin)
+    monkeypatch.setattr(workflows, "staar", _fake_staar)
+
+    workflows._fit_related_nullmodel_cached.cache_clear()
+    try:
+        first = workflows.staar_related_sparse_glmmkin(
+            dataset="example",
+            use_precomputed_artifacts=False,
+        )
+        second = workflows.staar_related_sparse_glmmkin(
+            dataset="example",
+            use_precomputed_artifacts=False,
+        )
+    finally:
+        workflows._fit_related_nullmodel_cached.cache_clear()
+
+    assert fit_calls["count"] == 1
+    assert first["num_variant"] == 2.0
+    assert second["results_STAAR_O"] == pytest.approx(0.11)
 
 
 def test_related_workflow_precomputed_mode_uses_scaled_without_cov_for_baseline_cutoff(

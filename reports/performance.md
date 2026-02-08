@@ -67,6 +67,22 @@ Observed median improvement versus the post-`STAAR-42` probe baseline:
 
 - `staar_related_sparse_binary_spa_pure`: `2.343567s` -> `0.909528s` (`~2.58x`)
 
+## Optimization Update (2026-02-07, STAAR-55)
+
+Targeted Phase 3 optimization work for `STAAR-55` is captured in:
+
+- `scripts/run_phase3_opt_55_benchmarks.py`
+- `benchmarks/phase3_opt_55_raw.csv`
+- `benchmarks/phase3_opt_55_summary.csv`
+- `benchmarks/phase3_opt_55_meta.json`
+- `benchmarks/phase3_opt_55_comparison.csv`
+- `reports/performance_opt_55.md`
+
+Observed median improvements in targeted no-cache vs cache benchmark mode:
+
+- `staar_related_sparse_glmmkin_pure`: `0.968130s` -> `0.192804s` (`~5.02x`)
+- `ai_staar_related_sparse_glmmkin_find_weight_pure`: `1.588007s` -> `0.817542s` (`~1.94x`)
+
 ## Non-Example Coverage Update (2026-02-07, STAAR-45)
 
 Non-`example` runtime-directory performance coverage is captured in:

@@ -1,0 +1,3 @@
+scenario_id,baseline_no_cache_median_seconds,optimized_cache_median_seconds,delta_seconds,speedup_vs_baseline_no_cache
+staar_related_sparse_glmmkin_pure,0.9681304590776563,0.19280350010376424,-0.775326958973892,5.021332385338552
+ai_staar_related_sparse_glmmkin_find_weight_pure,1.5880065830424428,0.8175418329192325,-0.7704647501232103,1.9424163010375604

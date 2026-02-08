@@ -4,7 +4,7 @@ Status as of 2026-02-07:
 
 - Phase: 3 (Performance and backends; baseline benchmark collection started)
 - Parity status: `pytest tests/parity -q` passes (`55 passed`) on the documented reference backend.
-- Full test status: `pytest -q` passes (`122 passed`).
+- Full test status: `pytest -q` passes (`123 passed`).
 - Scenarios implemented:
   - `ai_staar_related_sparse_glmmkin_find_weight`
   - `ai_staar_related_dense_glmmkin_find_weight`
@@ -58,6 +58,7 @@ Status as of 2026-02-07:
   - Phase 3 optimization artifacts (`STAAR-43`/`STAAR-44`): `benchmarks/phase3_opt_43_44_raw.csv`, `benchmarks/phase3_opt_43_44_summary.csv`, `benchmarks/phase3_opt_43_44_meta.json`, `benchmarks/phase3_opt_43_44_comparison.csv`, `reports/performance_opt_43_44.md`
   - Post-`STAAR-42` optimization targeting probe: `benchmarks/phase3_post42_probe_raw.csv`, `benchmarks/phase3_post42_probe_summary.csv`, `benchmarks/phase3_post42_probe_meta.json`, `reports/performance_post42_probe.md`
   - Phase 3 optimization artifacts (`STAAR-46`): `benchmarks/phase3_opt_46_raw.csv`, `benchmarks/phase3_opt_46_summary.csv`, `benchmarks/phase3_opt_46_meta.json`, `benchmarks/phase3_opt_46_comparison.csv`, `reports/performance_opt_46.md`
+  - Phase 3 optimization artifacts (`STAAR-55`): `scripts/run_phase3_opt_55_benchmarks.py`, `benchmarks/phase3_opt_55_raw.csv`, `benchmarks/phase3_opt_55_summary.csv`, `benchmarks/phase3_opt_55_meta.json`, `benchmarks/phase3_opt_55_comparison.csv`, `reports/performance_opt_55.md`
   - Non-example performance probe (`STAAR-45`): `benchmarks/phase3_nonexample_raw.csv`, `benchmarks/phase3_nonexample_summary.csv`, `benchmarks/phase3_nonexample_meta.json`, `reports/performance_nonexample.md`
   - Distinct non-example baseline artifacts (`STAAR-47`): `baselines/nonexample601_sim_data.rds`, `baselines/nonexample601_sim_metadata.json`, `baselines/nonexample601_fingerprint.json`, `baselines/unrelated_glm_nonexample601_sentinels.json`, and runtime dataset files `data/nonexample601_*`
   - Distinct non-example related baseline artifact (`STAAR-48`): `baselines/related_sparse_glmmkin_nonexample601_sentinels.json` with parity scenario `specs/staar_related_sparse_glmmkin_nonexample601.yaml`
@@ -83,6 +84,7 @@ Open compliance notes:
 - `DEV-001` is retained as a historical record in `reports/deviations.md` and is no longer active release gating.
 - Cross-language baseline benchmark is complete on the reference backend; geometric-mean Python speedup vs R across measured scenarios is approximately `1.64x` (see `reports/performance.md`).
 - `STAAR-46` optimized the high-cost related sparse binary pure path: `staar_related_sparse_binary_spa_pure` median improved from `2.343567s` to `0.909528s` (`~2.58x`) versus the post-`STAAR-42` probe baseline.
+- `STAAR-55` optimized repeated related-GLMM pure-path execution via cached related null-model fitting: `staar_related_sparse_glmmkin_pure` improved from `0.968130s` to `0.192804s` (`~5.02x`) and `ai_staar_related_sparse_glmmkin_find_weight_pure` improved from `1.588007s` to `0.817542s` (`~1.94x`) in targeted no-cache vs cache benchmarks.
 - `STAAR-45` adds parity + performance coverage for non-`example` runtime directory datasets via `staar_unrelated_glm_nonexample_dir`.
 - `STAAR-47` adds distinct non-clone non-`example` R-baseline parity coverage via `staar_unrelated_glm_nonexample601` (`dataset=nonexample601`, sentinels in `baselines/unrelated_glm_nonexample601_sentinels.json`).
 - `STAAR-48` expands distinct non-`example` parity into a related workflow family via `staar_related_sparse_glmmkin_nonexample601`.
@@ -102,14 +104,14 @@ Open compliance notes:
 Phase 2 handoff status:
 
 - Planned migration scope in `reports/issues.md` is complete (`STAAR-1` through `STAAR-29` resolved).
-- Full migration checklist in `reports/issues.md` is complete through `STAAR-54`; no open parity-robustness follow-up remains.
+- Full migration checklist in `reports/issues.md` is complete through `STAAR-55`; no open parity-robustness follow-up remains.
 - Current state has completed Phase 2 implementation and moved into Phase 3 baseline measurement.
 - Release sign-off can reference `DEV-001` as closed historical context only.
 
 PR-ready notes (copy into PR description):
 
 - Parity on reference backend: `pytest tests/parity -q` -> `55 passed`.
-- Full test suite: `pytest -q` -> `122 passed`.
+- Full test suite: `pytest -q` -> `123 passed`.
 - Deviations: no active deviations; `DEV-001` is closed and retained historically in `reports/deviations.md`.
 - Required named roles per policy:
   - Migration owner: `<fill>`

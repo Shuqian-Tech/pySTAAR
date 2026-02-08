@@ -1,0 +1,31 @@
+{
+  "generated_utc": "2026-02-08T05:21:47Z",
+  "warmup_runs": 0,
+  "measured_runs": 1,
+  "dataset_fingerprint_file": "baselines/example_fingerprint.json",
+  "reference_backend_file": "reports/reference_backend.md",
+  "r_environment_file": "baselines/r_environment.json",
+  "r_version": "4.5.0",
+  "staar_version": "0.9.8",
+  "platform": {
+    "sysname": "Darwin",
+    "release": "24.6.0",
+    "version": "Darwin Kernel Version 24.6.0: Mon Jul 14 11:30:40 PDT 2025; root:xnu-11417.140.69~1/RELEASE_ARM64_T8132",
+    "nodename": "xiaozhoumacbook-pro.tail6c359c.ts.net",
+    "machine": "arm64",
+    "login": "root",
+    "user": "xiaozhouwang",
+    "effective_user": "xiaozhouwang"
+  },
+  "scenarios": ["staar_unrelated_glm", "staar_related_sparse_glmmkin_pure", "staar_unrelated_binary_spa", "staar_related_sparse_binary_spa_pure", "staar_unrelated_glm_cond", "indiv_score_unrelated_glm", "ai_staar_unrelated_glm", "ai_staar_related_sparse_glmmkin_find_weight_pure"],
+  "sentinel_checks": {
+    "staar_unrelated_glm.run1": 0.0233,
+    "staar_related_sparse_glmmkin_pure.run1": 0.1397,
+    "staar_unrelated_binary_spa.run1": 0.2048,
+    "staar_related_sparse_binary_spa_pure.run1": 0.2336,
+    "staar_unrelated_glm_cond.run1": 0.0229,
+    "indiv_score_unrelated_glm.run1": 0.0003,
+    "ai_staar_unrelated_glm.run1": 0.0208,
+    "ai_staar_related_sparse_glmmkin_find_weight_pure.run1": 0.1437
+  }
+}

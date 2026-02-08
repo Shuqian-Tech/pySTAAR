@@ -1,0 +1,9 @@
+scenario_id,run_type,run_index,seconds,sentinel_value
+staar_unrelated_glm,measured,1,0.18873699998948723,0.02326161035930591
+staar_related_sparse_glmmkin_pure,measured,1,1.082701624953188,0.13966348237712975
+staar_unrelated_binary_spa,measured,1,0.15052916703280061,0.2047522366500004
+staar_related_sparse_binary_spa_pure,measured,1,0.8178357909200713,0.2336048073417211
+staar_unrelated_glm_cond,measured,1,0.23130491701886058,0.022907925285680412
+indiv_score_unrelated_glm,measured,1,0.05911404103972018,0.00028090095477744173
+ai_staar_unrelated_glm,measured,1,0.6509715829743072,0.020750151319889852
+ai_staar_related_sparse_glmmkin_find_weight_pure,measured,1,0.8004272080725059,0.14369423193763015

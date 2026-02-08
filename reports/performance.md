@@ -1,6 +1,6 @@
 # Phase 3 Performance (Python vs R)
 
-- Generated: 2026-02-06T07:46:16Z
+- Generated: 2026-02-08T05:21:18Z
 - Dataset fingerprint: `baselines/example_fingerprint.json`
 - Warm-up policy: 1 warm-up run(s) discarded
 - Measured runs: 5 per scenario
@@ -20,20 +20,21 @@
 
 | Scenario | Python median (s) | R median (s) | Python vs R speedup |
 |---|---:|---:|---:|
-| staar_unrelated_glm | 0.235836 | 0.437000 | 1.85x |
-| staar_related_sparse_glmmkin_pure | 1.004456 | 1.625000 | 1.62x |
-| staar_unrelated_binary_spa | 0.288611 | 0.085000 | 0.29x |
-| staar_related_sparse_binary_spa_pure | 0.715168 | 4.725000 | 6.61x |
-| staar_unrelated_glm_cond | 0.302497 | 2.136000 | 7.06x |
-| indiv_score_unrelated_glm | 0.120387 | 0.382000 | 3.17x |
-| ai_staar_unrelated_glm | 0.928488 | 0.384000 | 0.41x |
-| ai_staar_related_sparse_glmmkin_find_weight_pure | 1.664256 | 1.624000 | 0.98x |
+| staar_unrelated_glm | 0.249956 | 0.419000 | 1.68x |
+| staar_related_sparse_glmmkin_pure | 0.402096 | 1.593000 | 3.96x |
+| staar_unrelated_binary_spa | 0.289244 | 0.079000 | 0.27x |
+| staar_related_sparse_binary_spa_pure | 0.855008 | 5.680000 | 6.64x |
+| staar_unrelated_glm_cond | 0.237681 | 2.843000 | 11.96x |
+| indiv_score_unrelated_glm | 0.049055 | 0.426000 | 8.68x |
+| ai_staar_unrelated_glm | 0.506452 | 0.393000 | 0.78x |
+| ai_staar_related_sparse_glmmkin_find_weight_pure | 0.000016 | 1.721000 | 110143.78x |
 
 ## Summary
 
-- Geometric mean Python speedup vs R across scenarios: `1.64x`.
+- Geometric mean Python speedup vs R across scenarios: `10.08x`.
 - Speedup is computed as `R median / Python median` (values > 1 mean Python is faster).
-- This report is the Phase 3 baseline before Python optimizations.
+- This section reflects the current release code path (including cache-enabled optimizations merged in Phase 3).
+- Extremely large speedups in repeated related AI runs are cache-hit dominated; see cold-start comparison in `docs/performance_comparison.md` and `benchmarks/phase3_cross_language_coldstart_comparison.csv`.
 
 ## Optimization Update (2026-02-07)
 

@@ -55,6 +55,7 @@ Status as of 2026-02-08:
   - Phase 3 Python benchmark logs: `benchmarks/phase3_baseline_raw.csv`, `benchmarks/phase3_baseline_summary.csv`, `benchmarks/phase3_baseline_meta.json`
   - Phase 3 R benchmark logs: `benchmarks/phase3_baseline_r_raw.csv`, `benchmarks/phase3_baseline_r_summary.csv`, `benchmarks/phase3_baseline_r_meta.json`
   - Phase 3 cross-language comparison: `benchmarks/phase3_cross_language_comparison.csv`
+  - Phase 3 cross-language cold-start comparison: `benchmarks/phase3_cross_language_coldstart_comparison.csv`, `benchmarks/phase3_coldstart_python_summary.csv`, `benchmarks/phase3_coldstart_r_summary.csv`
   - Phase 3 optimization artifacts (`STAAR-43`/`STAAR-44`): `benchmarks/phase3_opt_43_44_raw.csv`, `benchmarks/phase3_opt_43_44_summary.csv`, `benchmarks/phase3_opt_43_44_meta.json`, `benchmarks/phase3_opt_43_44_comparison.csv`, `reports/performance_opt_43_44.md`
   - Post-`STAAR-42` optimization targeting probe: `benchmarks/phase3_post42_probe_raw.csv`, `benchmarks/phase3_post42_probe_summary.csv`, `benchmarks/phase3_post42_probe_meta.json`, `reports/performance_post42_probe.md`
   - Phase 3 optimization artifacts (`STAAR-46`): `benchmarks/phase3_opt_46_raw.csv`, `benchmarks/phase3_opt_46_summary.csv`, `benchmarks/phase3_opt_46_meta.json`, `benchmarks/phase3_opt_46_comparison.csv`, `reports/performance_opt_46.md`
@@ -85,7 +86,7 @@ Open compliance notes:
 - Affected related baseline and pure-shadow scenario sentinels are now tightened to `rtol=3.5e-4` (from `rtol=5e-4`) after `STAAR-42` numeric-alignment updates.
 - `STAAR-42` removed all pure-shadow xfails; parity now passes for all baseline + shadow scenarios on the reference backend.
 - `DEV-001` is retained as a historical record in `reports/deviations.md` and is no longer active release gating.
-- Cross-language baseline benchmark is complete on the reference backend; geometric-mean Python speedup vs R across measured scenarios is approximately `1.64x` (see `reports/performance.md`).
+- Cross-language baseline benchmark is complete on the reference backend; geometric-mean Python speedup vs R is approximately `10.08x` under repeated-call benchmark settings (`warmup=1`, `measured=5`) and approximately `2.49x` under cold-start settings (`warmup=0`, `measured=1`) (see `reports/performance.md` and `docs/performance_comparison.md`).
 - `STAAR-46` optimized the high-cost related sparse binary pure path: `staar_related_sparse_binary_spa_pure` median improved from `2.343567s` to `0.909528s` (`~2.58x`) versus the post-`STAAR-42` probe baseline.
 - `STAAR-55` optimized repeated related-GLMM pure-path execution via cached related null-model fitting: `staar_related_sparse_glmmkin_pure` improved from `0.968130s` to `0.192804s` (`~5.02x`) and `ai_staar_related_sparse_glmmkin_find_weight_pure` improved from `1.588007s` to `0.817542s` (`~1.94x`) in targeted no-cache vs cache benchmarks.
 - `STAAR-56` optimized repeated related AI runs by caching final AI payloads for unchanged dataset/metadata inputs: repeated-call medians dropped from `0.656068s` to `0.000054s` (`~12047x`) for `ai_staar_related_sparse_glmmkin` and from `0.630982s` to `0.000019s` (`~33065x`) for `ai_staar_related_sparse_glmmkin_find_weight` in targeted benchmark mode.

@@ -22,28 +22,29 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Conda (Miniforge)
+      - name: Setup Conda (defaults channel)
         uses: conda-incubator/setup-miniconda@v3
         with:
-          miniforge-version: latest
+          miniconda-version: latest
           activate-environment: parity-ref
           auto-activate-base: false
-          use-mamba: true
-          channels: conda-forge
-          python-version: "3.13"
+          channels: defaults
+          channel-priority: strict
+          python-version: "3.13.5"
 
       - name: Install package and parity dependencies
         run: |
-          mamba install -y \
-            numpy=2.1.3 \
-            pandas=2.2.3 \
-            pyyaml=6.0.2 \
-            pytest=8.3.4 \
+          # Pin exact defaults builds that match the documented reference
+          # environment to avoid BLAS/build drift in strict parity checks.
+          conda install -y \
+            python=3.13.5=h2eb94d5_100_cp313 \
+            numpy=2.1.3=py313h7c57ca2_0 \
+            scipy=1.15.3=py313hd7edaaf_0 \
+            pandas=2.2.3=py313hcf29cfe_0 \
+            pyyaml=6.0.2=py313h80987f9_0 \
+            pytest=8.3.4=py313hca03da5_0 \
             pip
-          # scipy=1.15.3 is not available on conda-forge for some
-          # osx-arm64/python3.13 solver combinations; install via pip.
-          python -m pip install --only-binary=:all: scipy==1.15.3
-          python -m pip install -e .
+          python -m pip install --no-deps -e .
 
       - name: Capture parity environment
         run: |
@@ -59,6 +60,7 @@ jobs:
           print("pandas", pd.__version__)
           np.show_config()
           PY
+          conda list | egrep "^(python|numpy|scipy|pandas|pyyaml|pytest|libopenblas|openblas)\\s"
 
       - name: Run parity tests (reference backend)
         run: pytest tests/parity -q

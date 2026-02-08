@@ -1,0 +1,9 @@
+# Local heavy artifacts (do not commit)
+data/*
+reports/*
+
+# Keep directory stubs
+!data/.gitkeep
+!reports/.gitkeep
+
+.DS_Store

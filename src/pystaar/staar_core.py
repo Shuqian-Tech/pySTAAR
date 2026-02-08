@@ -110,15 +110,19 @@ def _safe_ratio_square(numerator: float, denominator: float, eps: float = 1e-12)
 
 
 def _eigvalsh_symmetric(matrix: np.ndarray) -> np.ndarray:
-    # Use SciPy/LAPACK eigensolver with overwrite to reduce per-call overhead
-    # in repeated SKAT eigen computations.
+    # NumPy's eigvalsh is substantially faster than SciPy's eigh(eigvals_only=True)
+    # on the current reference backend for repeated SKAT eigen computations.
+    # Keep a SciPy fallback for robustness in case the primary path fails.
     matrix_for_eig = np.array(matrix, dtype=float, copy=True, order="F")
-    return linalg.eigh(
-        matrix_for_eig,
-        eigvals_only=True,
-        check_finite=False,
-        overwrite_a=True,
-    )
+    try:
+        return np.linalg.eigvalsh(matrix_for_eig)
+    except np.linalg.LinAlgError:
+        return linalg.eigh(
+            matrix_for_eig,
+            eigvals_only=True,
+            check_finite=False,
+            overwrite_a=True,
+        )
 
 
 def _k_binary_spa(x: float, muhat: np.ndarray, g: np.ndarray) -> float:

@@ -2,9 +2,9 @@
 
 Status as of 2026-02-08:
 
-- Phase: 3 (Performance and backends; baseline benchmark collection started)
+- Phase: 3 (Performance and backends; optimization + release-hardening)
 - Parity status: `pytest tests/parity -q` passes (`55 passed`) on the documented reference backend.
-- Full test status: `pytest -q` passes (`126 passed`).
+- Full test status: `pytest -q` passes (`128 passed`).
 - Scenarios implemented:
   - `ai_staar_related_sparse_glmmkin_find_weight`
   - `ai_staar_related_dense_glmmkin_find_weight`
@@ -60,6 +60,8 @@ Status as of 2026-02-08:
   - Phase 3 optimization artifacts (`STAAR-46`): `benchmarks/phase3_opt_46_raw.csv`, `benchmarks/phase3_opt_46_summary.csv`, `benchmarks/phase3_opt_46_meta.json`, `benchmarks/phase3_opt_46_comparison.csv`, `reports/performance_opt_46.md`
   - Phase 3 optimization artifacts (`STAAR-55`): `scripts/run_phase3_opt_55_benchmarks.py`, `benchmarks/phase3_opt_55_raw.csv`, `benchmarks/phase3_opt_55_summary.csv`, `benchmarks/phase3_opt_55_meta.json`, `benchmarks/phase3_opt_55_comparison.csv`, `reports/performance_opt_55.md`
   - Phase 3 optimization artifacts (`STAAR-56`): `scripts/run_phase3_opt_56_benchmarks.py`, `benchmarks/phase3_opt_56_raw.csv`, `benchmarks/phase3_opt_56_summary.csv`, `benchmarks/phase3_opt_56_meta.json`, `benchmarks/phase3_opt_56_comparison.csv`, `reports/performance_opt_56.md`
+  - Phase 3 cold-vs-warm runtime benchmark artifacts: `scripts/run_phase3_cold_warm_benchmarks.py`, `benchmarks/phase3_cold_warm_raw.csv`, `benchmarks/phase3_cold_warm_summary.csv`, `benchmarks/phase3_cold_warm_meta.json`, `benchmarks/phase3_cold_warm_comparison.csv`, `reports/performance_cold_warm.md`
+  - Release smoke-check artifacts: `scripts/run_release_smoke_checks.py`, `reports/release_readiness.md`, `reports/release_smoke.json`
   - Non-example performance probe (`STAAR-45`): `benchmarks/phase3_nonexample_raw.csv`, `benchmarks/phase3_nonexample_summary.csv`, `benchmarks/phase3_nonexample_meta.json`, `reports/performance_nonexample.md`
   - Distinct non-example baseline artifacts (`STAAR-47`): `baselines/nonexample601_sim_data.rds`, `baselines/nonexample601_sim_metadata.json`, `baselines/nonexample601_fingerprint.json`, `baselines/unrelated_glm_nonexample601_sentinels.json`, and runtime dataset files `data/nonexample601_*`
   - Distinct non-example related baseline artifact (`STAAR-48`): `baselines/related_sparse_glmmkin_nonexample601_sentinels.json` with parity scenario `specs/staar_related_sparse_glmmkin_nonexample601.yaml`
@@ -87,6 +89,8 @@ Open compliance notes:
 - `STAAR-46` optimized the high-cost related sparse binary pure path: `staar_related_sparse_binary_spa_pure` median improved from `2.343567s` to `0.909528s` (`~2.58x`) versus the post-`STAAR-42` probe baseline.
 - `STAAR-55` optimized repeated related-GLMM pure-path execution via cached related null-model fitting: `staar_related_sparse_glmmkin_pure` improved from `0.968130s` to `0.192804s` (`~5.02x`) and `ai_staar_related_sparse_glmmkin_find_weight_pure` improved from `1.588007s` to `0.817542s` (`~1.94x`) in targeted no-cache vs cache benchmarks.
 - `STAAR-56` optimized repeated related AI runs by caching final AI payloads for unchanged dataset/metadata inputs: repeated-call medians dropped from `0.656068s` to `0.000054s` (`~12047x`) for `ai_staar_related_sparse_glmmkin` and from `0.630982s` to `0.000019s` (`~33065x`) for `ai_staar_related_sparse_glmmkin_find_weight` in targeted benchmark mode.
+- Wheel release smoke checks now pass in fresh-venv install mode and validate workflow execution after install.
+- Runtime datasets are now bundled in wheel builds under `pystaar/_data` to support `dataset="example"` and related workflow defaults after pip installation.
 - `STAAR-45` adds parity + performance coverage for non-`example` runtime directory datasets via `staar_unrelated_glm_nonexample_dir`.
 - `STAAR-47` adds distinct non-clone non-`example` R-baseline parity coverage via `staar_unrelated_glm_nonexample601` (`dataset=nonexample601`, sentinels in `baselines/unrelated_glm_nonexample601_sentinels.json`).
 - `STAAR-48` expands distinct non-`example` parity into a related workflow family via `staar_related_sparse_glmmkin_nonexample601`.
@@ -113,7 +117,7 @@ Phase 2 handoff status:
 PR-ready notes (copy into PR description):
 
 - Parity on reference backend: `pytest tests/parity -q` -> `55 passed`.
-- Full test suite: `pytest -q` -> `126 passed`.
+- Full test suite: `pytest -q` -> `128 passed`.
 - Deviations: no active deviations; `DEV-001` is closed and retained historically in `reports/deviations.md`.
 - Required named roles per policy:
   - Migration owner: `<fill>`

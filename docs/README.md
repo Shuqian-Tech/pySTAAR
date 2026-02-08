@@ -31,6 +31,7 @@ print(res["results_STAAR_O"])
 - Installation: [`installation.md`](installation.md)
 - Tutorials: [`tutorials/`](tutorials/)
 - API output fields: [`api/output_fields.md`](api/output_fields.md)
+- API stability policy: [`api/stability.md`](api/stability.md)
 - R migration guide: [`migration_from_r.md`](migration_from_r.md)
 - Changelog: [`../CHANGELOG.md`](../CHANGELOG.md)
 

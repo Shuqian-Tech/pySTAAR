@@ -99,6 +99,24 @@ Observed median improvements in targeted baseline-vs-cache repeated-call benchma
 - `ai_staar_related_sparse_glmmkin`: `0.656068s` -> `0.000054s` (`~12047x`)
 - `ai_staar_related_sparse_glmmkin_find_weight`: `0.630982s` -> `0.000019s` (`~33065x`)
 
+## Release Hardening Update (2026-02-08, Cold vs Warm)
+
+Cold-process versus warm-inprocess latency measurements are captured in:
+
+- `scripts/run_phase3_cold_warm_benchmarks.py`
+- `benchmarks/phase3_cold_warm_raw.csv`
+- `benchmarks/phase3_cold_warm_summary.csv`
+- `benchmarks/phase3_cold_warm_meta.json`
+- `benchmarks/phase3_cold_warm_comparison.csv`
+- `reports/performance_cold_warm.md`
+
+Observed warm-process median speedups versus cold-process median:
+
+- `staar_unrelated_glm`: `7.44x`
+- `staar_related_sparse_glmmkin_pure`: `8.79x`
+- `staar_related_sparse_binary_spa_pure`: `2.02x`
+- `ai_staar_related_sparse_glmmkin_find_weight_pure`: `48245.53x` (reflects repeat-call cache hit path)
+
 ## Non-Example Coverage Update (2026-02-07, STAAR-45)
 
 Non-`example` runtime-directory performance coverage is captured in:

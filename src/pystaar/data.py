@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from functools import lru_cache
+import os
 from pathlib import Path
 import numpy as np
 import pandas as pd
@@ -11,7 +12,39 @@ import scipy.sparse as sp
 from scipy.io import mmread
 
 
-DATA_DIR = Path(__file__).resolve().parents[2] / "data"
+_REQUIRED_EXAMPLE_FILES = (
+    "example_geno.mtx",
+    "example_phred.csv",
+    "example_pheno_unrelated.csv",
+    "example_pheno_related.csv",
+    "example_kins_sparse.mtx",
+    "example_kins_dense.mtx",
+)
+
+
+def _is_valid_data_dir(path: Path) -> bool:
+    return all((path / filename).exists() for filename in _REQUIRED_EXAMPLE_FILES)
+
+
+def _resolve_data_dir() -> Path:
+    env_dir = os.environ.get("PYSTAAR_DATA_DIR")
+    if env_dir:
+        candidate = Path(env_dir).expanduser().resolve()
+        if _is_valid_data_dir(candidate):
+            return candidate
+        raise ValueError(
+            f"PYSTAAR_DATA_DIR={candidate} does not contain required dataset files."
+        )
+
+    package_data_dir = Path(__file__).resolve().parent / "_data"
+    repo_data_dir = Path(__file__).resolve().parents[2] / "data"
+    for candidate in (repo_data_dir, package_data_dir):
+        if _is_valid_data_dir(candidate):
+            return candidate
+    return repo_data_dir
+
+
+DATA_DIR = _resolve_data_dir()
 
 
 @dataclass

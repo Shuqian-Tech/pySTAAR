@@ -9,8 +9,9 @@ This handoff covers full functional migration of the planned STAAR workflows (`S
 ## Current Validation Status
 
 - Parity suite: `pytest tests/parity -q` -> `55 passed`
-- Full suite: `pytest -q` -> `126 passed`
+- Full suite: `pytest -q` -> `128 passed`
 - Related baseline parity scenarios run on pure-Python paths (`use_precomputed_artifacts: false` in baseline related specs).
+- Wheel release smoke check: `python scripts/run_release_smoke_checks.py` -> `PASS` (artifacts: `reports/release_readiness.md`, `reports/release_smoke.json`)
 
 ## Deviation Summary
 
@@ -27,6 +28,7 @@ This handoff covers full functional migration of the planned STAAR workflows (`S
 - Default related workflows execute fully in Python.
 - Baseline parity does not require precomputed R-derived covariance artifacts.
 - Optional compatibility mode remains available via `use_precomputed_artifacts=True` in workflow APIs but is not part of baseline parity gating.
+- Wheel builds bundle runtime datasets under `pystaar/_data`, so `dataset="example"` workflows run after normal `pip install`.
 
 ## Release Notes Guidance
 
@@ -48,6 +50,7 @@ Include the following points in release notes:
 - `STAAR-54` adds second-seed (`nonexample602`) conditional related parity coverage via `staar_related_sparse_glmmkin_cond_nonexample602`.
 - `STAAR-55` optimizes repeated related-GLMM pure-path runs by caching related null-model fits for string-addressable datasets; targeted no-cache vs cache benchmark shows median improvements `~5.02x` (`staar_related_sparse_glmmkin_pure`) and `~1.94x` (`ai_staar_related_sparse_glmmkin_find_weight_pure`).
 - `STAAR-56` optimizes repeated related AI workflow runs by caching repeated-call AI payloads when dataset/metadata inputs are unchanged; targeted baseline-vs-cache repeated-call benchmark shows median improvements `~12047x` (`ai_staar_related_sparse_glmmkin`) and `~33065x` (`ai_staar_related_sparse_glmmkin_find_weight`).
+- 1.0 release hardening includes wheel-install smoke checks and bundled package datasets so example workflows run in fresh venv installs.
 
 ## Suggested Post-Release Follow-up
 

@@ -18,7 +18,7 @@ from scipy.optimize import minimize_scalar
 from scipy.special import logit
 from scipy.sparse.linalg import splu
 
-from .data import clear_dataset_cache, get_dataset_cache_info, load_dataset
+from .data import DATA_DIR, clear_dataset_cache, get_dataset_cache_info, load_dataset
 from .models import (
     _reml_nll_binomial_tau,
     fit_null_glm,
@@ -36,7 +36,6 @@ from .staar_core import (
     staar_cond,
 )
 
-DATA_DIR = Path(__file__).resolve().parents[2] / "data"
 BASELINE_PRECOMPUTED_RARE_MAF_CUTOFF = 0.05
 BASELINE_COND_METHOD = "optimal"
 BASELINE_COND_ADJ_VARIANT_INDICES = (0, 3)

@@ -99,6 +99,7 @@ print("STAAR-O:", res["results_STAAR_O"])
 - STAAR API：[`api/staar_functions.md`](api/staar_functions.md)
 - 输出字段参考：[`api/output_fields.md`](api/output_fields.md)
 - 工具函数：[`api/utilities.md`](api/utilities.md)
+- API 稳定性策略：[`api/stability.md`](api/stability.md)
 - 变更记录：[`../CHANGELOG.md`](../CHANGELOG.md)
 
 ## 8. FAQ 与边界情况

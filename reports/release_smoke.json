@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-02-08T08:46:02Z",
+  "generated_utc": "2026-02-08T12:57:03Z",
   "ok": true,
   "platform": {
     "machine": "arm64",
@@ -17,18 +17,18 @@
         ".",
         "--no-deps",
         "-w",
-        "/var/folders/4g/l2tqzrz960vgmb3nq4t9xxlh0000gn/T/pystaar_release_smoke_g_s8zo96/wheelhouse"
+        "/var/folders/4g/l2tqzrz960vgmb3nq4t9xxlh0000gn/T/pystaar_release_smoke_99mdqffr/wheelhouse"
       ],
       "cwd": "/Users/xiaozhouwang/Documents/SHUQ/RPack/staar_migration/pySTAAR",
       "label": "build_wheel",
       "returncode": 0,
-      "seconds": 9.534333833958954,
+      "seconds": 4.813931833021343,
       "stderr": "",
-      "stdout": "Processing /Users/xiaozhouwang/Documents/SHUQ/RPack/staar_migration/pySTAAR\n  Installing build dependencies: started\n  Installing build dependencies: finished with status 'done'\n  Getting requirements to build wheel: started\n  Getting requirements to build wheel: finished with status 'done'\n  Preparing metadata (pyproject.toml): started\n  Preparing metadata (pyproject.toml): finished with status 'done'\nBuilding wheels for collected packages: pystaar\n  Building wheel for pystaar (pyproject.toml): started\n  Building wheel for pystaar (pyproject.toml): finished with status 'done'\n  Created wheel for pystaar: filename=pystaar-1.0.0-py3-none-any.whl size=6861933 sha256=f7a32c06b345b31c32c54b37a6d0a04bcaa5c4e739194d373789c1857d48ff7f\n  Stored in directory: /private/var/folders/4g/l2tqzrz960vgmb3nq4t9xxlh0000gn/T/pip-ephem-wheel-cache-6p5f5e6b/wheels/70/c1/55/007c31a70e8f194f2cb0f89e6f2e6bd77b72d07625ca2edc93\nSuccessfully built pystaar"
+      "stdout": "Processing /Users/xiaozhouwang/Documents/SHUQ/RPack/staar_migration/pySTAAR\n  Installing build dependencies: started\n  Installing build dependencies: finished with status 'done'\n  Getting requirements to build wheel: started\n  Getting requirements to build wheel: finished with status 'done'\n  Preparing metadata (pyproject.toml): started\n  Preparing metadata (pyproject.toml): finished with status 'done'\nBuilding wheels for collected packages: pystaar\n  Building wheel for pystaar (pyproject.toml): started\n  Building wheel for pystaar (pyproject.toml): finished with status 'done'\n  Created wheel for pystaar: filename=pystaar-1.0.0-py3-none-any.whl size=6863805 sha256=f3c08d0608fc9f4a26a99a1d868b0c0d868e4d64f79b44b59f46a18e3da57222\n  Stored in directory: /private/var/folders/4g/l2tqzrz960vgmb3nq4t9xxlh0000gn/T/pip-ephem-wheel-cache-k41_i7yw/wheels/70/c1/55/007c31a70e8f194f2cb0f89e6f2e6bd77b72d07625ca2edc93\nSuccessfully built pystaar"
     },
     {
       "command": [
-        "/var/folders/4g/l2tqzrz960vgmb3nq4t9xxlh0000gn/T/pystaar_release_smoke_g_s8zo96/venv/bin/python",
+        "/var/folders/4g/l2tqzrz960vgmb3nq4t9xxlh0000gn/T/pystaar_release_smoke_99mdqffr/venv/bin/python",
         "-m",
         "pip",
         "install",
@@ -38,37 +38,37 @@
       "cwd": null,
       "label": "upgrade_pip",
       "returncode": 0,
-      "seconds": 5.354863416985609,
+      "seconds": 4.112634249962866,
       "stderr": "",
-      "stdout": "Requirement already satisfied: pip in /var/folders/4g/l2tqzrz960vgmb3nq4t9xxlh0000gn/T/pystaar_release_smoke_g_s8zo96/venv/lib/python3.13/site-packages (25.1.1)\nCollecting pip\n  Using cached pip-26.0.1-py3-none-any.whl.metadata (4.7 kB)\nUsing cached pip-26.0.1-py3-none-any.whl (1.8 MB)\nInstalling collected packages: pip\n  Attempting uninstall: pip\n    Found existing installation: pip 25.1.1\n    Uninstalling pip-25.1.1:\n      Successfully uninstalled pip-25.1.1\nSuccessfully installed pip-26.0.1"
+      "stdout": "Requirement already satisfied: pip in /var/folders/4g/l2tqzrz960vgmb3nq4t9xxlh0000gn/T/pystaar_release_smoke_99mdqffr/venv/lib/python3.13/site-packages (25.1.1)\nCollecting pip\n  Using cached pip-26.0.1-py3-none-any.whl.metadata (4.7 kB)\nUsing cached pip-26.0.1-py3-none-any.whl (1.8 MB)\nInstalling collected packages: pip\n  Attempting uninstall: pip\n    Found existing installation: pip 25.1.1\n    Uninstalling pip-25.1.1:\n      Successfully uninstalled pip-25.1.1\nSuccessfully installed pip-26.0.1"
     },
     {
       "command": [
-        "/var/folders/4g/l2tqzrz960vgmb3nq4t9xxlh0000gn/T/pystaar_release_smoke_g_s8zo96/venv/bin/python",
+        "/var/folders/4g/l2tqzrz960vgmb3nq4t9xxlh0000gn/T/pystaar_release_smoke_99mdqffr/venv/bin/python",
         "-m",
         "pip",
         "install",
-        "/var/folders/4g/l2tqzrz960vgmb3nq4t9xxlh0000gn/T/pystaar_release_smoke_g_s8zo96/wheelhouse/pystaar-1.0.0-py3-none-any.whl"
+        "/var/folders/4g/l2tqzrz960vgmb3nq4t9xxlh0000gn/T/pystaar_release_smoke_99mdqffr/wheelhouse/pystaar-1.0.0-py3-none-any.whl"
       ],
       "cwd": null,
       "label": "install_wheel",
       "returncode": 0,
-      "seconds": 26.14412099996116,
+      "seconds": 10.662111332989298,
       "stderr": "",
-      "stdout": "Processing /var/folders/4g/l2tqzrz960vgmb3nq4t9xxlh0000gn/T/pystaar_release_smoke_g_s8zo96/wheelhouse/pystaar-1.0.0-py3-none-any.whl\nCollecting numpy>=1.24 (from pystaar==1.0.0)\n  Using cached numpy-2.4.2-cp313-cp313-macosx_14_0_arm64.whl.metadata (6.6 kB)\nCollecting scipy>=1.10 (from pystaar==1.0.0)\n  Using cached scipy-1.17.0-cp313-cp313-macosx_14_0_arm64.whl.metadata (62 kB)\nCollecting pandas>=2.0 (from pystaar==1.0.0)\n  Using cached pandas-3.0.0-cp313-cp313-macosx_11_0_arm64.whl.metadata (79 kB)\nCollecting pyyaml>=6.0 (from pystaar==1.0.0)\n  Using cached pyyaml-6.0.3-cp313-cp313-macosx_11_0_arm64.whl.metadata (2.4 kB)\nCollecting python-dateutil>=2.8.2 (from pandas>=2.0->pystaar==1.0.0)\n  Using cached python_dateutil-2.9.0.post0-py2.py3-none-any.whl.metadata (8.4 kB)\nCollecting six>=1.5 (from python-dateutil>=2.8.2->pandas>=2.0->pystaar==1.0.0)\n  Using cached six-1.17.0-py2.py3-none-any.whl.metadata (1.7 kB)\nUsing cached numpy-2.4.2-cp313-cp313-macosx_14_0_arm64.whl (5.2 MB)\nUsing cached pandas-3.0.0-cp313-cp313-macosx_11_0_arm64.whl (9.9 MB)\nUsing cached python_dateutil-2.9.0.post0-py2.py3-none-any.whl (229 kB)\nUsing cached pyyaml-6.0.3-cp313-cp313-macosx_11_0_arm64.whl (173 kB)\nUsing cached scipy-1.17.0-cp313-cp313-macosx_14_0_arm64.whl (20.1 MB)\nUsing cached six-1.17.0-py2.py3-none-any.whl (11 kB)\nInstalling collected packages: six, pyyaml, numpy, scipy, python-dateutil, pandas, pystaar\n\nSuccessfully installed numpy-2.4.2 pandas-3.0.0 pystaar-1.0.0 python-dateutil-2.9.0.post0 pyyaml-6.0.3 scipy-1.17.0 six-1.17.0"
+      "stdout": "Processing /var/folders/4g/l2tqzrz960vgmb3nq4t9xxlh0000gn/T/pystaar_release_smoke_99mdqffr/wheelhouse/pystaar-1.0.0-py3-none-any.whl\nCollecting numpy>=1.24 (from pystaar==1.0.0)\n  Using cached numpy-2.4.2-cp313-cp313-macosx_14_0_arm64.whl.metadata (6.6 kB)\nCollecting scipy>=1.10 (from pystaar==1.0.0)\n  Using cached scipy-1.17.0-cp313-cp313-macosx_14_0_arm64.whl.metadata (62 kB)\nCollecting pandas>=2.0 (from pystaar==1.0.0)\n  Using cached pandas-3.0.0-cp313-cp313-macosx_11_0_arm64.whl.metadata (79 kB)\nCollecting pyyaml>=6.0 (from pystaar==1.0.0)\n  Using cached pyyaml-6.0.3-cp313-cp313-macosx_11_0_arm64.whl.metadata (2.4 kB)\nCollecting python-dateutil>=2.8.2 (from pandas>=2.0->pystaar==1.0.0)\n  Using cached python_dateutil-2.9.0.post0-py2.py3-none-any.whl.metadata (8.4 kB)\nCollecting six>=1.5 (from python-dateutil>=2.8.2->pandas>=2.0->pystaar==1.0.0)\n  Using cached six-1.17.0-py2.py3-none-any.whl.metadata (1.7 kB)\nUsing cached numpy-2.4.2-cp313-cp313-macosx_14_0_arm64.whl (5.2 MB)\nUsing cached pandas-3.0.0-cp313-cp313-macosx_11_0_arm64.whl (9.9 MB)\nUsing cached python_dateutil-2.9.0.post0-py2.py3-none-any.whl (229 kB)\nUsing cached pyyaml-6.0.3-cp313-cp313-macosx_11_0_arm64.whl (173 kB)\nUsing cached scipy-1.17.0-cp313-cp313-macosx_14_0_arm64.whl (20.1 MB)\nUsing cached six-1.17.0-py2.py3-none-any.whl (11 kB)\nInstalling collected packages: six, pyyaml, numpy, scipy, python-dateutil, pandas, pystaar\n\nSuccessfully installed numpy-2.4.2 pandas-3.0.0 pystaar-1.0.0 python-dateutil-2.9.0.post0 pyyaml-6.0.3 scipy-1.17.0 six-1.17.0"
     },
     {
       "command": [
-        "/var/folders/4g/l2tqzrz960vgmb3nq4t9xxlh0000gn/T/pystaar_release_smoke_g_s8zo96/venv/bin/python",
+        "/var/folders/4g/l2tqzrz960vgmb3nq4t9xxlh0000gn/T/pystaar_release_smoke_99mdqffr/venv/bin/python",
         "-c",
         "import pystaar\ninfo = pystaar.get_runtime_cache_info()\nassert \"workflows\" in info and \"data\" in info\nresult = pystaar.staar_unrelated_glm(dataset=\"example\", seed=600, rare_maf_cutoff=0.05)\nassert \"results_STAAR_O\" in result\nassert 0.0 <= float(result[\"results_STAAR_O\"]) <= 1.0\nafter = pystaar.clear_runtime_caches(include_dataset_cache=True)\nassert after[\"after\"][\"workflows\"][\"related_nullmodel\"][\"currsize\"] == 0\nprint(\"SMOKE_OK\", float(result[\"results_STAAR_O\"]))"
       ],
       "cwd": null,
       "label": "import_and_workflow_smoke",
       "returncode": 0,
-      "seconds": 29.666195249999873,
+      "seconds": 26.32965383399278,
       "stderr": "",
-      "stdout": "SMOKE_OK 0.02326161035930605"
+      "stdout": "SMOKE_OK 0.023261610359306042"
     }
   ]
 }

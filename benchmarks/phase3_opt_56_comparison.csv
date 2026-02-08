@@ -1,0 +1,3 @@
+scenario_id,baseline_no_ai_result_cache_median_seconds,optimized_ai_result_cache_median_seconds,delta_seconds,speedup_vs_baseline_no_ai_result_cache
+ai_staar_related_sparse_glmmkin,0.6560681250412017,5.445792339742184e-05,-0.6560136671178043,12047.248299450608
+ai_staar_related_sparse_glmmkin_find_weight,0.6309822909533978,1.908303238451481e-05,-0.6309632079210132,33065.095643049746

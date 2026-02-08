@@ -5,6 +5,7 @@ matching the scenario specs under `specs/`.
 """
 
 from __future__ import annotations
+from copy import deepcopy
 from dataclasses import replace
 from functools import lru_cache
 from pathlib import Path
@@ -53,6 +54,7 @@ AI_POP_GROUPS_FILE = "example_ai_pop_groups.csv"
 AI_POP_WEIGHTS_1_1_FILE = "example_ai_pop_weights_1_1.csv"
 AI_POP_WEIGHTS_1_25_FILE = "example_ai_pop_weights_1_25.csv"
 _ORIGINAL_FIT_NULL_GLMMKIN = fit_null_glmmkin
+_ORIGINAL_AI_STAAR = ai_staar
 
 
 def _num_rare_variants(genotype: np.ndarray, rare_maf_cutoff: float) -> int:
@@ -153,6 +155,89 @@ def _fit_related_nullmodel(
             sparse=sparse,
             use_precomputed_artifacts=use_precomputed_artifacts,
         ),
+    )
+
+
+def _run_related_ai_common(
+    dataset: str,
+    seed: int,
+    rare_maf_cutoff: float,
+    sparse: bool,
+    find_weight: bool,
+    use_precomputed_artifacts: bool,
+    pop_groups: np.ndarray | list[str] | tuple[str, ...] | None,
+    pop_weights_1_1: np.ndarray | list[list[float]] | None,
+    pop_weights_1_25: np.ndarray | list[list[float]] | None,
+    pop_levels: list[str] | tuple[str, ...] | None,
+):
+    np.random.seed(seed)
+
+    data = load_dataset(dataset)
+    pop_groups, pop_levels, pop_weights_1_1, pop_weights_1_25 = _resolve_ai_metadata(
+        dataset=dataset,
+        num_samples=data.geno.shape[0],
+        pop_groups=pop_groups,
+        pop_weights_1_1=pop_weights_1_1,
+        pop_weights_1_25=pop_weights_1_25,
+        pop_levels=pop_levels,
+    )
+
+    obj_nullmodel = _fit_related_nullmodel(
+        dataset=dataset,
+        data=data,
+        sparse=sparse,
+        use_precomputed_artifacts=use_precomputed_artifacts,
+    )
+
+    obj_nullmodel.pop_groups = pop_groups
+    obj_nullmodel.pop_levels = pop_levels
+    obj_nullmodel.pop_weights_1_1 = pop_weights_1_1
+    obj_nullmodel.pop_weights_1_25 = pop_weights_1_25
+    results = ai_staar(
+        genotype=data.geno,
+        obj_nullmodel=obj_nullmodel,
+        annotation_phred=data.phred,
+        rare_maf_cutoff=rare_maf_cutoff,
+        find_weight=find_weight,
+    )
+
+    if find_weight:
+        return _summarize_ai_find_weight_results(results, pop_levels)
+
+    return {
+        "num_variant": results["num_variant"],
+        "cMAC": results["cMAC"],
+        "results_STAAR_O": results["results_STAAR_O"],
+        "results_ACAT_O": results["results_ACAT_O"],
+        "results_STAAR_S_1_25": results["results_STAAR_S_1_25"],
+        "results_STAAR_S_1_1": results["results_STAAR_S_1_1"],
+        "results_STAAR_B_1_25": results["results_STAAR_B_1_25"],
+        "results_STAAR_B_1_1": results["results_STAAR_B_1_1"],
+        "results_STAAR_A_1_25": results["results_STAAR_A_1_25"],
+        "results_STAAR_A_1_1": results["results_STAAR_A_1_1"],
+    }
+
+
+@lru_cache(maxsize=32)
+def _related_ai_common_cached(
+    dataset_key: str,
+    seed: int,
+    rare_maf_cutoff: float,
+    sparse: bool,
+    find_weight: bool,
+    use_precomputed_artifacts: bool,
+):
+    return _run_related_ai_common(
+        dataset=dataset_key,
+        seed=seed,
+        rare_maf_cutoff=rare_maf_cutoff,
+        sparse=sparse,
+        find_weight=find_weight,
+        use_precomputed_artifacts=use_precomputed_artifacts,
+        pop_groups=None,
+        pop_weights_1_1=None,
+        pop_weights_1_25=None,
+        pop_levels=None,
     )
 
 
@@ -931,52 +1016,40 @@ def _related_ai_common(
     pop_weights_1_25: np.ndarray | list[list[float]] | None = None,
     pop_levels: list[str] | tuple[str, ...] | None = None,
 ):
-    np.random.seed(seed)
+    runtime_metadata = any(
+        value is not None
+        for value in (pop_groups, pop_weights_1_1, pop_weights_1_25, pop_levels)
+    )
+    if (
+        not runtime_metadata
+        and isinstance(dataset, str)
+        and fit_null_glmmkin is _ORIGINAL_FIT_NULL_GLMMKIN
+        and ai_staar is _ORIGINAL_AI_STAAR
+    ):
+        dataset_key = _normalize_dataset_cache_key(dataset)
+        return deepcopy(
+            _related_ai_common_cached(
+                dataset_key=dataset_key,
+                seed=seed,
+                rare_maf_cutoff=float(rare_maf_cutoff),
+                sparse=sparse,
+                find_weight=find_weight,
+                use_precomputed_artifacts=use_precomputed_artifacts,
+            )
+        )
 
-    data = load_dataset(dataset)
-    pop_groups, pop_levels, pop_weights_1_1, pop_weights_1_25 = _resolve_ai_metadata(
+    return _run_related_ai_common(
         dataset=dataset,
-        num_samples=data.geno.shape[0],
+        seed=seed,
+        rare_maf_cutoff=rare_maf_cutoff,
+        sparse=sparse,
+        find_weight=find_weight,
+        use_precomputed_artifacts=use_precomputed_artifacts,
         pop_groups=pop_groups,
         pop_weights_1_1=pop_weights_1_1,
         pop_weights_1_25=pop_weights_1_25,
         pop_levels=pop_levels,
     )
-
-    obj_nullmodel = _fit_related_nullmodel(
-        dataset=dataset,
-        data=data,
-        sparse=sparse,
-        use_precomputed_artifacts=use_precomputed_artifacts,
-    )
-
-    obj_nullmodel.pop_groups = pop_groups
-    obj_nullmodel.pop_levels = pop_levels
-    obj_nullmodel.pop_weights_1_1 = pop_weights_1_1
-    obj_nullmodel.pop_weights_1_25 = pop_weights_1_25
-    results = ai_staar(
-        genotype=data.geno,
-        obj_nullmodel=obj_nullmodel,
-        annotation_phred=data.phred,
-        rare_maf_cutoff=rare_maf_cutoff,
-        find_weight=find_weight,
-    )
-
-    if find_weight:
-        return _summarize_ai_find_weight_results(results, pop_levels)
-
-    return {
-        "num_variant": results["num_variant"],
-        "cMAC": results["cMAC"],
-        "results_STAAR_O": results["results_STAAR_O"],
-        "results_ACAT_O": results["results_ACAT_O"],
-        "results_STAAR_S_1_25": results["results_STAAR_S_1_25"],
-        "results_STAAR_S_1_1": results["results_STAAR_S_1_1"],
-        "results_STAAR_B_1_25": results["results_STAAR_B_1_25"],
-        "results_STAAR_B_1_1": results["results_STAAR_B_1_1"],
-        "results_STAAR_A_1_25": results["results_STAAR_A_1_25"],
-        "results_STAAR_A_1_1": results["results_STAAR_A_1_1"],
-    }
 
 
 def _related_indiv_common(

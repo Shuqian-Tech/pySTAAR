@@ -6,7 +6,7 @@ import math
 from typing import Dict, List, Tuple
 
 import numpy as np
-from scipy import special, stats
+from scipy import linalg, special, stats
 
 from .staar_stats import cct, cct_pval, saddle
 
@@ -107,6 +107,18 @@ def _safe_ratio_square(numerator: float, denominator: float, eps: float = 1e-12)
             return 0.0
         return np.inf
     return (numerator**2) / denominator
+
+
+def _eigvalsh_symmetric(matrix: np.ndarray) -> np.ndarray:
+    # Use SciPy/LAPACK eigensolver with overwrite to reduce per-call overhead
+    # in repeated SKAT eigen computations.
+    matrix_for_eig = np.array(matrix, dtype=float, copy=True, order="F")
+    return linalg.eigh(
+        matrix_for_eig,
+        eigvals_only=True,
+        check_finite=False,
+        overwrite_a=True,
+    )
 
 
 def _k_binary_spa(x: float, muhat: np.ndarray, g: np.ndarray) -> float:
@@ -574,7 +586,7 @@ def _staartest_pvalues(
             Covw = Covw * (sigma**2)
 
         sum0 = np.sum((x**2) * (w**2))
-        eigenvals = np.linalg.eigvalsh(Covw)
+        eigenvals = _eigvalsh_symmetric(Covw)
         eigenvals[eigenvals < 1e-8] = 0.0
         p_skat = saddle(sum0, eigenvals)
         if p_skat == 2:
@@ -758,7 +770,7 @@ def _staartest_pvalues_smmat(
         Covw = Cov * np.outer(w, w)
 
         sum0 = np.sum((x**2) * (w**2))
-        eigenvals = np.linalg.eigvalsh(Covw)
+        eigenvals = _eigvalsh_symmetric(Covw)
         eigenvals[eigenvals < 1e-8] = 0.0
         p_skat = saddle(sum0, eigenvals)
         if p_skat == 2:

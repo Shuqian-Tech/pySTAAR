@@ -83,6 +83,22 @@ Observed median improvements in targeted no-cache vs cache benchmark mode:
 - `staar_related_sparse_glmmkin_pure`: `0.968130s` -> `0.192804s` (`~5.02x`)
 - `ai_staar_related_sparse_glmmkin_find_weight_pure`: `1.588007s` -> `0.817542s` (`~1.94x`)
 
+## Optimization Update (2026-02-08, STAAR-56)
+
+Targeted Phase 3 optimization work for `STAAR-56` is captured in:
+
+- `scripts/run_phase3_opt_56_benchmarks.py`
+- `benchmarks/phase3_opt_56_raw.csv`
+- `benchmarks/phase3_opt_56_summary.csv`
+- `benchmarks/phase3_opt_56_meta.json`
+- `benchmarks/phase3_opt_56_comparison.csv`
+- `reports/performance_opt_56.md`
+
+Observed median improvements in targeted baseline-vs-cache repeated-call benchmark mode:
+
+- `ai_staar_related_sparse_glmmkin`: `0.656068s` -> `0.000054s` (`~12047x`)
+- `ai_staar_related_sparse_glmmkin_find_weight`: `0.630982s` -> `0.000019s` (`~33065x`)
+
 ## Non-Example Coverage Update (2026-02-07, STAAR-45)
 
 Non-`example` runtime-directory performance coverage is captured in:

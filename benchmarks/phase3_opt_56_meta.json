@@ -1,0 +1,69 @@
+{
+  "dataset_fingerprint_file": "baselines/example_fingerprint.json",
+  "generated_utc": "2026-02-08T02:12:18Z",
+  "measured_runs": 5,
+  "modes": [
+    "baseline_no_ai_result_cache",
+    "optimized_ai_result_cache"
+  ],
+  "platform": {
+    "machine": "arm64",
+    "processor": "arm",
+    "python_version": "3.13.5",
+    "release": "24.6.0",
+    "system": "Darwin"
+  },
+  "python_environment_file": "reports/python_environment.md",
+  "reference_backend_file": "reports/reference_backend.md",
+  "scenarios": [
+    {
+      "function_name": "ai_staar_related_sparse_glmmkin",
+      "kwargs": {
+        "dataset": "example",
+        "rare_maf_cutoff": 0.05,
+        "seed": 600,
+        "use_precomputed_artifacts": false
+      },
+      "scenario_id": "ai_staar_related_sparse_glmmkin",
+      "sentinel_key": "results_STAAR_O"
+    },
+    {
+      "function_name": "ai_staar_related_sparse_glmmkin_find_weight",
+      "kwargs": {
+        "dataset": "example",
+        "rare_maf_cutoff": 0.05,
+        "seed": 600,
+        "use_precomputed_artifacts": false
+      },
+      "scenario_id": "ai_staar_related_sparse_glmmkin_find_weight",
+      "sentinel_key": "results_STAAR_O"
+    }
+  ],
+  "sentinel_checks": {
+    "baseline_no_ai_result_cache.ai_staar_related_sparse_glmmkin.run1": 0.14369423193763015,
+    "baseline_no_ai_result_cache.ai_staar_related_sparse_glmmkin.run2": 0.14369423193763015,
+    "baseline_no_ai_result_cache.ai_staar_related_sparse_glmmkin.run3": 0.14369423193763015,
+    "baseline_no_ai_result_cache.ai_staar_related_sparse_glmmkin.run4": 0.14369423193763015,
+    "baseline_no_ai_result_cache.ai_staar_related_sparse_glmmkin.run5": 0.14369423193763015,
+    "baseline_no_ai_result_cache.ai_staar_related_sparse_glmmkin.warmup1": 0.14369423193763015,
+    "baseline_no_ai_result_cache.ai_staar_related_sparse_glmmkin_find_weight.run1": 0.14369423193763015,
+    "baseline_no_ai_result_cache.ai_staar_related_sparse_glmmkin_find_weight.run2": 0.14369423193763015,
+    "baseline_no_ai_result_cache.ai_staar_related_sparse_glmmkin_find_weight.run3": 0.14369423193763015,
+    "baseline_no_ai_result_cache.ai_staar_related_sparse_glmmkin_find_weight.run4": 0.14369423193763015,
+    "baseline_no_ai_result_cache.ai_staar_related_sparse_glmmkin_find_weight.run5": 0.14369423193763015,
+    "baseline_no_ai_result_cache.ai_staar_related_sparse_glmmkin_find_weight.warmup1": 0.14369423193763015,
+    "optimized_ai_result_cache.ai_staar_related_sparse_glmmkin.run1": 0.14369423193763015,
+    "optimized_ai_result_cache.ai_staar_related_sparse_glmmkin.run2": 0.14369423193763015,
+    "optimized_ai_result_cache.ai_staar_related_sparse_glmmkin.run3": 0.14369423193763015,
+    "optimized_ai_result_cache.ai_staar_related_sparse_glmmkin.run4": 0.14369423193763015,
+    "optimized_ai_result_cache.ai_staar_related_sparse_glmmkin.run5": 0.14369423193763015,
+    "optimized_ai_result_cache.ai_staar_related_sparse_glmmkin.warmup1": 0.14369423193763015,
+    "optimized_ai_result_cache.ai_staar_related_sparse_glmmkin_find_weight.run1": 0.14369423193763015,
+    "optimized_ai_result_cache.ai_staar_related_sparse_glmmkin_find_weight.run2": 0.14369423193763015,
+    "optimized_ai_result_cache.ai_staar_related_sparse_glmmkin_find_weight.run3": 0.14369423193763015,
+    "optimized_ai_result_cache.ai_staar_related_sparse_glmmkin_find_weight.run4": 0.14369423193763015,
+    "optimized_ai_result_cache.ai_staar_related_sparse_glmmkin_find_weight.run5": 0.14369423193763015,
+    "optimized_ai_result_cache.ai_staar_related_sparse_glmmkin_find_weight.warmup1": 0.14369423193763015
+  },
+  "warmup_runs": 1
+}

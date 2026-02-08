@@ -5,7 +5,9 @@ from __future__ import annotations
 import argparse
 import gzip
 import json
+import platform
 import statistics
+import sys
 import time
 from pathlib import Path
 from typing import Any
@@ -14,6 +16,9 @@ import numpy as np
 import pandas as pd
 import scipy.sparse as sp
 from scipy.io import mmread
+import scipy
+
+import pystaar
 
 
 def _to_builtin(value: Any) -> Any:
@@ -227,6 +232,23 @@ def _build_performance(
     return payload
 
 
+def _runtime_meta() -> dict[str, Any]:
+    eig_info = {}
+    if hasattr(pystaar, "get_eigensolver_runtime_info"):
+        try:
+            eig_info = pystaar.get_eigensolver_runtime_info()
+        except Exception:
+            eig_info = {}
+    return {
+        "python_executable": sys.executable,
+        "python_version": platform.python_version(),
+        "numpy_version": np.__version__,
+        "scipy_version": scipy.__version__,
+        "blas_backend_hint": eig_info.get("blas_backend_hint", "unknown"),
+        "eigensolver_runtime": eig_info,
+    }
+
+
 def _render_markdown(report: dict[str, Any]) -> str:
     parity = report["parity"]
     perf = report["performance"]
@@ -334,6 +356,7 @@ def main() -> int:
             "snploc_file": str(snploc_path),
             "r_summary_file": str(r_summary_path),
             "r_benchmark_file": None if r_benchmark_path is None else str(r_benchmark_path),
+            **_runtime_meta(),
         },
         "parity": parity,
         "performance": performance,

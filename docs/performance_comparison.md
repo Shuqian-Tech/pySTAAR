@@ -2,6 +2,13 @@
 
 本页提供 `pySTAAR` 与 R STAAR 的一页式性能视图，便于 release 说明和用户快速判断当前性能状态。
 
+## 0. Official Benchmark Policy
+
+- 官方跨平台性能口径以 **OpenBLAS backend** 为准（用于 macOS/Linux 可复现比较）。
+- macOS 上的 Apple Accelerate 结果可作为本地参考，但不作为官方跨平台基准。
+- 不同 BLAS/LAPACK backend（OpenBLAS / Accelerate / MKL）间的绝对耗时不可直接横向比较。
+- 复现实验环境与安装建议见：`installation.md`。
+
 ## 1. 基线对比（Python vs R）
 
 数据来源：`benchmarks/phase3_cross_language_comparison.csv`（2026-02-08 重跑，统计量为中位数，`warmup=1`，`measured=5`）。
@@ -10,6 +17,7 @@
 - R 环境：`4.5.0`（STAAR `0.9.8`）
 - 速度比定义：`R median / Python median`（>1 表示 Python 更快）
 - 跨场景几何平均加速比：`10.08x`
+- 说明：本节为官方 OpenBLAS 口径；若你在 macOS Accelerate 环境运行，数值可能不同。
 
 | Scenario | Python median (s) | R median (s) | Python vs R |
 |---|---:|---:|---:|

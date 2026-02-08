@@ -43,3 +43,11 @@ def test_cache_management_api_is_exposed():
     assert pystaar.clear_runtime_caches is workflows.clear_runtime_caches
     assert "get_runtime_cache_info" in pystaar.__all__
     assert "clear_runtime_caches" in pystaar.__all__
+
+
+def test_eigensolver_runtime_info_api_is_exposed():
+    info = pystaar.get_eigensolver_runtime_info()
+    assert isinstance(info, dict)
+    assert "blas_backend_hint" in info
+    assert "eigensolver_selected_base" in info
+    assert "get_eigensolver_runtime_info" in pystaar.__all__

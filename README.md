@@ -49,6 +49,7 @@ print("STAAR-O:", res["results_STAAR_O"])
 - 英文快速入门：[`docs/README.md`](docs/README.md)
 - 安装与环境：[`docs/installation.md`](docs/installation.md)
 - 性能对比总览（Python vs R）：[`docs/performance_comparison.md`](docs/performance_comparison.md)
+- 性能口径说明：官方跨平台结论以 OpenBLAS backend 为准；macOS Accelerate 本地参考见 `examples/1kg_parity/README.md`。
 - 本地 1KG 对比示例（数据级 + 模拟完整 workflow）：[`examples/1kg_parity/README.md`](examples/1kg_parity/README.md)
 - 教程：
   - [`docs/tutorials/01_basic_staar.md`](docs/tutorials/01_basic_staar.md)

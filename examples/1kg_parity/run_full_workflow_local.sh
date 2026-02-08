@@ -24,6 +24,19 @@ RUNS="${RUNS:-3}"
 WARMUP="${WARMUP:-1}"
 ATOL="${ATOL:-1e-6}"
 RTOL="${RTOL:-1e-3}"
+PYTHON_BIN="${PYTHON_BIN:-python3}"
+REPORT_TAG="${REPORT_TAG:-}"
+
+if [[ -n "${REPORT_TAG}" ]]; then
+  REPORT_SUFFIX="_${REPORT_TAG}"
+else
+  REPORT_SUFFIX=""
+fi
+
+R_RESULTS_OUT="${REPORT_DIR}/r_full_workflow_results${REPORT_SUFFIX}.json"
+R_BENCHMARK_OUT="${REPORT_DIR}/r_full_workflow_benchmark${REPORT_SUFFIX}.json"
+FULL_JSON_OUT="${REPORT_DIR}/full_workflow_parity_and_perf${REPORT_SUFFIX}.json"
+FULL_MD_OUT="${REPORT_DIR}/full_workflow_parity_and_perf${REPORT_SUFFIX}.md"
 
 mkdir -p "${RAW_DIR}" "${WORKFLOW_DATASET_DIR}" "${REPORT_DIR}"
 
@@ -55,8 +68,8 @@ Rscript "${SCRIPT_DIR}/r/build_simulated_workflow_dataset.R" \
 echo "[2/4] Running R full-workflow benchmark suite..."
 Rscript "${SCRIPT_DIR}/r/run_full_workflow_benchmarks.R" \
   --sim-rds "${WORKFLOW_DATASET_DIR}/sim_workflow_data.rds" \
-  --out-results "${REPORT_DIR}/r_full_workflow_results.json" \
-  --out-benchmark "${REPORT_DIR}/r_full_workflow_benchmark.json" \
+  --out-results "${R_RESULTS_OUT}" \
+  --out-benchmark "${R_BENCHMARK_OUT}" \
   --runs "${RUNS}" \
   --warmup "${WARMUP}" \
   --seed "${SEED}" \
@@ -64,11 +77,13 @@ Rscript "${SCRIPT_DIR}/r/run_full_workflow_benchmarks.R" \
   --adj-variants "${ADJ_VARIANTS}"
 
 echo "[3/4] Running Python suite + R/Python comparison..."
+echo "Using Python interpreter: ${PYTHON_BIN}"
+"${PYTHON_BIN}" -c 'import sys; print("Python executable:", sys.executable); print("Python version:", sys.version.split()[0])'
 PYTHONPATH="${REPO_ROOT}/src:${PYTHONPATH:-}" \
-python3 "${SCRIPT_DIR}/python/run_full_workflow_compare.py" \
+"${PYTHON_BIN}" "${SCRIPT_DIR}/python/run_full_workflow_compare.py" \
   --dataset-dir "${WORKFLOW_DATASET_DIR}" \
-  --r-results "${REPORT_DIR}/r_full_workflow_results.json" \
-  --r-benchmark "${REPORT_DIR}/r_full_workflow_benchmark.json" \
+  --r-results "${R_RESULTS_OUT}" \
+  --r-benchmark "${R_BENCHMARK_OUT}" \
   --runs "${RUNS}" \
   --warmup "${WARMUP}" \
   --seed "${SEED}" \
@@ -76,8 +91,8 @@ python3 "${SCRIPT_DIR}/python/run_full_workflow_compare.py" \
   --adj-variants "${ADJ_VARIANTS}" \
   --atol "${ATOL}" \
   --rtol "${RTOL}" \
-  --out-json "${REPORT_DIR}/full_workflow_parity_and_perf.json" \
-  --out-md "${REPORT_DIR}/full_workflow_parity_and_perf.md"
+  --out-json "${FULL_JSON_OUT}" \
+  --out-md "${FULL_MD_OUT}"
 
 echo "[4/4] Done."
-echo "Main report: ${REPORT_DIR}/full_workflow_parity_and_perf.md"
+echo "Main report: ${FULL_MD_OUT}"

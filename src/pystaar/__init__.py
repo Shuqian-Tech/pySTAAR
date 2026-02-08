@@ -12,6 +12,7 @@ from .models import (
     fit_null_glmmkin_binary_spa,
 )
 from .staar_core import (
+    _get_eigensolver_runtime_info,
     ai_staar,
     indiv_score_test_region,
     indiv_score_test_region_cond,
@@ -94,4 +95,10 @@ __all__ = [
     "ai_staar_related_dense_glmmkin_find_weight",
     "get_runtime_cache_info",
     "clear_runtime_caches",
+    "get_eigensolver_runtime_info",
 ]
+
+
+def get_eigensolver_runtime_info():
+    """Return backend-aware eigensolver runtime selection metadata."""
+    return _get_eigensolver_runtime_info()

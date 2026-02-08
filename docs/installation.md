@@ -45,7 +45,41 @@ pip install pystaar==1.0.0
 - `pandas>=2.0`
 - `pyyaml>=6.0`
 
-## 5. 数据组织规范
+## 5. 性能复现环境（重要）
+
+- `pip install pystaar` 只保证功能可用，不保证不同机器的性能数字一致。
+- 若要复现官方跨平台性能口径，建议使用 OpenBLAS backend（见 `docs/performance_comparison.md`）。
+- macOS 用户可使用 Apple Accelerate backend 作为本地性能参考（在部分场景会更快）。
+
+后端自检命令：
+
+```bash
+python - <<'PY'
+import numpy as np
+np.__config__.show()
+PY
+```
+
+建议在性能测试前固定线程环境变量（示例）：
+
+```bash
+export OMP_NUM_THREADS=1
+export OPENBLAS_NUM_THREADS=1
+export MKL_NUM_THREADS=1
+```
+
+可选：手动覆盖 eigensolver 选择策略（默认自动）：
+
+```bash
+export PYSTAAR_EIGENSOLVER=auto   # auto / numpy / scipy
+export PYSTAAR_EIGENSOLVER_SIZE_THRESHOLD=256
+```
+
+macOS 本地示例（Accelerate/OpenBLAS 对比入口）见：
+
+- `examples/1kg_parity/README.md`
+
+## 6. 数据组织规范
 
 `dataset` 支持目录路径。目录内需要以下文件：
 
@@ -58,7 +92,7 @@ pip install pystaar==1.0.0
 
 其中 phenotype 文件至少包含列：`Y`, `X1`, `X2`。
 
-## 6. 验证安装
+## 7. 验证安装
 
 ```bash
 pytest -q
@@ -86,21 +120,21 @@ PY
 python scripts/run_release_smoke_checks.py
 ```
 
-## 7. 常见安装问题
+## 8. 常见安装问题
 
-### 7.1 `ModuleNotFoundError: pystaar`
+### 8.1 `ModuleNotFoundError: pystaar`
 
 通常是未执行 `pip install -e .`，或当前环境不是安装时的虚拟环境。
 
-### 7.2 稀疏矩阵读取失败
+### 8.2 稀疏矩阵读取失败
 
 请确认 `.mtx` 文件格式正确，且文件路径没有拼写错误。
 
-### 7.3 版本冲突
+### 8.3 版本冲突
 
 优先新建干净虚拟环境，再重新安装。
 
-## 8. 仓库维护者发布（PyPI/TestPyPI）
+## 9. 仓库维护者发布（PyPI/TestPyPI）
 
 仓库已提供发布 workflow：`.github/workflows/publish.yml`。
 

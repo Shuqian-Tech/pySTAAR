@@ -2,7 +2,12 @@
 
 from __future__ import annotations
 
+import contextlib
+import io
 import math
+import os
+import warnings
+from functools import lru_cache
 from typing import Dict, List, Tuple
 
 import numpy as np
@@ -109,20 +114,128 @@ def _safe_ratio_square(numerator: float, denominator: float, eps: float = 1e-12)
     return (numerator**2) / denominator
 
 
-def _eigvalsh_symmetric(matrix: np.ndarray) -> np.ndarray:
-    # NumPy's eigvalsh is substantially faster than SciPy's eigh(eigvals_only=True)
-    # on the current reference backend for repeated SKAT eigen computations.
-    # Keep a SciPy fallback for robustness in case the primary path fails.
-    matrix_for_eig = np.array(matrix, dtype=float, copy=True, order="F")
+_EIGENSOLVER_ENV_VAR = "PYSTAAR_EIGENSOLVER"
+_EIGENSOLVER_SIZE_THRESHOLD_ENV_VAR = "PYSTAAR_EIGENSOLVER_SIZE_THRESHOLD"
+_DEFAULT_EIGENSOLVER_SIZE_THRESHOLD = 256
+
+
+@lru_cache(maxsize=1)
+def _numpy_config_text() -> str:
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            np.__config__.show()
+    return buf.getvalue().lower()
+
+
+@lru_cache(maxsize=1)
+def _blas_backend_hint() -> str:
     try:
-        return np.linalg.eigvalsh(matrix_for_eig)
-    except np.linalg.LinAlgError:
+        config_text = _numpy_config_text()
+    except Exception:
+        return "unknown"
+
+    if "accelerate" in config_text or "veclib" in config_text:
+        return "accelerate"
+    if "openblas" in config_text:
+        return "openblas"
+    if "mkl" in config_text or "oneapi" in config_text:
+        return "mkl"
+    if "blis" in config_text:
+        return "blis"
+    return "unknown"
+
+
+def _eigensolver_policy() -> str:
+    raw = os.environ.get(_EIGENSOLVER_ENV_VAR, "auto").strip().lower()
+    if raw in {"", "auto"}:
+        return "auto"
+    if raw in {"numpy", "np", "eigvalsh"}:
+        return "numpy"
+    if raw in {"scipy", "eigh"}:
+        return "scipy"
+    return "auto"
+
+
+@lru_cache(maxsize=1)
+def _eigensolver_size_threshold() -> int:
+    raw = os.environ.get(_EIGENSOLVER_SIZE_THRESHOLD_ENV_VAR, "").strip()
+    if raw == "":
+        return _DEFAULT_EIGENSOLVER_SIZE_THRESHOLD
+    try:
+        value = int(raw)
+    except ValueError:
+        return _DEFAULT_EIGENSOLVER_SIZE_THRESHOLD
+    return max(0, value)
+
+
+@lru_cache(maxsize=1)
+def _selected_eigensolver() -> str:
+    policy = _eigensolver_policy()
+    if policy != "auto":
+        return policy
+
+    backend = _blas_backend_hint()
+    if backend == "openblas":
+        # Empirically faster for large symmetric eigensystems on our OpenBLAS path.
+        return "scipy"
+    if backend == "accelerate":
+        return "numpy"
+    # Conservative default for unknown backends.
+    return "numpy"
+
+
+def _eigvalsh_scipy(matrix_for_eig: np.ndarray) -> np.ndarray:
+    try:
+        return linalg.eigh(
+            matrix_for_eig,
+            eigvals_only=True,
+            check_finite=False,
+            overwrite_a=True,
+            driver="evd",
+        )
+    except TypeError:
+        # Older SciPy builds may not accept driver explicitly.
         return linalg.eigh(
             matrix_for_eig,
             eigvals_only=True,
             check_finite=False,
             overwrite_a=True,
         )
+
+
+def _get_eigensolver_runtime_info() -> Dict[str, str]:
+    return {
+        "eigensolver_policy": _eigensolver_policy(),
+        "eigensolver_selected_base": _selected_eigensolver(),
+        "blas_backend_hint": _blas_backend_hint(),
+        "eigensolver_env_var": _EIGENSOLVER_ENV_VAR,
+        "eigensolver_size_threshold_env_var": _EIGENSOLVER_SIZE_THRESHOLD_ENV_VAR,
+        "eigensolver_size_threshold": str(_eigensolver_size_threshold()),
+    }
+
+
+def _eigvalsh_symmetric(matrix: np.ndarray) -> np.ndarray:
+    # Backend-aware strategy:
+    # - OpenBLAS: SciPy eigh(evd) is often faster for larger symmetric systems.
+    # - Accelerate: NumPy eigvalsh tends to be faster/stabler.
+    # Primary path always has a fallback to keep robustness.
+    matrix_for_eig = np.array(matrix, dtype=float, copy=True, order="F")
+    selected = _selected_eigensolver()
+    if matrix_for_eig.shape[0] < _eigensolver_size_threshold():
+        selected = "numpy"
+
+    if selected == "scipy":
+        try:
+            return _eigvalsh_scipy(matrix_for_eig)
+        except Exception:
+            return np.linalg.eigvalsh(matrix_for_eig)
+
+    try:
+        return np.linalg.eigvalsh(matrix_for_eig)
+    except np.linalg.LinAlgError:
+        return _eigvalsh_scipy(matrix_for_eig)
 
 
 def _k_binary_spa(x: float, muhat: np.ndarray, g: np.ndarray) -> float:

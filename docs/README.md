@@ -29,6 +29,7 @@ print(res["results_STAAR_O"])
 ## More docs
 
 - Installation: [`installation.md`](installation.md)
+- Performance comparison (Python vs R): [`performance_comparison.md`](performance_comparison.md)
 - Tutorials: [`tutorials/`](tutorials/)
 - API output fields: [`api/output_fields.md`](api/output_fields.md)
 - API stability policy: [`api/stability.md`](api/stability.md)

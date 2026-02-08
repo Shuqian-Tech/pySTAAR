@@ -48,6 +48,7 @@ print("STAAR-O:", res["results_STAAR_O"])
 - 中文快速入门：[`docs/README_CN.md`](docs/README_CN.md)
 - 英文快速入门：[`docs/README.md`](docs/README.md)
 - 安装与环境：[`docs/installation.md`](docs/installation.md)
+- 性能对比总览（Python vs R）：[`docs/performance_comparison.md`](docs/performance_comparison.md)
 - 教程：
   - [`docs/tutorials/01_basic_staar.md`](docs/tutorials/01_basic_staar.md)
   - [`docs/tutorials/02_binary_spa.md`](docs/tutorials/02_binary_spa.md)

@@ -91,6 +91,7 @@ print("STAAR-O:", res["results_STAAR_O"])
 ## 7. 文档导航
 
 - 安装与环境：[`installation.md`](installation.md)
+- 性能对比总览（Python vs R）：[`performance_comparison.md`](performance_comparison.md)
 - R 用户 15 分钟迁移清单：[`migration_r_quickstart_cn.md`](migration_r_quickstart_cn.md)
 - 数据目录模板：[`data_directory_template_cn.md`](data_directory_template_cn.md)
 - 基础教程：[`tutorials/01_basic_staar.md`](tutorials/01_basic_staar.md)

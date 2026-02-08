@@ -19,7 +19,7 @@ pip install -e .
 安装开发测试依赖：
 
 ```bash
-pip install -e .[dev]
+pip install -e '.[dev]'
 ```
 
 ## 3. 发布版用户安装（非开发模式）
@@ -99,3 +99,16 @@ python scripts/run_release_smoke_checks.py
 ### 7.3 版本冲突
 
 优先新建干净虚拟环境，再重新安装。
+
+## 8. 仓库维护者发布（PyPI/TestPyPI）
+
+仓库已提供发布 workflow：`.github/workflows/publish.yml`。
+
+- 自动正式发布：
+  - 在 GitHub 创建并发布一个 Release（`published`）后，workflow 会构建并发布到 PyPI。
+- 手动发布预演：
+  - 在 Actions 中手动触发 `Publish` workflow，`target=testpypi` 发布到 TestPyPI。
+- 手动正式发布：
+  - 在 Actions 中手动触发 `Publish` workflow，`target=pypi` 发布到 PyPI。
+
+发布前请先在仓库 Settings 中配置 GitHub Environments（`testpypi` / `pypi`）并按 Trusted Publishing 绑定对应 Python package。
